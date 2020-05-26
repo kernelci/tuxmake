@@ -27,23 +27,23 @@ by supporting dockerized build environments and providing a consistent command
 line interface to each of those combinations listed above.
 
 For example, wouldn't it be great if a user could install docker and then check
-out a linux source tree and run:
+out a Linux source tree and run:
 
 ```sh
 tuxmake build --kconfig defconfig --target-arch arm64 --toolchain clang-9
 ```
 
-While bit-for-bit [reprodicible
+While bit-for-bit [reproducible
 builds](https://www.kernel.org/doc/html/latest/kbuild/reproducible-builds.html)
 are out of scope for the initial version of this project, the above command
 should be portable such that if there is a problem with the build, any other
 user should be able to use the same command to produce the same build problem.
 
-Such an interface provides portability and simplicity, making arbitrary linux
+Such an interface provides portability and simplicity, making arbitrary Linux
 kernel build combinations easier for developers.
 
 Every step of the build should be clearly shown so that there is no mystery or
-obfiscation during the build.
+obfuscation during the build.
 
 It should not 'fix' any problems in Linux - rather it should provide a thin
 veneer over the top of the existing Linux source tree to make building Linux
@@ -100,7 +100,7 @@ docker run --rm -u $(id -u):$(id -g) -v $(pwd):/linux -w /linux --env ARCH=arm -
 Required.
 
 Every build must have a `.config`. If a `.config` is provided, it must be
-updated with `make olddefconfig`. If a config is not provided, a config may be
+updated with `make olddefconfig`. If a config is not provided, a config can be
 built from the source tree using defconfig files, special make targets, and/or
 config fragments.
 
@@ -115,7 +115,7 @@ Required.
 Building the actual kernel has different make targets depending on architecture
 as well as different output kernel types/filenames.
 
-In addition to the kernel binary, other artifacts may include a debug kernel
+In addition to the kernel binary, other artifacts might include a debug kernel
 image and kernel header files.
 
 IN: config file
@@ -126,7 +126,7 @@ OUT: kernel image file
 
 Optional.
 
-When a .config file requests "MODULES", modules may be built.
+When a .config file requests "MODULES", modules might be built.
 
 IN:
 
@@ -137,7 +137,7 @@ OUT: modules.tgz
 
 Optional.
 
-Some architectures use allow DTBs to be built.
+Some architectures allow DTBs to be built.
 
 IN:
 
@@ -148,7 +148,7 @@ OUT: Directory tree of `.dtb` files
 
 Optional.
 
-The `tools/perf` directory may be built.
+The `tools/perf` directory might be built.
 
 IN:
 
@@ -158,7 +158,7 @@ OUT: perf binaries
 
 Optional.
 
-The `tools/testing/selftests` directory may be built.
+The `tools/testing/selftests` directory might be built.
 
 IN:
 
@@ -168,7 +168,7 @@ OUT: kselftest artifacts
 
 Optional.
 
-The `Documentation` directory may be built.
+The `Documentation` directory might be built.
 
 IN:
 
@@ -206,3 +206,4 @@ The following features are desirable and should be possible to do with TuxMake.
   combinations
 - Support additional targets in the kernel source tree
 - Support additional build-time validation
+
