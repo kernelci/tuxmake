@@ -42,6 +42,10 @@ user should be able to use the same command to produce the same build problem.
 Such an interface provides portability and simplicity, making arbitrary Linux
 kernel build combinations easier for developers.
 
+TuxMake should provide strong defaults, making the easy cases easy. By default,
+tuxmake will build a config, a kernel, and modules and dtbs if applicable.
+Additional targets can be specified with command line flags.
+
 Every step of the build should be clearly shown so that there is no mystery or
 obfuscation during the build.
 
