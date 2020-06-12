@@ -1,3 +1,4 @@
+import os
 import subprocess
 from tuxmake.arch import Architecture
 from tuxmake.output import get_new_output_dir
@@ -5,6 +6,7 @@ from tuxmake.output import get_new_output_dir
 
 class Build:
     artifacts = []
+    output_dir = None
 
 
 def build(tree, target_arch=None, targets=["bzImage"], output_dir=None):
@@ -15,7 +17,8 @@ def build(tree, target_arch=None, targets=["bzImage"], output_dir=None):
 
     if output_dir is None:
         output_dir = get_new_output_dir()
-    print(output_dir)
+    else:
+        os.mkdir(output_dir)
 
     # FIXME don't hardcode
     subprocess.check_call(["make", "defconfig", f"O={output_dir}"], cwd=tree)
@@ -24,6 +27,7 @@ def build(tree, target_arch=None, targets=["bzImage"], output_dir=None):
     for target in targets:
         subprocess.check_call(["make", target, f"O={output_dir}"], cwd=tree)
 
+    result.output_dir = output_dir
     for artifact in arch.artifacts:
         result.artifacts.append(artifact)
     return result

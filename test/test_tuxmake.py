@@ -3,11 +3,8 @@ import tuxmake
 
 
 @pytest.fixture
-def output_dir(mocker, tmp_path):
-    get_new_output_dir = mocker.patch("tuxmake.get_new_output_dir")
+def output_dir(tmp_path):
     out = tmp_path / "output"
-    get_new_output_dir.return_value = out
-    out.mkdir()
     return out
 
 
@@ -18,6 +15,7 @@ def test_build(linux, home):
 
 
 def test_build_with_output_dir(linux, output_dir):
-    build = tuxmake.build(linux)
+    build = tuxmake.build(linux, output_dir=output_dir)
     assert "arch/x86/boot/bzImage" in build.artifacts
     assert (output_dir / "arch/x86/boot/bzImage").exists()
+    assert build.output_dir == output_dir
