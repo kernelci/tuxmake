@@ -29,12 +29,16 @@ def test_unsupported_target(linux):
 
 def test_kconfig_default(linux, mocker):
     check_call = mocker.patch("subprocess.check_call")
+    mocker.patch("tuxmake.build.Build.copy_artifacts")
+    mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"])
     assert "defconfig" in check_call.call_args_list[0].args[0]
 
 
 def test_kconfig_named(linux, mocker):
     check_call = mocker.patch("subprocess.check_call")
+    mocker.patch("tuxmake.build.Build.copy_artifacts")
+    mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"], kconfig=["fooconfig"])
     assert "fooconfig" in check_call.call_args_list[0].args[0]
 
