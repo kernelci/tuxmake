@@ -45,10 +45,14 @@ def build(
                     with config.open("a") as f:
                         f.write(Path(conf).read_text())
                 else:
-                    subprocess.check_call(["make", conf, f"O={output_dir}"], cwd=tree)
+                    subprocess.check_call(
+                        ["make", "--silent", conf, f"O={output_dir}"], cwd=tree
+                    )
         elif target == "kernel":
             kernel = arch.kernel
-            subprocess.check_call(["make", kernel, f"O={output_dir}"], cwd=tree)
+            subprocess.check_call(
+                ["make", "--silent", kernel, f"O={output_dir}"], cwd=tree
+            )
         else:
             raise InvalidTarget(f"Unsupported target: {target}")
 

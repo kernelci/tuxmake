@@ -30,13 +30,13 @@ def test_unsupported_target(linux):
 def test_kconfig_default(linux, mocker):
     check_call = mocker.patch("subprocess.check_call")
     build(linux, targets=["config"])
-    assert check_call.call_args_list[0][0][0][1] == "defconfig"
+    assert "defconfig" in check_call.call_args_list[0].args[0]
 
 
 def test_kconfig_named(linux, mocker):
     check_call = mocker.patch("subprocess.check_call")
     build(linux, targets=["config"], kconfig=["fooconfig"])
-    assert check_call.call_args_list[0].args[0][1] == "fooconfig"
+    assert "fooconfig" in check_call.call_args_list[0].args[0]
 
 
 def test_kconfig_url(linux, mocker, output_dir):
