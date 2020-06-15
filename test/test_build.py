@@ -11,14 +11,14 @@ def output_dir(tmp_path):
 
 def test_build(linux, home):
     result = build(linux)
-    assert "arch/x86/boot/bzImage" in result.artifacts
-    assert (home / ".cache/tuxmake/builds/1/arch/x86/boot/bzImage").exists()
+    assert "bzImage" in result.artifacts
+    assert (home / ".cache/tuxmake/builds/1/bzImage").exists()
 
 
 def test_build_with_output_dir(linux, output_dir):
     result = build(linux, output_dir=output_dir)
-    assert "arch/x86/boot/bzImage" in result.artifacts
-    assert (output_dir / "arch/x86/boot/bzImage").exists()
+    assert "bzImage" in result.artifacts
+    assert (output_dir / "bzImage").exists()
     assert result.output_dir == output_dir
 
 
@@ -51,7 +51,7 @@ def test_kconfig_url(linux, mocker, output_dir):
         kconfig=["defconfig", "https://example.com/config.txt"],
         output_dir=output_dir,
     )
-    config = output_dir / ".config"
+    config = output_dir / "config"
     assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
 
 
@@ -64,5 +64,10 @@ def test_kconfig_localfile(linux, tmp_path, output_dir):
         kconfig=["defconfig", str(extra_config)],
         output_dir=output_dir,
     )
-    config = output_dir / ".config"
+    config = output_dir / "config"
     assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
+
+
+def test_output_dir(linux, output_dir):
+    build(linux, output_dir=output_dir)
+    assert [str(f.name) for f in output_dir.glob("*")] == ["config", "bzImage"]
