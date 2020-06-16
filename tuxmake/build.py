@@ -24,15 +24,29 @@ class Build:
         self.arch = Architecture(defaults.target_arch)
         self.toolchain = Toolchain(defaults.toolchain)
         self.kconfig = defaults.kconfig
-        self.artifacts = []
+        self.artifacts = ["build.log"]
+        self.__logger__ = None
 
     def make(self, *args):
         cmd = ["make", "--silent", f"O={self.build_dir}"] + self.makevars + list(args)
         self.log(" ".join(cmd))
-        subprocess.check_call(cmd, cwd=self.source_tree)
+        subprocess.check_call(
+            cmd,
+            cwd=self.source_tree,
+            stdout=self.logger.stdin,
+            stderr=subprocess.STDOUT,
+        )
+
+    @property
+    def logger(self):
+        if not self.__logger__:
+            self.__logger__ = subprocess.Popen(
+                ["tee", str(self.output_dir / "build.log")], stdin=subprocess.PIPE
+            )
+        return self.__logger__
 
     def log(self, *stuff):
-        print(*stuff)
+        subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
 
     @property
     def makevars(self):
@@ -72,6 +86,7 @@ class Build:
         self.artifacts.append(dest)
 
     def cleanup(self):
+        self.logger.terminate()
         shutil.rmtree(self.build_dir)
 
 

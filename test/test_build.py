@@ -89,6 +89,15 @@ def test_output_dir(linux, output_dir, arch):
     assert "arch" not in artifacts
 
 
+def test_saves_log(linux):
+    result = build(linux)
+    artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+    assert "build.log" in result.artifacts
+    assert "build.log" in artifacts
+    log = result.output_dir / "build.log"
+    assert "make --silent" in log.read_text()
+
+
 class TestArchitecture:
     def test_x86_64(self, linux):
         result = build(linux, target_arch="x86_64")
