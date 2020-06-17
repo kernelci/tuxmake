@@ -32,7 +32,7 @@ def test_build_with_output_dir(linux, output_dir, arch):
 
 
 def test_unsupported_target(linux):
-    with pytest.raises(tuxmake.exceptions.InvalidTarget):
+    with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
         build(linux, targets=["unknown-target"])
 
 
@@ -108,7 +108,7 @@ class TestArchitecture:
         assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_invalid_arch(self):
-        with pytest.raises(tuxmake.exceptions.InvalidArchitecture):
+        with pytest.raises(tuxmake.exceptions.UnsupportedArchitecture):
             Architecture("foobar")
 
 
@@ -141,5 +141,5 @@ class TestToolchain:
         assert "CC=clang" in cmdline
 
     def test_invalid_toolchain(self, builder):
-        with pytest.raises(tuxmake.exceptions.InvalidToolchain):
+        with pytest.raises(tuxmake.exceptions.UnsupportedToolchain):
             Toolchain("foocc")

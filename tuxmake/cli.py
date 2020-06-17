@@ -2,6 +2,7 @@ import argparse
 import sys
 from tuxmake import __version__
 from tuxmake.build import build, defaults
+from tuxmake.exceptions import TuxMakeException
 
 
 def comma_separated(s):
@@ -53,5 +54,9 @@ def main(*argv):
 
     options = parser.parse_args(argv)
     build_args = {k: v for k, v in options.__dict__.items() if v}
-    result = build(**build_args)
-    print(f"I: build output in {result.output_dir}")
+    try:
+        result = build(**build_args)
+        print(f"I: build output in {result.output_dir}")
+    except TuxMakeException as e:
+        sys.stderr.write("E: " + str(e) + "\n")
+        sys.exit(1)

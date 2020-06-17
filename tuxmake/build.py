@@ -6,7 +6,7 @@ from urllib.request import urlopen
 from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
 from tuxmake.output import get_new_output_dir
-from tuxmake.exceptions import InvalidTarget
+from tuxmake.exceptions import UnsupportedTarget
 
 
 class defaults:
@@ -73,7 +73,7 @@ class Build:
         elif target == "kernel":
             self.make()
         else:
-            raise InvalidTarget(f"Unsupported target: {target}")
+            raise UnsupportedTarget(target)
 
     def copy_artifacts(self, target):
         if target == "kernel":

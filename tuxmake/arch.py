@@ -1,13 +1,13 @@
 from configparser import ConfigParser
 from pathlib import Path
-from tuxmake.exceptions import InvalidArchitecture
+from tuxmake.exceptions import UnsupportedArchitecture
 
 
 class Architecture:
     def __init__(self, name):
         conffile = Path(__file__).parent / "arch" / f"{name}.ini"
         if not conffile.exists():
-            raise InvalidArchitecture(name)
+            raise UnsupportedArchitecture(name)
         config = ConfigParser()
         config.optionxform = str
         config.read(conffile)

@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from pathlib import Path
-from tuxmake.exceptions import InvalidToolchain
+from tuxmake.exceptions import UnsupportedToolchain
 
 
 class Toolchain:
@@ -8,7 +8,7 @@ class Toolchain:
         family = name.split("-")[0]
         conffile = Path(__file__).parent / "toolchain" / f"{family}.ini"
         if not conffile.exists():
-            raise InvalidToolchain(name)
+            raise UnsupportedToolchain(name)
         config = ConfigParser()
         config.optionxform = str
         config.read(conffile)

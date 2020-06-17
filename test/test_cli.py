@@ -2,6 +2,7 @@ import argparse
 import pytest
 import sys
 from tuxmake.cli import main as tuxmake
+from tuxmake.exceptions import TuxMakeException
 
 
 @pytest.fixture
@@ -63,3 +64,13 @@ class TestTargetArch:
     def test_target_arch(self, builder):
         tuxmake("--target-arch=arm64")
         assert args(builder).target_arch == "arm64"
+
+
+class TestExceptions:
+    def test_basic(self, builder, capsys):
+        builder.side_effect = TuxMakeException("hello")
+        with pytest.raises(SystemExit) as exit:
+            tuxmake("/path/to/linux")
+        assert exit.value.code == 1
+        _, err = capsys.readouterr()
+        assert "E: hello" in err
