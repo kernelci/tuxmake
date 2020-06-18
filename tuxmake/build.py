@@ -8,6 +8,7 @@ from urllib.request import urlopen
 from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
 from tuxmake.output import get_new_output_dir
+from tuxmake.runner import get_runner
 from tuxmake.exceptions import UnsupportedTarget
 
 
@@ -49,8 +50,13 @@ class Build:
             + list(args)
         )
         self.log(" ".join(cmd))
+        self.run(cmd)
+
+    def run(self, cmd):
+        runner = get_runner(self)
+        final_cmd = runner.get_command_line(cmd)
         subprocess.check_call(
-            cmd,
+            final_cmd,
             cwd=self.source_tree,
             stdout=self.logger.stdin,
             stderr=subprocess.STDOUT,
