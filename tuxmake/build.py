@@ -129,6 +129,7 @@ class Build:
 
 def build(
     tree,
+    *,
     target_arch=defaults.target_arch,
     toolchain=defaults.toolchain,
     kconfig=defaults.kconfig,
