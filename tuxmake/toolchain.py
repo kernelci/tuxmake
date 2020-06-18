@@ -15,3 +15,9 @@ class Toolchain:
 
         self.name = name
         self.makevars = config["makevars"]
+
+    def expand_makevars(self, arch):
+        return {
+            k: v.format(toolchain=self.name, **arch.makevars)
+            for k, v in self.makevars.items()
+        }

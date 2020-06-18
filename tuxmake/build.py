@@ -75,12 +75,14 @@ class Build:
 
     @property
     def makevars(self):
-        archvars = [f"{k}={v}" for k, v in self.arch.makevars.items()]
-        toolchainvars = [
-            f"{k}={v}".format(toolchain=self.toolchain.name, **self.arch.makevars)
-            for k, v in self.toolchain.makevars.items()
-        ]
-        return archvars + toolchainvars
+        return [f"{k}={v}" for k, v in self.environment.items()]
+
+    @property
+    def environment(self):
+        v = {}
+        v.update(self.arch.makevars)
+        v.update(self.toolchain.expand_makevars(self.arch))
+        return v
 
     def build(self, target):
         start = time.time()
