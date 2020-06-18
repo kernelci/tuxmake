@@ -20,13 +20,13 @@ def builder(mocker):
 
 
 def args(called):
-    return argparse.Namespace(**called.call_args.kwargs)
+    return argparse.Namespace(**called.call_args[1])
 
 
 def test_basic_build(linux, builder):
     tree = str(linux)
     tuxmake(tree)
-    assert builder.call_args.kwargs == {"tree": tree}
+    assert builder.call_args[1] == {"tree": tree}
 
 
 def test_build_from_sys_argv(monkeypatch, builder):

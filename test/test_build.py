@@ -41,7 +41,7 @@ def test_kconfig_default(linux, mocker):
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"])
-    assert "defconfig" in check_call.call_args_list[0].args[0]
+    assert "defconfig" in check_call.call_args_list[0][0][0]
 
 
 def test_kconfig_named(linux, mocker):
@@ -49,7 +49,7 @@ def test_kconfig_named(linux, mocker):
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"], kconfig=["fooconfig"])
-    assert "fooconfig" in check_call.call_args_list[0].args[0]
+    assert "fooconfig" in check_call.call_args_list[0][0][0]
 
 
 def test_kconfig_url(linux, mocker, output_dir):
@@ -140,7 +140,7 @@ class TestToolchain:
         check_call = mocker.patch("subprocess.check_call")
         builder.toolchain = Toolchain("gcc-10")
         builder.build("config")
-        cmdline = check_call.call_args.args[0]
+        cmdline = check_call.call_args[0][0]
         cross = builder.arch.makevars["CROSS_COMPILE"]
         assert f"CC={cross}gcc-10" in cmdline
 
@@ -148,7 +148,7 @@ class TestToolchain:
         check_call = mocker.patch("subprocess.check_call")
         builder.toolchain = Toolchain("clang")
         builder.build("config")
-        cmdline = check_call.call_args.args[0]
+        cmdline = check_call.call_args[0][0]
         assert "CC=clang" in cmdline
 
     def test_invalid_toolchain(self, builder):
