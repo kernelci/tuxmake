@@ -70,6 +70,12 @@ class TestTargetArch:
         assert args(builder).target_arch == "arm64"
 
 
+class TestJobs:
+    def test_jobs(self, builder):
+        tuxmake("--jobs=300")
+        assert args(builder).jobs == 300
+
+
 class TestExceptions:
     def test_basic(self, builder, capsys):
         builder.side_effect = TuxMakeException("hello")

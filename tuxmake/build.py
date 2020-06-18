@@ -16,6 +16,7 @@ class defaults:
     toolchain = "gcc"
     kconfig = ["defconfig"]
     targets = ["config", "kernel"]
+    jobs = int(subprocess.check_output(["nproc"], text=True)) * 2
 
 
 class BuildInfo:
@@ -36,12 +37,17 @@ class Build:
         self.arch = Architecture(defaults.target_arch)
         self.toolchain = Toolchain(defaults.toolchain)
         self.kconfig = defaults.kconfig
+        self.jobs = defaults.jobs
         self.artifacts = ["build.log"]
         self.__logger__ = None
         self.status = {}
 
     def make(self, *args):
-        cmd = ["make", "--silent", f"O={self.build_dir}"] + self.makevars + list(args)
+        cmd = (
+            ["make", "--silent", f"--jobs={self.jobs}", f"O={self.build_dir}"]
+            + self.makevars
+            + list(args)
+        )
         self.log(" ".join(cmd))
         subprocess.check_call(
             cmd,
@@ -127,6 +133,7 @@ def build(
     toolchain=defaults.toolchain,
     kconfig=defaults.kconfig,
     targets=defaults.targets,
+    jobs=defaults.jobs,
     output_dir=None,
 ):
 
@@ -142,6 +149,7 @@ def build(
     builder.arch = Architecture(target_arch)
     builder.toolchain = Toolchain(toolchain)
     builder.kconfig = kconfig
+    builder.jobs = jobs
 
     for target in targets:
         builder.build(target)

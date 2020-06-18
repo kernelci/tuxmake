@@ -45,6 +45,13 @@ def main(*argv):
     )
 
     parser.add_argument(
+        "-j",
+        "--jobs",
+        type=int,
+        help=f"Number of concurrent jobs to run when building (default: {defaults.jobs})",
+    )
+
+    parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
 

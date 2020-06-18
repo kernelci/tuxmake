@@ -109,6 +109,22 @@ def test_build_failure(linux, monkeypatch):
     assert result.arch.kernel not in artifacts
 
 
+def test_concurrency_default(linux, mocker):
+    check_call = mocker.patch("subprocess.check_call")
+    mocker.patch("tuxmake.build.Build.copy_artifacts")
+    mocker.patch("tuxmake.build.Build.cleanup")
+    build(linux, targets=["config"])
+    assert f"--jobs={defaults.jobs}" in check_call.call_args[0][0]
+
+
+def test_concurrency_set(linux, mocker):
+    check_call = mocker.patch("subprocess.check_call")
+    mocker.patch("tuxmake.build.Build.copy_artifacts")
+    mocker.patch("tuxmake.build.Build.cleanup")
+    build(linux, targets=["config"], jobs=99)
+    assert "--jobs=99" in check_call.call_args[0][0]
+
+
 class TestArchitecture:
     def test_x86_64(self, linux):
         result = build(linux, target_arch="x86_64")
