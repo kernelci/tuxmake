@@ -170,3 +170,15 @@ class TestToolchain:
     def test_invalid_toolchain(self, builder):
         with pytest.raises(tuxmake.exceptions.UnsupportedToolchain):
             Toolchain("foocc")
+
+
+class TestDebugKernel:
+    def test_build_with_debugkernel(self, linux):
+        result = build(linux, targets=["config", "debugkernel"])
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "vmlinux" in artifacts
+
+    def test_build_with_debugkernel_arm64(self, linux):
+        result = build(linux, targets=["config", "debugkernel"], target_arch="arm64")
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "vmlinux" in artifacts

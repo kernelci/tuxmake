@@ -108,6 +108,8 @@ class Build:
                             f.write(Path(conf).read_text())
                     else:
                         self.make(conf)
+            elif target == "debugkernel":
+                self.make(self.arch.debugkernel)
             elif target == "kernel":
                 self.make()
             else:
@@ -123,6 +125,8 @@ class Build:
             return
         if target == "kernel":
             dest = self.arch.kernel
+        elif target == "debugkernel":
+            dest = self.arch.debugkernel
         else:
             dest = target
         src = self.build_dir / self.arch.artifacts[dest]

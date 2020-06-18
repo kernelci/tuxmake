@@ -6,9 +6,9 @@ all:
 include $(ARCH).mk
 ARCHDIRNAME ?= $(ARCH)
 
-.PHONY: $(IMAGE)
+.PHONY: vmlinux $(IMAGE)
 
-all: $(IMAGE)
+all: vmlinux $(IMAGE)
 
 define maybefail
 	@if [ "$(filter $(1),$(FAIL))" = "$(1)" ]; then echo "Error: target $(FAIL) failed"; exit 1; fi
@@ -16,9 +16,15 @@ endef
 
 $(IMAGE): $(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE)
 
-$(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE): $(O)/.config
+vmlinux: $(O)/vmlinux
+
+$(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE): $(O)/vmlinux
 	$(call maybefail,kernel)
 	mkdir -p $$(dirname $@)
+	touch $@
+
+$(O)/vmlinux: $(O)/.config
+	$(call maybefail,debugkernel)
 	touch $@
 
 defconfig:
