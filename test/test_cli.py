@@ -90,6 +90,12 @@ class TestDocker:
         assert args(builder).docker
 
 
+class TestVerbose:
+    def test_verbose(self, builder):
+        tuxmake("--verbose")
+        assert args(builder).verbose
+
+
 class TestExceptions:
     def test_basic(self, builder, capsys):
         builder.side_effect = TuxMakeException("hello")

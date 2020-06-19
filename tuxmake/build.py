@@ -50,6 +50,7 @@ class Build:
         jobs=defaults.jobs,
         docker=False,
         docker_image=None,
+        verbose=False,
     ):
         self.source_tree = source_tree
 
@@ -82,6 +83,8 @@ class Build:
         self.docker = docker
         self.docker_image = docker_image
 
+        self.verbose = verbose
+
         self.artifacts = ["build.log"]
         self.runner = None
         self.__logger__ = None
@@ -98,15 +101,17 @@ class Build:
         self.runner = get_runner(self)
         self.runner.prepare()
 
+    def get_silent(self):
+        if self.verbose:
+            return []
+        else:
+            return ["--silent"]
+
     def make(self, *args):
         cmd = (
-            [
-                "make",
-                "--silent",
-                "--keep-going",
-                f"--jobs={self.jobs}",
-                f"O={self.build_dir}",
-            ]
+            ["make"]
+            + self.get_silent()
+            + ["--keep-going", f"--jobs={self.jobs}", f"O={self.build_dir}"]
             + self.makevars
             + list(args)
         )

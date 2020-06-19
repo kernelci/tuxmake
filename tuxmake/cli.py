@@ -65,6 +65,13 @@ def main(*argv):
     )
 
     parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Do a verbose build (default: silent build)",
+    )
+
+    parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
 
