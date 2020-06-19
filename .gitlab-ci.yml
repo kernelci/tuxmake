@@ -39,6 +39,8 @@ build:
 
 integration:
   stage: testbuild
+  dependencies:
+    - build
   script:
     - python3 -m pip install dist/*.whl
     - make integration-tests
