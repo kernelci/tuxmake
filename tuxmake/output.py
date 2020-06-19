@@ -12,11 +12,17 @@ def get_default_output_basedir():
 
 def get_new_output_dir():
     base = get_default_output_basedir()
+    base.mkdir(parents=True, exist_ok=True)
     existing = [int(f.name) for f in base.glob("[0-9]*")]
     if existing:
-        new = str(max(existing) + 1)
+        new = max(existing) + 1
     else:
-        new = "1"
-    new_dir = base / new
-    new_dir.mkdir(parents=True)
+        new = 1
+    while True:
+        new_dir = base / str(new)
+        try:
+            new_dir.mkdir()
+            break
+        except FileExistsError:
+            new += 1
     return new_dir
