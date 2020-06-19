@@ -15,6 +15,13 @@ def test_unsupported():
         Target("foobarbaz", Native())
 
 
+def test_comparison():
+    t1 = Target("config", "Native()")
+    t2 = Target("config", "Native()")
+    assert t1 == t2
+    assert t1 in [t2]
+
+
 class TestConfig:
     def test_name(self, config):
         assert config.name == "config"

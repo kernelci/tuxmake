@@ -66,7 +66,17 @@ class Build:
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
 
         self.kconfig = kconfig
-        self.targets = [Target(t, self.target_arch) for t in targets]
+
+        self.targets = []
+        for t in targets:
+            target = Target(t, self.target_arch)
+            for d in target.dependencies:
+                dependency = Target(d, self.target_arch)
+                if dependency not in self.targets:
+                    self.targets.append(dependency)
+            if target not in self.targets:
+                self.targets.append(target)
+
         self.jobs = jobs
 
         self.docker = docker

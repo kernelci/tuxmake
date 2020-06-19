@@ -204,3 +204,8 @@ class TestTargetDependencies:
         result = build(linux)
         assert result.status["config"].failed
         assert result.status["kernel"].skipped
+
+    def test_include_dependencies_in_targets(self, linux):
+        result = build(linux, targets=["kernel"])
+        assert result.status["config"].passed
+        assert result.status["kernel"].passed
