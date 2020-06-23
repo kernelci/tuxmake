@@ -230,3 +230,13 @@ class TestTargetDependencies:
         assert result.status["config"].passed
         assert result.status["kernel"].passed
         assert result.status["modules"].passed
+
+
+class TestRuntime:
+    def test_null(self, linux):
+        build = Build(linux)
+        assert build.runtime
+
+    def test_docker(self, linux):
+        build = Build(linux, runtime="docker")
+        assert build.runtime

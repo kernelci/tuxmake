@@ -11,7 +11,7 @@ from tuxmake.arch import Architecture, Native
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.output import get_new_output_dir
 from tuxmake.target import Target
-from tuxmake.runner import get_runner
+from tuxmake.runtime import get_runtime
 from tuxmake.exceptions import UnrecognizedSourceTree
 
 
@@ -19,6 +19,7 @@ class supported:
     architectures = Architecture.supported()
     targets = Target.supported()
     toolchains = Toolchain.supported()
+    runtimes = ["docker"]  # FIXME don't hardcode here
 
 
 class defaults:
@@ -56,8 +57,7 @@ class Build:
         kconfig=defaults.kconfig,
         targets=defaults.targets,
         jobs=defaults.jobs,
-        docker=False,
-        docker_image=None,
+        runtime=None,
         verbose=False,
     ):
         self.source_tree = source_tree
@@ -83,13 +83,11 @@ class Build:
 
         self.jobs = jobs
 
-        self.docker = docker
-        self.docker_image = docker_image
+        self.runtime = get_runtime(self, runtime)
 
         self.verbose = verbose
 
         self.artifacts = ["build.log"]
-        self.runner = None
         self.__logger__ = None
         self.status = {}
 
@@ -108,8 +106,7 @@ class Build:
 
     def prepare(self):
         self.log("# command line: " + shlex.join(["tuxmake"] + sys.argv[1:]))
-        self.runner = get_runner(self)
-        self.runner.prepare()
+        self.runtime.prepare()
 
     def get_silent(self):
         if self.verbose:
@@ -130,10 +127,7 @@ class Build:
     def run_cmd(self, cmd):
         cmd = [c.format(build_dir=self.build_dir) for c in cmd]
 
-        if self.runner:
-            final_cmd = self.runner.get_command_line(cmd)
-        else:
-            final_cmd = cmd
+        final_cmd = self.runtime.get_command_line(cmd)
 
         self.log(" ".join(cmd))
         subprocess.check_call(
@@ -221,9 +215,6 @@ class Build:
     def cleanup(self):
         self.logger.terminate()
         shutil.rmtree(self.build_dir)
-
-    def get_docker_image(self):
-        return self.toolchain.get_docker_image(self.target_arch)
 
     def run(self):
         self.validate()

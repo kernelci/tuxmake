@@ -2,14 +2,14 @@ import os
 import subprocess
 
 
-def get_runner(build):
-    if build.docker:
-        return DockerRunner(build)
+def get_runtime(build, runtime):
+    if runtime == "docker":
+        return DockerRuntime(build)
     else:
-        return NullRunner()
+        return NullRuntime()
 
 
-class NullRunner:
+class NullRuntime:
     def get_command_line(self, cmd):
         return cmd
 
@@ -17,10 +17,12 @@ class NullRunner:
         pass
 
 
-class DockerRunner:
+class DockerRuntime:
     def __init__(self, build):
         self.build = build
-        self.image = build.get_docker_image()
+        self.image = os.getenv("TUXMAKE_DOCKER_IMAGE")
+        if not self.image:
+            self.image = build.toolchain.get_docker_image(build.target_arch)
 
     def prepare(self):
         subprocess.check_call(["docker", "pull", self.image])

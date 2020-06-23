@@ -58,10 +58,9 @@ def main(*argv):
         help=f"Number of concurrent jobs to run when building (default: {defaults.jobs})",
     )
     buildenv.add_argument(
-        "-d",
-        "--docker",
-        action="store_true",
-        help="Do the build using Docker containers (default: No)",
+        "-r",
+        "--runtime",
+        help="Runtime to use for the builds. By default, builds are run natively on the build host. Supported: {', '.join(supported.runtimes)}",
     )
     buildenv.add_argument(
         "-i",
@@ -82,9 +81,6 @@ def main(*argv):
     )
 
     options = parser.parse_args(argv)
-
-    if options.docker_image:
-        options.docker = True
 
     build_args = {k: v for k, v in options.__dict__.items() if v}
     try:
