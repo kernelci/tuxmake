@@ -20,7 +20,7 @@ def main(*argv):
         add_help=False,
     )
     parser.add_argument(
-        "tree", nargs="?", default=".", help="Tree to build (default: .)"
+        "-C", "--directory", dest="tree", default=".", help="Tree to build (default: .)"
     )
 
     target = parser.add_argument_group("Build target options")

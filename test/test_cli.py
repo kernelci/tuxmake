@@ -23,14 +23,20 @@ def args(called):
     return argparse.Namespace(**called.call_args[1])
 
 
-def test_basic_build(linux, builder):
+def test_basic_build(builder, monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["tuxmake"])
+    tuxmake()
+    assert builder.call_args[1] == {"tree": "."}
+
+
+def test_basic_build_with_directory(linux, builder):
     tree = str(linux)
-    tuxmake(tree)
+    tuxmake("--directory", tree)
     assert builder.call_args[1] == {"tree": tree}
 
 
 def test_build_from_sys_argv(monkeypatch, builder):
-    monkeypatch.setattr(sys, "argv", ["tuxmake", "/path/to/linux"])
+    monkeypatch.setattr(sys, "argv", ["tuxmake", "--directory=/path/to/linux"])
     tuxmake()
     assert args(builder).tree == "/path/to/linux"
 
@@ -43,12 +49,11 @@ def test_build_from_sys_argv_default_tree_is_cwd(monkeypatch, builder):
 
 class TestTargets:
     def test_config(self, builder):
-        tuxmake("--targets=config", "foo")
+        tuxmake("--targets=config")
         args(builder).targets == ["config"]
-        args(builder).tree == "foo"
 
     def test_config_multiple(self, builder):
-        tuxmake("--targets=config,kernel", "foo")
+        tuxmake("--targets=config,kernel")
         assert args(builder).targets == ["config", "kernel"]
 
 
@@ -100,7 +105,7 @@ class TestExceptions:
     def test_basic(self, builder, capsys):
         builder.side_effect = TuxMakeException("hello")
         with pytest.raises(SystemExit) as exit:
-            tuxmake("/path/to/linux")
+            tuxmake("-C", "/path/to/linux")
         assert exit.value.code == 1
         _, err = capsys.readouterr()
         assert "E: hello" in err
@@ -114,7 +119,7 @@ class TestBuildStatus:
             "kernel": BuildInfo("FAIL", 2),
         }
         with pytest.raises(SystemExit) as exit:
-            tuxmake("/path/to/linux")
+            tuxmake("-C", "/path/to/linux")
         assert exit.value.code == 2
 
         _, err = capsys.readouterr()
