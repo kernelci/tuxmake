@@ -5,4 +5,5 @@ flit
 black
 flake8
 mypy
+codespell
 # you also need this non-Python packages: make shunit2 git

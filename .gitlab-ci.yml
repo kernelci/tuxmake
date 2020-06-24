@@ -11,7 +11,7 @@ stages:
   - publish
 
 .install: &install
-  - 'apt-get update && apt-get install -qy python3-pytest python3-pytest-cov python3-pytest-mock python3-pip mypy make black flake8 shunit2 git'
+  - 'apt-get update && apt-get install -qy python3-pytest python3-pytest-cov python3-pytest-mock python3-pip mypy codespell make black flake8 shunit2 git'
   - python3 -m pip install flit
 
 before_script: *install
@@ -27,11 +27,15 @@ style:
     - black --check .
     - flake8 .
 
-
 typecheck:
   stage: test
   script:
     - mypy tuxmake
+
+codespell:
+  stage: test
+  script:
+    - make codespell
 
 build:
   stage: build

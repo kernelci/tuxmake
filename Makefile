@@ -2,7 +2,7 @@
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
-all: unit-tests style integration-tests typechecks
+all: unit-tests style integration-tests typechecks codespell
 	@printf "\033[01;32m$(ALL_TESTS_PASSED)\033[m\n"
 
 
@@ -15,6 +15,9 @@ style:
 
 typechecks:
 	mypy tuxmake
+
+codespell:
+	find . -name \*.py | xargs codespell
 
 integration-tests:
 	sh test/integration/fakelinux.sh

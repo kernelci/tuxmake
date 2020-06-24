@@ -21,7 +21,7 @@ def main(*argv):
         "targets",
         nargs="*",
         type=str,
-        help=f"Targets to build. If ommited, tuxmake will build  {' + '.join(defaults.targets)}. Supported targets: {', '.join(supported.targets)}",
+        help=f"Targets to build. If omitted, tuxmake will build  {' + '.join(defaults.targets)}. Supported targets: {', '.join(supported.targets)}",
     )
 
     build_input = parser.add_argument_group("Build input options")
