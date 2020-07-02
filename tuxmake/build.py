@@ -187,7 +187,8 @@ class Build:
                     else:
                         self.make(conf)
             else:
-                self.make(*target.make_args)
+                for args in target.make_args:
+                    self.make(*args)
                 if target.extra_command:
                     self.run_cmd(target.extra_command)
             self.status[target.name] = BuildInfo("PASS")

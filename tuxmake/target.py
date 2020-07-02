@@ -1,3 +1,4 @@
+import re
 import shlex
 
 from tuxmake.config import ConfigurableObject
@@ -15,7 +16,8 @@ class Target(ConfigurableObject):
     def __init_config__(self):
         self.description = self.config["target"].get("description")
         self.dependencies = self.config["target"].get("dependencies", "").split()
-        self.make_args = shlex.split(self.config["target"].get("make_args", ""))
+        make_args = re.split(r"\s*&&\s*", self.config["target"].get("make_args", ""))
+        self.make_args = [shlex.split(c) for c in make_args]
         self.extra_command = shlex.split(self.config["target"].get("extra_command", ""))
         try:
             self.artifacts = self.config["artifacts"]

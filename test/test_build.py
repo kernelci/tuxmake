@@ -213,6 +213,13 @@ class TestModules:
         assert "modules.tar.gz" in artifacts
 
 
+class TestDtbs:
+    def test_dtbs(self, linux):
+        result = build(linux, targets=["dtbs"])
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "dtbs.tar.gz" in artifacts
+
+
 class TestTargetDependencies:
     def test_dont_build_kernel_if_config_fails(self, linux, monkeypatch):
         monkeypatch.setenv("FAIL", "defconfig")

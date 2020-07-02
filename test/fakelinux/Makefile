@@ -7,7 +7,7 @@ all:
 include arch/$(ARCH).mk
 ARCHDIRNAME ?= $(ARCH)
 
-.PHONY: vmlinux $(IMAGE) modules modules_install
+.PHONY: vmlinux $(IMAGE) modules modules_install dtbs dtbs_install
 
 all: vmlinux $(IMAGE)
 
@@ -23,6 +23,8 @@ $(IMAGE): $(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE)
 vmlinux: $(O)/vmlinux
 
 modules: $(O)/modules
+
+dtbs: $(O)/dtbs
 
 $(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE): $(O)/vmlinux
 	$(call maybefail,kernel)
@@ -42,10 +44,19 @@ modules_install: $(O)/modules
 	mkdir -p $(INSTALL_MOD_PATH)
 	cp -r $(O)/modules/lib $(INSTALL_MOD_PATH)/
 
+$(O)/dtbs: $(O)/.config
+	$(call maybefail,dtbs)
+	mkdir -p $@/hisilicon
+	touch    $@/hisilicon/hi6220-hikey.dtb
+
+dtbs_install: $(O)/dtbs
+	mkdir -p $(INSTALL_DTBS_PATH)
+	cp -r $(O)/dtbs/* $(INSTALL_DTBS_PATH)/
+
 defconfig:
 	$(call maybefail,defconfig)
 	mkdir -p $(O)
 	touch $(O)/.config
 
 clean:
-	$(RM) -rf vmlinux $(O)/arch/*/boot $(O)/.config $(O)/modules
+	$(RM) -rf vmlinux $(O)/arch/*/boot $(O)/.config $(O)/modules $(O)/dtbs

@@ -39,7 +39,7 @@ class TestConfig:
 class TestDebugKernel:
     def test_make_args(self):
         debugkernel = Target("debugkernel", Native())
-        assert debugkernel.make_args == ["vmlinux"]
+        assert debugkernel.make_args == [["vmlinux"]]
 
 
 @pytest.fixture
@@ -55,3 +55,19 @@ class TestKernel:
     def test_depends_on_config(self, arch):
         kernel = Target("kernel", arch)
         assert kernel.dependencies == ["config"]
+
+
+class TestDtbs:
+    def test_make_args(self, arch):
+        dtbs = Target("dtbs", arch)
+        assert dtbs.make_args[0] == ["dtbs"]
+        assert dtbs.make_args[1][0] == "dtbs_install"
+        assert "INSTALL_DTBS_PATH=" in dtbs.make_args[1][1]
+
+    def test_depends_on_config(self, arch):
+        dtbs = Target("dtbs", arch)
+        assert dtbs.dependencies == ["config"]
+
+    def test_artifacts(self, arch):
+        dtbs = Target("dtbs", arch)
+        assert dtbs.artifacts["dtbs.tar.gz"] == "dtbs.tar.gz"
