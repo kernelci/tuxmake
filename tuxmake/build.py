@@ -128,7 +128,10 @@ class Build:
         self.run_cmd(cmd)
 
     def run_cmd(self, cmd):
-        cmd = [c.format(build_dir=self.build_dir) for c in cmd]
+        cmd = [
+            c.format(build_dir=self.build_dir, target_arch=self.target_arch.name)
+            for c in cmd
+        ]
 
         final_cmd = self.runtime.get_command_line(cmd)
 
@@ -168,6 +171,16 @@ class Build:
                 self.status[target.name] = BuildInfo(
                     "SKIP", datetime.timedelta(seconds=0)
                 )
+                return
+
+        if target.precondition:
+            try:
+                self.run_cmd(target.precondition)
+            except subprocess.CalledProcessError:
+                self.status[target.name] = BuildInfo(
+                    "SKIP", datetime.timedelta(seconds=0)
+                )
+                self.log(f"# Skipping {target.name} because precondition failed")
                 return
 
         start = time.time()

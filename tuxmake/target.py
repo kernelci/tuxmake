@@ -18,6 +18,7 @@ class Target(ConfigurableObject):
         self.dependencies = self.config["target"].get("dependencies", "").split()
         make_args = re.split(r"\s*&&\s*", self.config["target"].get("make_args", ""))
         self.make_args = [shlex.split(c) for c in make_args]
+        self.precondition = shlex.split(self.config["target"].get("precondition", ""))
         self.extra_command = shlex.split(self.config["target"].get("extra_command", ""))
         try:
             self.artifacts = self.config["artifacts"]

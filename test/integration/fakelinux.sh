@@ -85,5 +85,21 @@ test_config_only() {
   assertFalse "kernel image not produced" "test -f $XDG_CACHE_HOME/tuxmake/builds/1/Image.gz"
 }
 
+test_modules() {
+  run tuxmake modules
+  assertTrue "build modules on defconfig" "grep 'modules: PASS' stderr"
+
+  run tuxmake --kconfig=tinyconfig modules
+  assertTrue "skip modules on tinyconfig" "grep 'modules: SKIP' stderr"
+}
+
+test_dtbs() {
+  run tuxmake --target-arch=arm64 dtbs
+  assertTrue "build dtbs on arm64" "grep 'dtbs: PASS' stderr"
+
+  run tuxmake --target-arch=x86_64 dtbs
+  assertTrue "does not build dtbs on x86_64" "grep 'dtbs: SKIP' stderr"
+}
+
 
 . shunit2

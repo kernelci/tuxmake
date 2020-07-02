@@ -56,7 +56,12 @@ dtbs_install: $(O)/dtbs
 defconfig:
 	$(call maybefail,defconfig)
 	mkdir -p $(O)
-	touch $(O)/.config
+	echo 'CONFIG_MODULES=y' > $(O)/.config
+
+tinyconfig:
+	$(call maybefail,tinyconfig)
+	mkdir -p $(O)
+	echo '# CONFIG_MODULES is not set' > $(O)/.config
 
 clean:
 	$(RM) -rf vmlinux $(O)/arch/*/boot $(O)/.config $(O)/modules $(O)/dtbs

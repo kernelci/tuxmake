@@ -212,12 +212,24 @@ class TestModules:
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "modules.tar.gz" in artifacts
 
+    def test_skip_if_not_configured_for_modules(self, linux):
+        result = build(
+            linux, targets=["config", "kernel", "modules"], kconfig=["tinyconfig"]
+        )
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "modules.tar.gz" not in artifacts
+
 
 class TestDtbs:
     def test_dtbs(self, linux):
-        result = build(linux, targets=["dtbs"])
+        result = build(linux, targets=["dtbs"], target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.gz" in artifacts
+
+    def test_skip_on_arch_with_no_dtbs(self, linux):
+        result = build(linux, targets=["dtbs"], target_arch="x86_64")
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "dtbs.tar.gz" not in artifacts
 
 
 class TestTargetDependencies:
