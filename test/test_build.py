@@ -63,7 +63,7 @@ def test_kconfig_url(linux, mocker, output_dir):
     response = mocker.MagicMock()
     response.getcode.return_value = 200
     response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
-    mocker.patch("tuxmake.build.urlopen", return_value=response)
+    mocker.patch("urllib.request.urlopen", return_value=response)
 
     build(
         linux,

@@ -2,12 +2,12 @@ import pytest
 
 import tuxmake.exceptions
 from tuxmake.arch import Native
-from tuxmake.target import Target
+from tuxmake.target import Target, Config
 
 
 @pytest.fixture
 def config():
-    return Target("config", Native())
+    return Config("config", Native())
 
 
 def test_unsupported():
@@ -16,8 +16,8 @@ def test_unsupported():
 
 
 def test_comparison():
-    t1 = Target("config", "Native()")
-    t2 = Target("config", "Native()")
+    t1 = Target("kernel", Native())
+    t2 = Target("kernel", Native())
     assert t1 == t2
     assert t1 in [t2]
 

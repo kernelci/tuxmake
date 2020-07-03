@@ -1,8 +1,19 @@
+from pathlib import Path
 import re
 import shlex
+import urllib.request
 
 from tuxmake.config import ConfigurableObject
 from tuxmake.exceptions import UnsupportedTarget
+
+
+def supported_targets():
+    return Target.supported()
+
+
+def create_target(name, target_arch):
+    cls = (name == "config") and Config or Target
+    return cls(name, target_arch)
 
 
 class Target(ConfigurableObject):
@@ -32,3 +43,25 @@ class Target(ConfigurableObject):
 
     def __eq__(self, other):
         return str(self) == str(other)
+
+    def prepare(self, build):
+        pass
+
+
+class Config(Target):
+    def __init_config__(self):
+        super().__init_config__()
+        self.make_args = []
+
+    def prepare(self, build):
+        config = build.build_dir / ".config"
+        for conf in build.kconfig:
+            if conf.startswith("http://") or conf.startswith("https://"):
+                download = urllib.request.urlopen(conf)
+                with config.open("a") as f:
+                    f.write(download.read().decode("utf-8"))
+            elif Path(conf).exists():
+                with config.open("a") as f:
+                    f.write(Path(conf).read_text())
+            else:
+                build.make(conf)

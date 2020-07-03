@@ -6,18 +6,17 @@ import shutil
 import subprocess
 import sys
 import time
-from urllib.request import urlopen
 from tuxmake.arch import Architecture, Native
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.output import get_new_output_dir
-from tuxmake.target import Target
+from tuxmake.target import create_target, supported_targets
 from tuxmake.runtime import get_runtime
 from tuxmake.exceptions import UnrecognizedSourceTree
 
 
 class supported:
     architectures = Architecture.supported()
-    targets = Target.supported()
+    targets = supported_targets()
     toolchains = Toolchain.supported()
     runtimes = ["docker"]  # FIXME don't hardcode here
 
@@ -78,8 +77,7 @@ class Build:
 
         self.targets = []
         for t in targets:
-            target = Target(t, self.target_arch)
-            self.add_target(target)
+            self.add_target(t)
 
         self.jobs = jobs
 
@@ -91,9 +89,10 @@ class Build:
         self.__logger__ = None
         self.status = {}
 
-    def add_target(self, target):
+    def add_target(self, target_name):
+        target = create_target(target_name, self.target_arch)
         for d in target.dependencies:
-            self.add_target(Target(d, self.target_arch))
+            self.add_target(d)
         if target not in self.targets:
             self.targets.append(target)
 
@@ -185,25 +184,11 @@ class Build:
 
         start = time.time()
         try:
-            if target.name == "config":
-                # config is a special case
-                # FIXME move somewhere else
-                config = self.build_dir / ".config"
-                for conf in self.kconfig:
-                    if conf.startswith("http://") or conf.startswith("https://"):
-                        download = urlopen(conf)
-                        with config.open("a") as f:
-                            f.write(download.read().decode("utf-8"))
-                    elif Path(conf).exists():
-                        with config.open("a") as f:
-                            f.write(Path(conf).read_text())
-                    else:
-                        self.make(conf)
-            else:
-                for args in target.make_args:
-                    self.make(*args)
-                if target.extra_command:
-                    self.run_cmd(target.extra_command)
+            target.prepare(self)
+            for args in target.make_args:
+                self.make(*args)
+            if target.extra_command:
+                self.run_cmd(target.extra_command)
             self.status[target.name] = BuildInfo("PASS")
         except subprocess.CalledProcessError:
             self.status[target.name] = BuildInfo("FAIL")
