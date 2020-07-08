@@ -64,7 +64,7 @@ def main(*argv):
     buildenv.add_argument(
         "-i",
         "--docker-image",
-        help=f"Docker image to build with (implies --docker). {{toolchain}} and {{arch}} get replaced by the names of the toolchain and architecture selected for the build. (default: tuxmake-provided images)",
+        help="Docker image to build with (implies --docker). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. (default: tuxmake-provided images)",
     )
     buildenv.add_argument(
         "-v",
