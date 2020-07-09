@@ -118,21 +118,10 @@ class Build:
         else:
             return ["--silent"]
 
-    def make(self, *args):
-        cmd = (
-            ["make"]
-            + self.get_silent()
-            + ["--keep-going", f"--jobs={self.jobs}", f"O={self.build_dir}"]
-            + self.makevars
-            + list(args)
-        )
-        self.run_cmd(cmd)
-
-    def run_cmd(self, cmd):
-        cmd = [
-            c.format(build_dir=self.build_dir, target_arch=self.target_arch.name)
-            for c in cmd
-        ]
+    def run_cmd(self, origcmd):
+        cmd = []
+        for c in origcmd:
+            cmd += self.expand_cmd_part(c)
 
         final_cmd = self.runtime.get_command_line(cmd)
 
@@ -143,6 +132,24 @@ class Build:
             stdout=self.logger.stdin,
             stderr=subprocess.STDOUT,
         )
+
+    def expand_cmd_part(self, part):
+        if part == "{make}":
+            return (
+                ["make"]
+                + self.get_silent()
+                + ["--keep-going", f"--jobs={self.jobs}", f"O={self.build_dir}"]
+                + self.makevars
+            )
+        else:
+            return [
+                part.format(
+                    build_dir=self.build_dir,
+                    target_arch=self.target_arch.name,
+                    toolchain=self.toolchain.name,
+                    kconfig=self.kconfig,
+                )
+            ]
 
     @property
     def logger(self):
@@ -185,9 +192,7 @@ class Build:
         start = time.time()
         try:
             target.prepare()
-            for args in target.make_args:
-                self.make(*args)
-            for cmd in target.extra_commands:
+            for cmd in target.commands:
                 self.run_cmd(cmd)
             self.status[target.name] = BuildInfo("PASS")
         except subprocess.CalledProcessError:

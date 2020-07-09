@@ -1,7 +1,6 @@
 import pytest
 import urllib
 from tuxmake.arch import Architecture, Native
-from tuxmake.target import Target
 from tuxmake.toolchain import Toolchain
 from tuxmake.build import build
 from tuxmake.build import Build
@@ -233,11 +232,10 @@ class TestArchitecture:
 
 
 @pytest.fixture
-def builder(linux, output_dir, mocker):
+def builder(mocker):
     mocker.patch("tuxmake.build.Build.cleanup")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
-    b = Build(linux, output_dir=output_dir)
-    return b
+    return Build
 
 
 class TestToolchain:
@@ -245,25 +243,23 @@ class TestToolchain:
     # tests that check the results of the build, but for that we need a
     # mechanism to check which toolchain was used to build a given binary (and
     # for test/fakelinux/ to produce real binaries)
-    def test_gcc_10(self, builder, mocker):
+    def test_gcc_10(self, linux, builder, mocker):
         check_call = mocker.patch("subprocess.check_call")
-        builder.toolchain = Toolchain("gcc-10")
-        builder.build(Target("config", builder))
+        builder(linux, targets=["config"], toolchain="gcc-10").run()
         cmdline = check_call.call_args[0][0]
         assert "CC=gcc-10" in cmdline
 
-    def test_gcc_10_cross(self, builder, mocker):
+    def test_gcc_10_cross(self, linux, builder, mocker):
         check_call = mocker.patch("subprocess.check_call")
-        builder.toolchain = Toolchain("gcc-10")
-        builder.target_arch = Architecture("arm64")
-        builder.build(Target("config", builder))
+        builder(
+            linux, targets=["config"], toolchain="gcc-10", target_arch="arm64"
+        ).run()
         cmdline = check_call.call_args[0][0]
         assert "CC=aarch64-linux-gnu-gcc-10" in cmdline
 
-    def test_clang(self, builder, mocker):
+    def test_clang(self, linux, builder, mocker):
         check_call = mocker.patch("subprocess.check_call")
-        builder.toolchain = Toolchain("clang")
-        builder.build(Target("config", builder))
+        builder(linux, targets=["config"], toolchain="clang").run()
         cmdline = check_call.call_args[0][0]
         assert "CC=clang" in cmdline
 

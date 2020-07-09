@@ -31,9 +31,8 @@ class Target(ConfigurableObject):
     def __init_config__(self):
         self.description = self.config["target"].get("description")
         self.dependencies = self.config["target"].get("dependencies", "").split()
-        self.make_args = self.__split_cmds__("target", "make_args") or [[]]
         self.preconditions = self.__split_cmds__("target", "preconditions")
-        self.extra_commands = self.__split_cmds__("target", "extra_commands")
+        self.commands = self.__split_cmds__("target", "commands")
         try:
             self.artifacts = self.config["artifacts"]
         except KeyError:
@@ -66,16 +65,17 @@ class Target(ConfigurableObject):
 class Config(Target):
     def __init_config__(self):
         super().__init_config__()
-        self.make_args = []
 
     def prepare(self):
         build_dir = self.build.build_dir
         config = build_dir / ".config"
         conf = self.build.kconfig
-        if not self.handle_url(config, conf):
-            if not self.handle_local_file(config, conf):
-                if not self.handle_make_target(conf):
-                    raise UnsupportedKconfig(conf)
+        if self.handle_url(config, conf) or self.handle_local_file(config, conf):
+            self.build.log(f"# {conf} -> {config}")
+        elif self.handle_make_target(conf):
+            pass
+        else:
+            raise UnsupportedKconfig(conf)
 
         kconfig_add = self.build.kconfig_add
         if not kconfig_add:
@@ -97,7 +97,7 @@ class Config(Target):
             else:
                 raise UnsupportedKconfigFragment(frag)
         if merge:
-            self.build.run_cmd(
+            self.commands.append(
                 [
                     "scripts/kconfig/merge_config.sh",
                     "-m",
@@ -107,7 +107,7 @@ class Config(Target):
                     *merge,
                 ]
             )
-            self.build.make("olddefconfig")
+            self.commands.append(["{make}", "olddefconfig"])
 
     def handle_url(self, config, url):
         if not url.startswith("http://") and not url.startswith("https://"):
@@ -132,14 +132,14 @@ class Config(Target):
 
     def handle_make_target(self, t):
         if re.match(r"^\w+config$", t):
-            self.build.make(t)
+            self.commands.append(["{make}", t])
             return True
         else:
             return False
 
     def handle_in_tree_config(self, t):
         if re.match(r"^\w+\.config$", t):
-            self.build.make(t)
+            self.commands.append(["{make}", t])
             return True
         else:
             return False

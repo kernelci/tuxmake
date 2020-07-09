@@ -45,9 +45,9 @@ class TestConfig:
 
 
 class TestDebugKernel:
-    def test_make_args(self, build):
+    def test_commands(self, build):
         debugkernel = Target("debugkernel", build)
-        assert debugkernel.make_args == [["vmlinux"]]
+        assert ["{make}", "vmlinux"] in debugkernel.commands
 
 
 class TestKernel:
@@ -61,11 +61,11 @@ class TestKernel:
 
 
 class TestDtbs:
-    def test_make_args(self, build):
+    def test_commands(self, build):
         dtbs = Target("dtbs", build)
-        assert dtbs.make_args[0] == ["dtbs"]
-        assert dtbs.make_args[1][0] == "dtbs_install"
-        assert "INSTALL_DTBS_PATH=" in dtbs.make_args[1][1]
+        assert dtbs.commands[0] == ["{make}", "dtbs"]
+        assert dtbs.commands[1][1] == "dtbs_install"
+        assert "INSTALL_DTBS_PATH=" in dtbs.commands[1][2]
 
     def test_depends_on_config(self, build):
         dtbs = Target("dtbs", build)
