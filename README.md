@@ -85,6 +85,10 @@ Build an arm64 kernel                             | `tuxmake --target-arch=arm64
 Build an arm64 kernel with gcc-10                 | `tuxmake --target-arch=arm64 --toolchain=gcc-10`
 Build an arm64 kernel with clang-10               | `tuxmake --target-arch=arm64 --toolchain=clang-10`
 Build tinyconfig on arm64 with gcc-9              | `tuxmake -a arm64 -t gcc-9 -k tinyconfig`
+Build defconfig with additional config from file  | `tuxmake --kconfig-add /path/to/my.config`
+Build defconfig with additional config from URL   | `tuxmake --kconfig-add https://foo.com/my.config`
+Build defconfig with additional in-tree config    | `tuxmake --kconfig-add kvm_guest.config`
+Build defconfig with additional inline config     | `tuxmake --kconfig-add CONFIG_KVM_GUEST=y`
 Build tinyconfig on arm64 with gcc-9 using docker | `tuxmake -r docker -a arm64 -t gcc-9 -k tinyconfig`
 Build DTBs on arm64 using docker                  | `tuxmake -r docker -a arm64 -t gcc-9 dtbs`
 Display all options                               | `tuxmake --help`

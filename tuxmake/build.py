@@ -54,6 +54,7 @@ class Build:
         target_arch=None,
         toolchain=None,
         kconfig=defaults.kconfig,
+        kconfig_add=[],
         targets=defaults.targets,
         jobs=defaults.jobs,
         runtime=None,
@@ -74,6 +75,7 @@ class Build:
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
 
         self.kconfig = kconfig
+        self.kconfig_add = kconfig_add
 
         self.targets = []
         for t in targets:

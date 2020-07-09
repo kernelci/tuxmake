@@ -1,9 +1,12 @@
 from pathlib import Path
+import re
 import shlex
 import urllib.request
 
 from tuxmake.config import ConfigurableObject
 from tuxmake.exceptions import UnsupportedTarget
+from tuxmake.exceptions import UnsupportedKconfig
+from tuxmake.exceptions import UnsupportedKconfigFragment
 
 
 def supported_targets():
@@ -65,14 +68,85 @@ class Config(Target):
         self.make_args = []
 
     def prepare(self):
-        config = self.build.build_dir / ".config"
+        build_dir = self.build.build_dir
+        config = build_dir / ".config"
         conf = self.build.kconfig
-        if conf.startswith("http://") or conf.startswith("https://"):
-            download = urllib.request.urlopen(conf)
-            with config.open("w") as f:
-                f.write(download.read().decode("utf-8"))
-        elif Path(conf).exists():
-            with config.open("w") as f:
-                f.write(Path(conf).read_text())
+        if not self.handle_url(config, conf):
+            if not self.handle_local_file(config, conf):
+                if not self.handle_make_target(conf):
+                    raise UnsupportedKconfig(conf)
+
+        kconfig_add = self.build.kconfig_add
+        if not kconfig_add:
+            return
+
+        merge = []
+        for i in range(len(kconfig_add)):
+            frag = kconfig_add[i]
+            fragfile = build_dir / f"{i}.config"
+            if (
+                self.handle_url(fragfile, frag)
+                or self.handle_local_file(fragfile, frag)
+                or self.handle_inline_fragment(fragfile, frag)
+            ):
+                merge.append(str(fragfile))
+                self.build.log(f"# {frag} -> {fragfile}")
+            elif self.handle_in_tree_config(frag):
+                pass
+            else:
+                raise UnsupportedKconfigFragment(frag)
+        if merge:
+            self.build.run_cmd(
+                [
+                    "scripts/kconfig/merge_config.sh",
+                    "-m",
+                    "-O",
+                    str(build_dir),
+                    str(config),
+                    *merge,
+                ]
+            )
+            self.build.make("olddefconfig")
+
+    def handle_url(self, config, url):
+        if not url.startswith("http://") and not url.startswith("https://"):
+            return False
+
+        download = urllib.request.urlopen(url)
+        with config.open("w") as f:
+            f.write(download.read().decode("utf-8"))
+        return True
+
+    def handle_local_file(self, config, filename):
+        path = Path(filename)
+        if not path.exists():
+            return False
+
+        with config.open("w") as f:
+            f.write(path.read_text())
+        return True
+
+    def handle_make_target(self, t):
+        if re.match(r"^\w+config$", t):
+            self.build.make(t)
+            return True
         else:
-            self.build.make(conf)
+            return False
+
+    def handle_in_tree_config(self, t):
+        if re.match(r"^\w+\.config$", t):
+            self.build.make(t)
+            return True
+        else:
+            return False
+
+    def handle_inline_fragment(self, config, frag):
+        if not re.match(r"^CONFIG_\w+=[ym]$", frag) and not re.match(
+            r"^#\s*CONFIG_\w+\s*is\s*not\s*set\s*$", frag
+        ):
+            return False
+
+        with config.open("a") as f:
+            f.write(frag)
+            f.write("\n")
+        return True

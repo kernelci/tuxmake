@@ -42,6 +42,13 @@ def main(*argv):
         type=str,
         help=f"kconfig to use. Named (defconfig etc), path to a local config file, or URL to config file (default: {defaults.kconfig})",
     )
+    target.add_argument(
+        "-K",
+        "--kconfig-add",
+        type=str,
+        action="append",
+        help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. Path to local file, URL, `CONFIG_*=[y|m]`, or `# CONFIG_* is not set`. Can be specified multiple times, and will be merged in the order given",
+    )
 
     buildenv = parser.add_argument_group("Build environment options")
     buildenv.add_argument(

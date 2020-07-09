@@ -62,6 +62,16 @@ class TestKConfig:
         tuxmake("--kconfig=olddefconfig")
         assert args(builder).kconfig == "olddefconfig"
 
+    def test_kconfig_add(self, builder):
+        tuxmake(
+            "--kconfig-add=https://example.com/foo.config",
+            "--kconfig-add=/path/to/local.config",
+        )
+        assert args(builder).kconfig_add == [
+            "https://example.com/foo.config",
+            "/path/to/local.config",
+        ]
+
 
 class TestToolchain:
     def test_toolchain(self, builder):

@@ -58,10 +58,18 @@ defconfig:
 	mkdir -p $(O)
 	echo 'CONFIG_MODULES=y' > $(O)/.config
 
+olddefconfig:
+	$(call maybefail,olddefconfig)
+	test -f $(O)/.config
+
 tinyconfig:
 	$(call maybefail,tinyconfig)
 	mkdir -p $(O)
 	echo '# CONFIG_MODULES is not set' > $(O)/.config
+
+kvm_guest.config:
+	$(call maybefail,kvm_guest.config)
+	echo CONFIG_KVM_GUEST=y >> $(O)/.config
 
 clean:
 	$(RM) -rf vmlinux $(O)/arch/*/boot $(O)/.config $(O)/modules $(O)/dtbs

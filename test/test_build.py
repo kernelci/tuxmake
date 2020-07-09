@@ -59,6 +59,11 @@ def test_kconfig_named(linux, mocker):
     assert "fooconfig" in check_call.call_args_list[0][0][0]
 
 
+def test_kconfig_named_invalid(linux, mocker):
+    with pytest.raises(tuxmake.exceptions.UnsupportedKconfig):
+        build(linux, targets=["config"], kconfig="foobar")
+
+
 def test_kconfig_url(linux, mocker, output_dir):
     response = mocker.MagicMock()
     response.getcode.return_value = 200
@@ -81,6 +86,71 @@ def test_kconfig_localfile(linux, tmp_path, output_dir):
     build(linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir)
     config = output_dir / "config"
     assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
+
+
+def test_kconfig_add_url(linux, mocker, output_dir):
+    response = mocker.MagicMock()
+    response.getcode.return_value = 200
+    response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
+    mocker.patch("urllib.request.urlopen", return_value=response)
+
+    build(
+        linux,
+        targets=["config"],
+        kconfig="defconfig",
+        kconfig_add=["https://example.com/config.txt"],
+        output_dir=output_dir,
+    )
+    config = output_dir / "config"
+    assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
+
+
+def test_kconfig_add_localfile(linux, tmp_path, output_dir):
+    extra_config = tmp_path / "extra_config"
+    extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
+    build(
+        linux,
+        targets=["config"],
+        kconfig_add=[str(extra_config)],
+        output_dir=output_dir,
+    )
+    config = output_dir / "config"
+    assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
+
+
+def test_kconfig_add_inline(linux, output_dir):
+    build(
+        linux, targets=["config"], kconfig_add=["CONFIG_FOO=y"], output_dir=output_dir
+    )
+    config = output_dir / "config"
+    assert "CONFIG_FOO=y\n" in config.read_text()
+
+
+def test_kconfig_add_inline_not_set(linux, output_dir):
+    build(
+        linux,
+        targets=["config"],
+        kconfig_add=["# CONFIG_FOO is not set"],
+        output_dir=output_dir,
+    )
+    config = output_dir / "config"
+    assert "CONFIG_FOO is not set\n" in config.read_text()
+
+
+def test_kconfig_add_in_tree(linux, output_dir):
+    build(
+        linux,
+        targets=["config"],
+        kconfig_add=["kvm_guest.config"],
+        output_dir=output_dir,
+    )
+    config = output_dir / "config"
+    assert "CONFIG_KVM_GUEST=y" in config.read_text()
+
+
+def test_kconfig_add_invalid(linux):
+    with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
+        build(linux, targets=["config"], kconfig_add=["foo"])
 
 
 def test_output_dir(linux, output_dir, kernel):
