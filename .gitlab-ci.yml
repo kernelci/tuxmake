@@ -52,4 +52,4 @@ integration:
     - build
   script:
     - python3 -m pip install dist/*.whl
-    - make integration-tests
+    - make integration-tests TMV=1

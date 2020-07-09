@@ -18,10 +18,14 @@ failrun() {
 }
 
 run() {
-  echo '    $' "$@"
+  if [ "${TMV:-}" = 1 ]; then
+    echo '    $' "$@"
+  fi
   rc=0
   "$@" > stdout 2> stderr || rc=$?
-  cat stdout stderr | sed -e 's/^/    /'
+  if [ "${TMV:-}" = 1 ]; then
+    cat stdout stderr | sed -e 's/^/    /'
+  fi
   export rc
 }
 
