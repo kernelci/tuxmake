@@ -78,9 +78,7 @@ def test_kconfig_url(linux, mocker, output_dir):
 def test_kconfig_localfile(linux, tmp_path, output_dir):
     extra_config = tmp_path / "extra_config"
     extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
-    build(
-        linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir,
-    )
+    build(linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir)
     config = output_dir / "config"
     assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
 
