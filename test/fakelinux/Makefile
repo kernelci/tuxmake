@@ -72,4 +72,4 @@ kvm_guest.config:
 	echo CONFIG_KVM_GUEST=y >> $(O)/.config
 
 clean:
-	$(RM) -rf vmlinux $(O)/arch/*/boot $(O)/.config $(O)/modules $(O)/dtbs
+	$(RM) -rf vmlinux $(IMAGE) $(O)/.config $(O)/modules $(O)/dtbs
