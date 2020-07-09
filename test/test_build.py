@@ -1,4 +1,5 @@
 import pytest
+import urllib
 from tuxmake.arch import Architecture, Native
 from tuxmake.target import Target
 from tuxmake.toolchain import Toolchain
@@ -78,6 +79,18 @@ def test_kconfig_url(linux, mocker, output_dir):
     )
     config = output_dir / "config"
     assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
+
+
+def test_kconfig_url_not_found(linux, mocker):
+    mocker.patch(
+        "urllib.request.urlopen",
+        side_effect=urllib.error.HTTPError(
+            "https://example.com/config.txt", 404, "Not Found", {}, None
+        ),
+    )
+
+    with pytest.raises(tuxmake.exceptions.InvalidKConfig):
+        build(linux, targets=["config"], kconfig="https://example.com/config.txt")
 
 
 def test_kconfig_localfile(linux, tmp_path, output_dir):

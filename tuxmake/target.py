@@ -4,6 +4,7 @@ import shlex
 import urllib.request
 
 from tuxmake.config import ConfigurableObject
+from tuxmake.exceptions import InvalidKConfig
 from tuxmake.exceptions import UnsupportedTarget
 from tuxmake.exceptions import UnsupportedKconfig
 from tuxmake.exceptions import UnsupportedKconfigFragment
@@ -112,7 +113,10 @@ class Config(Target):
         if not url.startswith("http://") and not url.startswith("https://"):
             return False
 
-        download = urllib.request.urlopen(url)
+        try:
+            download = urllib.request.urlopen(url)
+        except urllib.error.URLError as error:
+            raise InvalidKConfig(f"{url} - {error}")
         with config.open("w") as f:
             f.write(download.read().decode("utf-8"))
         return True
