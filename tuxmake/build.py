@@ -1,5 +1,6 @@
 from pathlib import Path
 import datetime
+import multiprocessing
 import os
 import shlex
 import shutil
@@ -24,7 +25,7 @@ class supported:
 class defaults:
     kconfig = "defconfig"
     targets = ["config", "kernel", "modules", "dtbs"]
-    jobs = int(subprocess.check_output(["nproc"], text=True)) * 2
+    jobs = multiprocessing.cpu_count() * 2
 
 
 class BuildInfo:
