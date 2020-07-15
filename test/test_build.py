@@ -19,6 +19,10 @@ def output_dir(tmp_path):
     return out
 
 
+def args(called):
+    return called.call_args[0][0]
+
+
 def test_invalid_directory(tmp_path):
     (tmp_path / "Makefile").touch()
     with pytest.raises(tuxmake.exceptions.UnrecognizedSourceTree):
@@ -44,19 +48,19 @@ def test_unsupported_target(linux):
 
 
 def test_kconfig_default(linux, mocker):
-    check_call = mocker.patch("subprocess.check_call")
+    Popen = mocker.patch("subprocess.Popen")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"])
-    assert "defconfig" in check_call.call_args_list[0][0][0]
+    assert "defconfig" in args(Popen)
 
 
 def test_kconfig_named(linux, mocker):
-    check_call = mocker.patch("subprocess.check_call")
+    Popen = mocker.patch("subprocess.Popen")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"], kconfig="fooconfig")
-    assert "fooconfig" in check_call.call_args_list[0][0][0]
+    assert "fooconfig" in args(Popen)
 
 
 def test_kconfig_named_invalid(linux, mocker):
@@ -194,27 +198,38 @@ def test_build_failure(linux, kernel, monkeypatch):
 
 
 def test_concurrency_default(linux, mocker):
-    check_call = mocker.patch("subprocess.check_call")
+    Popen = mocker.patch("subprocess.Popen")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"])
-    assert f"--jobs={defaults.jobs}" in check_call.call_args[0][0]
+    assert f"--jobs={defaults.jobs}" in args(Popen)
 
 
 def test_concurrency_set(linux, mocker):
-    check_call = mocker.patch("subprocess.check_call")
+    Popen = mocker.patch("subprocess.Popen")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"], jobs=99)
-    assert "--jobs=99" in check_call.call_args[0][0]
+    assert "--jobs=99" in args(Popen)
 
 
 def test_verbose(linux, mocker):
-    check_call = mocker.patch("subprocess.check_call")
+    Popen = mocker.patch("subprocess.Popen")
     mocker.patch("tuxmake.build.Build.copy_artifacts")
     mocker.patch("tuxmake.build.Build.cleanup")
     build(linux, targets=["config"], verbose=True)
-    assert "--silent" not in check_call.call_args[0][0]
+    assert "--silent" not in args(Popen)
+
+
+def test_ctrl_c(linux, mocker):
+    mocker.patch("tuxmake.build.Build.logger")
+    Popen = mocker.patch("subprocess.Popen")
+    process = mocker.MagicMock()
+    Popen.return_value = process
+    process.communicate.side_effect = KeyboardInterrupt()
+    with pytest.raises(SystemExit):
+        build(linux)
+    process.terminate.assert_called()
 
 
 class TestArchitecture:
@@ -244,23 +259,23 @@ class TestToolchain:
     # mechanism to check which toolchain was used to build a given binary (and
     # for test/fakelinux/ to produce real binaries)
     def test_gcc_10(self, linux, builder, mocker):
-        check_call = mocker.patch("subprocess.check_call")
+        Popen = mocker.patch("subprocess.Popen")
         builder(linux, targets=["config"], toolchain="gcc-10").run()
-        cmdline = check_call.call_args[0][0]
+        cmdline = args(Popen)
         assert "CC=gcc-10" in cmdline
 
     def test_gcc_10_cross(self, linux, builder, mocker):
-        check_call = mocker.patch("subprocess.check_call")
+        Popen = mocker.patch("subprocess.Popen")
         builder(
             linux, targets=["config"], toolchain="gcc-10", target_arch="arm64"
         ).run()
-        cmdline = check_call.call_args[0][0]
+        cmdline = args(Popen)
         assert "CC=aarch64-linux-gnu-gcc-10" in cmdline
 
     def test_clang(self, linux, builder, mocker):
-        check_call = mocker.patch("subprocess.check_call")
+        Popen = mocker.patch("subprocess.Popen")
         builder(linux, targets=["config"], toolchain="clang").run()
-        cmdline = check_call.call_args[0][0]
+        cmdline = args(Popen)
         assert "CC=clang" in cmdline
 
     def test_invalid_toolchain(self, builder):

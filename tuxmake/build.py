@@ -127,12 +127,19 @@ class Build:
         final_cmd = self.runtime.get_command_line(cmd)
 
         self.log(" ".join(cmd))
-        subprocess.check_call(
+        process = subprocess.Popen(
             final_cmd,
             cwd=self.source_tree,
+            stdin=subprocess.DEVNULL,
             stdout=self.logger.stdin,
             stderr=subprocess.STDOUT,
         )
+        try:
+            process.communicate()
+            return process.returncode == 0
+        except KeyboardInterrupt:
+            process.terminate()
+            sys.exit(1)
 
     def expand_cmd_part(self, part):
         if part == "{make}":
@@ -182,24 +189,30 @@ class Build:
                 )
                 return
 
-        try:
-            for precondition in target.preconditions:
-                self.run_cmd(precondition)
-        except subprocess.CalledProcessError:
-            self.status[target.name] = BuildInfo("SKIP", datetime.timedelta(seconds=0))
-            self.log(f"# Skipping {target.name} because precondition failed")
-            return
+        for precondition in target.preconditions:
+            if not self.run_cmd(precondition):
+                self.status[target.name] = BuildInfo(
+                    "SKIP", datetime.timedelta(seconds=0)
+                )
+                self.log(f"# Skipping {target.name} because precondition failed")
+                return
 
         start = time.time()
-        try:
-            target.prepare()
-            for cmd in target.commands:
-                self.run_cmd(cmd)
-            self.status[target.name] = BuildInfo("PASS")
-        except subprocess.CalledProcessError:
-            self.status[target.name] = BuildInfo("FAIL")
+
+        target.prepare()
+
+        status = None
+        for cmd in target.commands:
+            if not self.run_cmd(cmd):
+                status = BuildInfo("FAIL")
+                break
+        if not status:
+            status = BuildInfo("PASS")
+
         finish = time.time()
-        self.status[target.name].duration = datetime.timedelta(seconds=finish - start)
+        status.duration = datetime.timedelta(seconds=finish - start)
+
+        self.status[target.name] = status
 
     def copy_artifacts(self, target):
         if not self.status[target.name].passed:

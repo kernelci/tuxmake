@@ -38,6 +38,7 @@ class DockerRuntime:
             "docker",
             "run",
             "--rm",
+            "--init",
             f"--user={uid}:{gid}",
             f"--volume={source_tree}:{source_tree}",
             f"--volume={build_dir}:{build_dir}",
