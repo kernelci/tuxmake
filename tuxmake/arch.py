@@ -1,4 +1,4 @@
-import subprocess
+import platform
 from tuxmake.config import ConfigurableObject
 from tuxmake.exceptions import UnsupportedArchitecture
 
@@ -15,6 +15,6 @@ class Architecture(ConfigurableObject):
 
 class Native(Architecture):
     def __init__(self):
-        name = subprocess.check_output(["uname", "-m"], text=True).strip()
+        name = platform.machine()
         super().__init__(name)
         self.makevars = {"CROSS_COMPILE": ""}

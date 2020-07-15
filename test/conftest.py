@@ -4,6 +4,13 @@ import pytest
 import shutil
 
 
+if pytest.__version__ < "3.9":
+
+    @pytest.fixture()
+    def tmp_path(tmpdir):
+        return pathlib.Path(tmpdir)
+
+
 @pytest.fixture(autouse=True)
 def home(mocker, tmp_path):
     h = tmp_path / "HOME"

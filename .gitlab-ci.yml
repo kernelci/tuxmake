@@ -1,5 +1,5 @@
 image:
-  name: debian:buster-slim
+  name: debian:10-slim
 
 services:
   - docker:dind
@@ -11,15 +11,24 @@ stages:
   - publish
 
 .install: &install
-  - 'apt-get update && apt-get install -qy python3-pytest python3-pytest-cov python3-pytest-mock python3-pip mypy codespell make black flake8 shunit2 git'
+  - 'apt-get update && apt-get install -qy python3-pytest python3-pytest-cov python3-pytest-mock python3-pip mypy codespell make flake8 shunit2 git'
+  - 'apt-get install -qy black || true'
   - python3 -m pip install flit
 
 before_script: *install
 
-unittests:
+.unit-tests:
   stage: test
   script:
     - make unit-tests
+
+unit-tests-python3.7:
+  extends: .unit-tests
+  image: debian:10-slim
+
+unit-tests-python3.6:
+  extends: .unit-tests
+  image: ubuntu:18.04
 
 style:
   stage: test
@@ -46,10 +55,18 @@ build:
     paths:
       - dist/
 
-integration:
+.integration:
   stage: testbuild
   dependencies:
     - build
   script:
     - python3 -m pip install dist/*.whl
     - make integration-tests TMV=1
+
+integration-python3.7:
+  extends: .integration
+  image: debian:10-slim
+
+integration-python3.6:
+  extends: .integration
+  image: ubuntu:18.04
