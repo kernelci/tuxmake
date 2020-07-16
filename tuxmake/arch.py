@@ -17,4 +17,4 @@ class Native(Architecture):
     def __init__(self):
         name = platform.machine()
         super().__init__(name)
-        self.makevars = {"CROSS_COMPILE": ""}
+        self.makevars = {}

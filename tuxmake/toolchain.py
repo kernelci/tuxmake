@@ -16,8 +16,9 @@ class Toolchain(ConfigurableObject):
         self.docker_image = self.config["docker"]["image"]
 
     def expand_makevars(self, arch):
+        archvars = {"CROSS_COMPILE": "", **arch.makevars}
         return {
-            k: v.format(toolchain=self.name, **arch.makevars)
+            k: v.format(toolchain=self.name, **archvars)
             for k, v in self.makevars.items()
         }
 
