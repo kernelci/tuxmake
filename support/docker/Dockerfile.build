@@ -1,0 +1,20 @@
+ARG BASE
+FROM ${BASE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG PACKAGES
+# arch where we are building for (i.e. the cross arch)
+ARG HOSTARCH
+
+# Skip package installation if arch to build for is the same as the native. For
+# multi-arch images, only the foreign one will need a cross toolchain.
+RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
+    && apt-get install \
+        --assume-yes \
+        --no-install-recommends \
+        --option=debug::pkgProblemResolver=yes \
+        $PACKAGES; \
+    fi
+
+# vim: ft=dockerfile

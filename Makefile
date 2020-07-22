@@ -2,7 +2,7 @@
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
-all: unit-tests style integration-tests typecheck codespell
+all: unit-tests integration-tests docker-build-tests typecheck codespell
 	@printf "\033[01;32m$(ALL_TESTS_PASSED)\033[m\n"
 
 
@@ -21,6 +21,9 @@ codespell:
 
 integration-tests:
 	sh test/integration/fakelinux.sh
+
+docker-build-tests:
+	$(MAKE) -C support/docker test
 
 version = $(shell python3 -c "import tuxmake; print(tuxmake.__version__)")
 

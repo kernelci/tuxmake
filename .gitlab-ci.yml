@@ -4,6 +4,11 @@ image:
 services:
   - docker:dind
 
+
+.tuxmake:
+  except:
+    - schedules
+
 stages:
   - test
   - build
@@ -18,6 +23,7 @@ stages:
 before_script: *install
 
 .unit-tests:
+  extends: .tuxmake
   stage: test
   script:
     - make unit-tests
@@ -43,21 +49,31 @@ unit-tests-python3.6-arm64:
   image: ubuntu:18.04
 
 style:
+  extends: .tuxmake
   stage: test
   script:
     - make style
 
 typecheck:
+  extends: .tuxmake
   stage: test
   script:
     - make typecheck
 
 codespell:
+  extends: .tuxmake
   stage: test
   script:
     - make codespell
 
+docker-build-tests:
+  extends: .tuxmake
+  stage: test
+  script:
+    - make docker-build-tests
+
 build:
+  extends: .tuxmake
   stage: build
   script:
     - git status
@@ -68,6 +84,7 @@ build:
       - dist/
 
 .integration:
+  extends: .tuxmake
   stage: testbuild
   dependencies:
     - build
@@ -94,3 +111,44 @@ integration-python3.6-arm64:
   tags:
     - arm64
   image: ubuntu:18.04
+
+.docker:
+  image: docker:19.03.11-dind
+  services:
+    - name: docker:19.03.11-dind
+  only:
+    - schedules
+  variables:
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - apk add make python3
+    - cd support/docker/
+    - ./configure
+    - 'docker login --username="${DOCKER_USERNAME}" --password-stdin < "${DOCKER_PASSWORD_FILE}"'
+
+docker-images-amd64:
+  stage: build
+  extends: .docker
+  variables:
+    TAG: "-amd64"
+  script:
+    - make publish-${DOCKER_IMAGES}
+
+docker-images-arm64:
+  stage: build
+  extends: .docker
+  tags:
+     - arm64-dind
+  variables:
+    TAG: "-arm64"
+  script:
+    - make publish-${DOCKER_IMAGES}
+
+docker-images-multiarch:
+  stage: publish
+  extends: .docker
+  variables:
+    DOCKER_CLI_EXPERIMENTAL: "enabled"
+    ARCH_TAGS: "-amd64 -arm64"
+  script:
+    - make publish-multiarch-${DOCKER_IMAGES}

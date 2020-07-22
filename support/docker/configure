@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+
+import os
+import pathlib
+import re
+import sys
+
+tuxmake = (pathlib.Path(__file__).parent / "../..").resolve()
+sys.path.insert(0, str(tuxmake))
+
+
+from tuxmake.build import supported
+from tuxmake.arch import Architecture
+
+
+class Image:
+    kind = "base"
+    lists = []
+
+    def __init__(self, name, base, when):
+        self.name = name
+        self.base = base
+        self.when = when
+        self.args = []
+
+    @property
+    def dependency(self):
+        return self.base
+
+    @property
+    def base_image(self):
+        return f"$(PROJECT)/{self.base}:latest$(TAG)"
+
+    def arg(self, k, v):
+        self.args.append((k, v))
+
+    def emit(self):
+        self.args = [("BASE", self.base_image)]
+
+    def generate(self, stream):
+        self.emit()
+        for l in self.lists:
+            stream.write(f"{l} += {self.name}\n")
+        stream.write(f"{self.when}_images += {self.name}\n")
+        if self.dependency:
+            stream.write(f"{self.name}: {self.dependency} log\n")
+        else:
+            stream.write(f"{self.name}: log\n")
+        stream.write("\t$(docker_build) \\\n")
+        for k, v in self.args:
+            stream.write(f"\t\t--build-arg={k}={v} \\\n")
+        stream.write(f"\t\t--file=Dockerfile.{self.kind} \\\n")
+        stream.write(f"\t\t--tag=$(PROJECT)/{self.name}:latest$(TAG) \\\n")
+        stream.write("\t\t. $(LOG)\n\n")
+
+
+class BaseImage(Image):
+    lists = ["base_images", "all_images"]
+
+    @property
+    def dependency(self):
+        return None
+
+    @property
+    def base_image(self):
+        return f"{self.base}"
+
+
+class GccMixin:
+    @property
+    def packages(self):
+        return [self.pkgname, self.pkgname.replace("gcc", "g++")]
+
+
+class BuildImage(Image):
+    kind = "build"
+    lists = ["build_images", "all_images"]
+    build_cross_images = False
+
+    def __init__(self, name, base, when):
+        super().__init__(name, base, when)
+        self.pkgname = self.name
+
+    @property
+    def packages(self):
+        return [self.pkgname]
+
+    def emit(self):
+        super().emit()
+        packages = " ".join(self.packages)
+        self.arg("PACKAGES", f'"{packages}"')
+
+    def generate(self, stream):
+        super().generate(stream)
+        if self.build_cross_images:
+            for arch in supported.architectures:
+                cls = globals()["Cross" + type(self).__name__]
+                image = cls(f"{arch}_{self.name}", self.name, self.when, arch)
+                image.generate(stream)
+
+
+class GccBuildImage(GccMixin, BuildImage):
+    build_cross_images = True
+
+
+class CrossGccBuildImage(GccMixin, BuildImage):
+    lists = ["crossbuild_images", "all_images"]
+
+    def __init__(self, name, base, when, arch):
+        super().__init__(name, base, when)
+        self.pkgname = base
+        self.arch = Architecture(arch)
+        self.cross_suffix = re.sub(r"-$", "", self.arch.makevars["CROSS_COMPILE"])
+
+    @property
+    def packages(self):
+        suffix = self.cross_suffix.replace("_", "-")
+        return [pkg + "-" + suffix for pkg in super().packages]
+
+    def emit(self):
+        super().emit()
+        gnu_arch = self.cross_suffix.replace("-linux-gnu", "")
+        self.arg("HOSTARCH", gnu_arch)
+
+
+def generate(name, kind, base, when):
+    # transforms foo-bar into FooBarImage
+    clsname = "".join([w.title() for w in re.split(r"[-_]", kind)]) + "Image"
+
+    cls = globals()[clsname]
+    image = cls(name, base, when)
+    image.generate(output)
+
+
+if os.getenv("DEBUG"):
+    output = sys.stdout
+else:
+    output = open("configure.mk", "w")
+
+
+with open("base.in", "r") as f:
+    for line in f.readlines():
+        if re.match(r"^\s*#", line):
+            continue
+        if not re.match(r"\S", line):
+            continue
+        generate(*line.split())
+
+output.close()

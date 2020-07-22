@@ -16,7 +16,7 @@ def arm64():
 
 class TestGcc:
     def test_docker_image(self, gcc, arm64):
-        assert gcc.get_docker_image(arm64) == "tuxbuild/build-gcc_arm64"
+        assert gcc.get_docker_image(arm64) == "tuxmake/arm64_gcc"
 
 
 @pytest.fixture
@@ -26,4 +26,4 @@ def clang():
 
 class TestClang:
     def test_docker_image(self, clang, arm64):
-        assert clang.get_docker_image(arm64) == "tuxbuild/build-clang"
+        assert clang.get_docker_image(arm64) == "tuxmake/clang"

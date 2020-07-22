@@ -1,30 +1,60 @@
 import os
+import re
 import subprocess
+import sys
+
+
+from tuxmake.exceptions import RuntimePreparationFailed
+from tuxmake.exceptions import InvalidRuntimeError
+
+
+DEFAULT_RUNTIME = "null"
 
 
 def get_runtime(build, runtime):
-    if runtime == "docker":
-        return DockerRuntime(build)
-    else:
-        return NullRuntime()
+    runtime = runtime or DEFAULT_RUNTIME
+    name = "".join([w.title() for w in re.split(r"[_-]", runtime)]) + "Runtime"
+    try:
+        here = sys.modules[__name__]
+        cls = getattr(here, name)
+        return cls(build)
+    except AttributeError:
+        raise InvalidRuntimeError(runtime)
 
 
-class NullRuntime:
+class Runtime:
+    def __init__(self, build):
+        self.build = build
+
     def get_command_line(self, cmd):
         return cmd
 
     def prepare(self):
+        try:
+            self.do_prepare()
+        except subprocess.CalledProcessError:
+            raise RuntimePreparationFailed(
+                self.prepare_failed_msg.format(image=self.image)
+            )
+
+    def do_prepare(self):
         pass
 
 
-class DockerRuntime:
+class NullRuntime(Runtime):
+    pass
+
+
+class DockerRuntime(Runtime):
     def __init__(self, build):
-        self.build = build
+        super().__init__(build)
         self.image = os.getenv("TUXMAKE_DOCKER_IMAGE")
         if not self.image:
             self.image = build.toolchain.get_docker_image(build.target_arch)
 
-    def prepare(self):
+    prepare_failed_msg = "failed to pull remote image {image}"
+
+    def do_prepare(self):
         subprocess.check_call(["docker", "pull", self.image])
 
     def get_command_line(self, cmd):
@@ -45,3 +75,18 @@ class DockerRuntime:
             f"--workdir={source_tree}",
             self.image,
         ] + cmd
+
+
+class DockerLocalRuntime(DockerRuntime):
+    prepare_failed_msg = "image {image} not found locally"
+
+    def do_prepare(self):
+        subprocess.check_call(
+            [
+                "docker",
+                "image",
+                "inspect",
+                f"--format=Local image {self.image} exists!",
+                self.image,
+            ]
+        )

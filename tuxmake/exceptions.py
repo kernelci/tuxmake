@@ -36,3 +36,11 @@ class InvalidKConfig(TuxMakeException):
 
 class UnsupportedKconfigFragment(TuxMakeException):
     msg = "Unsupported kconfig fragment: {name}"
+
+
+class InvalidRuntimeError(TuxMakeException):
+    msg = "Invalid runtime: {name}"
+
+
+class RuntimePreparationFailed(TuxMakeException):
+    msg = "Runtime preparation failed: {name}"

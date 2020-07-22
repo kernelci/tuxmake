@@ -1,0 +1,21 @@
+# Container     Type          Base container         When to build
+#############################################################################
+base-debian     base          debian:stable-slim     monthly
+base-debian10   base          debian:10-slim         monthly
+base-debian11   base          debian:bullseye-slim   monthly
+
+# The "unversioned" toolchains follow Debian stable, and will upgraded together
+# with Debian.
+gcc             gcc-build     base-debian            monthly
+clang           build         base-debian            monthly
+
+# The versioned toolchains will sometime need specific Debian releases as older
+# versions get removed and new versions are introduced.
+gcc-8           gcc-build     base-debian10          monthly
+gcc-9           gcc-build     base-debian11          monthly
+gcc-10          gcc-build     base-debian11          monthly
+clang-8         build         base-debian11          monthly
+clang-9         build         base-debian11          monthly
+clang-10        build         base-debian11          monthly
+
+# vim: ts=2 ts=2 sw=2 et
