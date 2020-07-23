@@ -17,6 +17,8 @@ failrun() {
   unset FAIL
 }
 
+gcc_v=$(readlink /usr/bin/gcc) # gcc-8, gcc-9, gcc-10 etc
+
 run() {
   if [ "${TMV:-}" = 1 ]; then
     echo '    $' "$@"
@@ -39,29 +41,44 @@ test_basic() {
   assertFalse 'no CC=' 'grep CC= stdout'
 }
 
-test_cross() {
+test_x86_64() {
+  run tuxmake --target-arch=x86_64
+  assertEquals 0 "$rc"
+  assertTrue 'ARCH=' "grep 'ARCH=x86_64' stdout"
+  assertTrue 'CROSS_COMPILE=' "grep 'CROSS_COMPILE=x86_64-linux-gnu-' stdout"
+  assertFalse 'no CC=' 'grep CC= stdout'
+  assertTrue 'bzImage' 'test -f $XDG_CACHE_HOME/tuxmake/builds/1/bzImage'
+  bunzip2 < "${XDG_CACHE_HOME}/tuxmake/builds/1/bzImage" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for x86-64' \
+    'file ${tmpdir}/Image | grep -qi x86-64'
+}
+
+test_arm64() {
   run tuxmake --target-arch=arm64
   assertEquals 0 "$rc"
   assertTrue 'ARCH=' "grep 'ARCH=arm64' stdout"
   assertTrue 'CROSS_COMPILE=' "grep 'CROSS_COMPILE=aarch64-linux-gnu-' stdout"
   assertFalse 'no CC=' 'grep CC= stdout'
   assertTrue 'Image.gz' 'test -f $XDG_CACHE_HOME/tuxmake/builds/1/Image.gz'
+  gunzip < "${XDG_CACHE_HOME}/tuxmake/builds/1/Image.gz" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for arm64' \
+    'file ${tmpdir}/Image | grep -qi aarch64'
 }
 
 test_toolchain() {
-  run tuxmake --toolchain=gcc-10
+  run tuxmake --toolchain="${gcc_v}"
   assertEquals 0 "$rc"
   assertFalse 'no ARCH=' 'grep ARCH= stdout'
   assertFalse 'no CROSS_COMPILE=' 'grep CROSS_COMPILE= stdout'
-  assertTrue 'CC=' "grep 'CC=gcc-10' stdout"
+  assertTrue 'CC=' "grep 'CC=${gcc_v}' stdout"
 }
 
 test_cross_toolchain() {
-  run tuxmake --target-arch=arm64 --toolchain=gcc-10
+  run tuxmake --target-arch=arm64 --toolchain="${gcc_v}"
   assertEquals 0 "$rc"
   assertTrue 'ARCH=' "grep 'ARCH=arm64' stdout"
   assertTrue 'CROSS_COMPILE=' "grep 'CROSS_COMPILE=aarch64-linux-gnu-' stdout"
-  assertTrue 'CC=' "grep 'CC=aarch64-linux-gnu-gcc-10' stdout"
+  assertTrue 'CC=' "grep 'CC=aarch64-linux-gnu-${gcc_v}' stdout"
   assertTrue 'Image.gz' 'test -f $XDG_CACHE_HOME/tuxmake/builds/1/Image.gz'
 }
 
@@ -79,8 +96,8 @@ test_skip_kernel_if_config_fails() {
 }
 
 test_log_command_line() {
-  run tuxmake --toolchain=gcc-10 --target-arch=arm64
-  assertTrue 'command line logged' 'grep "tuxmake --toolchain=gcc-10 --target-arch=arm64" $XDG_CACHE_HOME/tuxmake/builds/1/build.log'
+  run tuxmake --toolchain="${gcc_v}" --target-arch=arm64
+  assertTrue 'command line logged' "grep \"tuxmake --toolchain=${gcc_v} --target-arch=arm64\" $XDG_CACHE_HOME/tuxmake/builds/1/build.log"
 }
 
 test_config_only() {

@@ -1,2 +1,3 @@
 IMAGE = bzImage
+COMPRESS = bzip2
 ARCHDIRNAME = x86
