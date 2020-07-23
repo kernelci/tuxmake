@@ -8,6 +8,7 @@ from tuxmake.runtime import get_runtime
 from tuxmake.runtime import NullRuntime
 from tuxmake.runtime import DockerRuntime
 from tuxmake.runtime import DockerLocalRuntime
+from tuxmake.wrapper import Wrapper
 
 
 @pytest.fixture
@@ -67,6 +68,20 @@ class TestDockerRuntime:
         build.environment = {"FOO": "BAR"}
         cmd = DockerRuntime(build).get_command_line(["date"])
         assert "--env=FOO=BAR" in cmd
+
+    def test_ccache(self, build, home):
+        ccache = Wrapper("ccache")
+        orig_ccache_dir = ccache.environment["CCACHE_DIR"]
+        build.wrapper = ccache
+        cmd = DockerRuntime(build).get_command_line(["date"])
+        assert "--env=CCACHE_DIR=/ccache-dir" in cmd
+        assert f"--volume={orig_ccache_dir}:/ccache-dir" in cmd
+
+    def test_sccache_with_path(self, build, home):
+        sccache_from_host = Wrapper("/opt/bin/sccache")
+        build.wrapper = sccache_from_host
+        cmd = DockerRuntime(build).get_command_line(["date"])
+        assert "--volume=/opt/bin/sccache:/usr/local/bin/sccache" in cmd
 
 
 class TestDockerLocalRuntime:

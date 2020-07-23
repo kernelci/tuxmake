@@ -122,6 +122,12 @@ class TestEnvironment:
         assert args(builder).environment["OPTIONS"] == "x=y"
 
 
+class TestWrapper:
+    def test_ccache(self, builder):
+        tuxmake("--wrapper=ccache")
+        assert args(builder).wrapper == "ccache"
+
+
 class TestExceptions:
     def test_basic(self, builder, capsys):
         builder.side_effect = TuxMakeException("hello")

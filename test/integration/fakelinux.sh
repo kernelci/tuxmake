@@ -122,5 +122,10 @@ test_dtbs() {
   assertTrue "does not build dtbs on x86_64" "grep 'dtbs: SKIP' stderr"
 }
 
+test_ccache() {
+  run tuxmake --wrapper=ccache
+  assertTrue 'CC=' "grep \"'CC=ccache gcc'\" stdout"
+}
+
 
 . shunit2

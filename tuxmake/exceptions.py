@@ -26,6 +26,11 @@ class UnsupportedToolchain(TuxMakeException):
     pass
 
 
+class UnsupportedWrapper(TuxMakeException):
+    msg = "Unsupported compiler wrapper: {name}"
+    pass
+
+
 class UnsupportedKconfig(TuxMakeException):
     msg = "Unsupported kconfig: {name}"
 

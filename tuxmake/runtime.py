@@ -62,6 +62,19 @@ class DockerRuntime(Runtime):
         source_tree = os.path.abspath(build.source_tree)
         build_dir = os.path.abspath(build.build_dir)
 
+        wrapper = build.wrapper
+        wrapper_opts = []
+        if wrapper.path:
+            wrapper_opts.append(
+                f"--volume={wrapper.path}:/usr/local/bin/{wrapper.name}"
+            )
+        for k, v in wrapper.environment.items():
+            if k.endswith("_DIR"):
+                path = "/" + re.sub(r"[^a-zA-Z0-9]+", "-", k.lower())
+                wrapper_opts.append(f"--volume={v}:{path}")
+                v = path
+            wrapper_opts.append(f"--env={k}={v}")
+
         env = (f"--env={k}={v}" for k, v in build.environment.items())
         uid = os.getuid()
         gid = os.getgid()
@@ -70,6 +83,7 @@ class DockerRuntime(Runtime):
             "run",
             "--rm",
             "--init",
+            *wrapper_opts,
             *env,
             f"--user={uid}:{gid}",
             f"--volume={source_tree}:{source_tree}",
