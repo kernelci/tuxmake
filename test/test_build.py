@@ -361,3 +361,18 @@ class TestEnvironment:
             linux, environment={"KCONFIG_ALLCONFIG": "foo.config"}, targets=["config"]
         ).run()
         assert kwargs(Popen)["env"]["KCONFIG_ALLCONFIG"] == "foo.config"
+
+
+class TestCompilerWrappers:
+    def test_ccache(self, linux, builder, mocker):
+        Popen = mocker.patch("subprocess.Popen")
+        builder(linux, targets=["config"], wrapper="ccache").run()
+        assert "CC=ccache gcc" in args(Popen)
+        assert "HOSTCC=ccache gcc" in args(Popen)
+        assert "CCACHE_DIR" in kwargs(Popen)["env"]
+
+    def test_ccache_gcc_v(self, linux, builder, mocker):
+        Popen = mocker.patch("subprocess.Popen")
+        builder(linux, targets=["config"], toolchain="gcc-10", wrapper="ccache").run()
+        assert "CC=ccache gcc-10" in args(Popen)
+        assert "HOSTCC=ccache gcc-10" in args(Popen)

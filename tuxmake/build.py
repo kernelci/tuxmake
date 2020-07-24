@@ -9,6 +9,7 @@ import sys
 import time
 from tuxmake.arch import Architecture, Native
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
+from tuxmake.wrapper import Wrapper, NoWrapper
 from tuxmake.output import get_new_output_dir
 from tuxmake.target import create_target, supported_targets
 from tuxmake.runtime import get_runtime
@@ -20,6 +21,7 @@ class supported:
     targets = supported_targets()
     toolchains = Toolchain.supported()
     runtimes = ["docker"]  # FIXME don't hardcode here
+    wrappers = Wrapper.supported()
 
 
 class defaults:
@@ -54,6 +56,7 @@ class Build:
         output_dir=None,
         target_arch=None,
         toolchain=None,
+        wrapper=None,
         environment={},
         kconfig=defaults.kconfig,
         kconfig_add=[],
@@ -75,6 +78,7 @@ class Build:
 
         self.target_arch = target_arch and Architecture(target_arch) or Native()
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
+        self.wrapper = wrapper and Wrapper(wrapper) or NoWrapper()
 
         self.environment = environment
 
@@ -114,6 +118,7 @@ class Build:
             "# command line: "
             + " ".join(["tuxmake"] + [shlex.quote(a) for a in sys.argv[1:]])
         )
+        self.wrapper.prepare()
         self.runtime.prepare()
 
     def get_silent(self):
@@ -128,12 +133,13 @@ class Build:
             cmd += self.expand_cmd_part(c)
 
         final_cmd = self.runtime.get_command_line(cmd)
+        env = dict(os.environ, **self.wrapper.environment, **self.environment)
 
-        self.log(" ".join(cmd))
+        self.log(" ".join([shlex.quote(c) for c in cmd]))
         process = subprocess.Popen(
             final_cmd,
             cwd=self.source_tree,
-            env=dict(os.environ, **self.environment),
+            env=env,
             stdin=subprocess.DEVNULL,
             stdout=self.logger.stdin,
             stderr=subprocess.STDOUT,
@@ -179,6 +185,7 @@ class Build:
         mvars = {}
         mvars.update(self.target_arch.makevars)
         mvars.update(self.toolchain.expand_makevars(self.target_arch))
+        mvars.update(self.wrapper.wrap(mvars))
         return [f"{k}={v}" for k, v in mvars.items() if v]
 
     def build(self, target):

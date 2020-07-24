@@ -63,6 +63,12 @@ def main(*argv):
         help=f"Toolchain to use in the build. Default: none (use whatever Linux uses by default). Supported: {', '.join(supported.toolchains)}; request specific versions by appending \"-N\" (e.g. gcc-10, clang-9).",
     )
     buildenv.add_argument(
+        "-w",
+        "--wrapper",
+        type=str,
+        help=f"Compiler wrapper to use in the build. Default: none. Supported: {', '.join(supported.wrappers)}. When used with containers, either the wrapper binary must be available in the container image, OR you can pass --wrapper=/path/to/WRAPPER and WRAPPER will be bind mounted in /usr/local/bin inside the container (for this to work WRAPPER needs to be a static binary, or have its shared library dependencies available inside the container).",
+    )
+    buildenv.add_argument(
         "-e",
         "--environment",
         type=key_value,
