@@ -1,10 +1,6 @@
 image:
   name: tuxmake/ci-python3.7
 
-services:
-  - docker:dind
-
-
 .tuxmake:
   except:
     - schedules
