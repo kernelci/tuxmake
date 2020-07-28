@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import subprocess
 import sys
 
@@ -78,6 +79,7 @@ class DockerRuntime(Runtime):
         env = (f"--env={k}={v}" for k, v in build.environment.items())
         uid = os.getuid()
         gid = os.getgid()
+        extra_opts = self.__get_extra_opts__()
         return [
             "docker",
             "run",
@@ -89,8 +91,13 @@ class DockerRuntime(Runtime):
             f"--volume={source_tree}:{source_tree}",
             f"--volume={build_dir}:{build_dir}",
             f"--workdir={source_tree}",
+            *extra_opts,
             self.image,
         ] + cmd
+
+    def __get_extra_opts__(self):
+        opts = os.getenv("TUXMAKE_DOCKER_RUN", "")
+        return shlex.split(opts)
 
 
 class DockerLocalRuntime(DockerRuntime):

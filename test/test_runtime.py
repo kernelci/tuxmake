@@ -83,6 +83,14 @@ class TestDockerRuntime:
         cmd = DockerRuntime(build).get_command_line(["date"])
         assert "--volume=/opt/bin/sccache:/usr/local/bin/sccache" in cmd
 
+    def test_TUXMAKE_DOCKER_RUN(self, build, monkeypatch):
+        monkeypatch.setenv(
+            "TUXMAKE_DOCKER_RUN", "--hostname=foobar --env=FOO='bar baz'"
+        )
+        cmd = DockerRuntime(build).get_command_line(["bash"])
+        assert "--hostname=foobar" in cmd
+        assert "--env=FOO=bar baz" in cmd
+
 
 class TestDockerLocalRuntime:
     def test_prepare_checks_local_image(self, build, get_docker_image, mocker):
