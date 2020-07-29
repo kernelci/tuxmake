@@ -18,9 +18,9 @@ def home(mocker, tmp_path):
     return h
 
 
-@pytest.fixture
-def linux(tmp_path):
+@pytest.fixture(scope="session")
+def linux(tmpdir_factory):
     src = pathlib.Path(__file__).parent / "fakelinux"
-    dst = tmp_path / "linux"
+    dst = tmpdir_factory.mktemp("source") / "linux"
     shutil.copytree(src, dst)
     return dst
