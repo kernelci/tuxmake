@@ -255,6 +255,10 @@ class TestArchitecture:
         result = build(linux, target_arch="arm64")
         assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
+    def test_arm(self, linux):
+        result = build(linux, target_arch="arm")
+        assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
+
     def test_invalid_arch(self):
         with pytest.raises(tuxmake.exceptions.UnsupportedArchitecture):
             Architecture("foobar")
