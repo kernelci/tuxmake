@@ -59,13 +59,13 @@ test_gcc_9() {
 test_arm64_gcc() {
     get_build_args arm64_gcc
     assertArg 'BASE=$(PROJECT)/gcc' 'HOSTARCH=aarch64'\
-        'PACKAGES="gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"'
+        'PACKAGES="gcc g++ gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"'
 }
 
 test_arm64_gcc_8() {
     get_build_args arm64_gcc-8
     assertArg 'BASE=$(PROJECT)/gcc' 'HOSTARCH=aarch64'\
-        'PACKAGES="gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu"'
+        'PACKAGES="gcc-8 g++-8 gcc-8-aarch64-linux-gnu g++-8-aarch64-linux-gnu"'
 }
 
 test_clang() {

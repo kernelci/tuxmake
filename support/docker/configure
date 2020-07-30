@@ -115,7 +115,7 @@ class CrossGccBuildImage(GccMixin, BuildImage):
     @property
     def packages(self):
         suffix = self.cross_suffix.replace("_", "-")
-        return [pkg + "-" + suffix for pkg in super().packages]
+        return super().packages + [pkg + "-" + suffix for pkg in super().packages]
 
     def emit(self):
         super().emit()
