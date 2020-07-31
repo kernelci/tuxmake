@@ -139,11 +139,14 @@ class Build:
         final_cmd = self.runtime.get_command_line(cmd)
         env = dict(os.environ, **self.wrapper.environment, **self.environment)
 
+        logger = self.logger.stdin
         if output:
             stdout = subprocess.PIPE
+            stderr = logger
         else:
             self.log(" ".join([shlex.quote(c) for c in cmd]))
-            stdout = self.logger.stdin
+            stdout = logger
+            stderr = subprocess.STDOUT
 
         process = subprocess.Popen(
             final_cmd,
@@ -151,7 +154,7 @@ class Build:
             env=env,
             stdin=subprocess.DEVNULL,
             stdout=stdout,
-            stderr=subprocess.STDOUT,
+            stderr=stderr,
         )
         try:
             out, _ = process.communicate()
