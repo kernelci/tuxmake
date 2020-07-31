@@ -52,11 +52,6 @@ class TestKernelVersion:
     def test_happy_path(self, build):
         assert type(build.metadata["source"]["kernelversion"]) is str
 
-    def test_command_fails(self, build, monkeypatch):
-        monkeypatch.setenv("FAIL", "kernelversion")
-        source = Metadata("source")
-        assert not source.extract(build)
-
 
 class TestGitMetadata:
     def test_git_describe(self, build):
@@ -102,7 +97,7 @@ class TestTools:
 
 class TestArtifacts:
     def test_modules(self, build):
-        assert type(build.metadata["artifacts"]["modules"]) is list
+        assert len(build.metadata["artifacts"]["modules"]) > 0
 
     def test_dtbs(self, build):
         assert type(build.metadata["artifacts"]["dtbs"]) is list
