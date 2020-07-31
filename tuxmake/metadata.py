@@ -1,4 +1,7 @@
 from io import StringIO
+import json
+from pathlib import Path
+import shutil
 from tuxmake.config import ConfigurableObject
 from tuxmake.exceptions import UnsupportedMetadata
 from tuxmake.exceptions import UnsupportedMetadataType
@@ -9,11 +12,37 @@ class MetadataExtractor:
         self.build = build
 
     def extract(self):
+        handlers = Metadata.all()
+        build = self.build
+        compiler = build.toolchain.compiler(build.target_arch)
+        metadata_input_data = {
+            handler.name: {
+                key: build.format_cmd_part(cmd.replace("{compiler}", compiler))
+                for key, cmd in handler.commands.items()
+            }
+            for handler in handlers
+        }
+        metadata_input = build.build_dir / "metadata.in.json"
+        metadata_input.write_text(json.dumps(metadata_input_data))
+
+        script_src = Path(__file__).parent / "metadata.pl"
+        script = build.build_dir / "metadata.pl"
+        shutil.copy(script_src, script)
+
+        stdout = StringIO()
+        build.run_cmd(["perl", str(script), str(metadata_input)], output=stdout)
+        stdout.seek(0)
+        metadata_json = stdout.read()
+        metadata = json.loads(metadata_json)
+
         result = {}
-        for handler in Metadata.all():
-            metadata = handler.extract(self.build)
-            if metadata:
-                result.update(metadata)
+        for handler in handlers:
+            for key in handler.commands.keys():
+                v = metadata[handler.name][key].strip()
+                if v:
+                    result.setdefault(handler.name, {})
+                    result[handler.name][key] = handler.cast(key, v)
+
         return result
 
 
@@ -27,7 +56,6 @@ class Metadata(ConfigurableObject):
     order = 0
 
     def __init_config__(self):
-        self.commands = []
         self.types = {}
         try:
             self.order = int(self.config["meta"]["order"])
@@ -40,24 +68,7 @@ class Metadata(ConfigurableObject):
                 self.types[k] = eval(t)
         except KeyError:
             pass  # no types, assume everything is str
-
-        for key, cmd in self.config["commands"].items():
-            self.commands.append((key, cmd))
-
-    def extract(self, build):
-        output = {}
-
-        compiler = build.toolchain.compiler(build.target_arch)
-        for key, cmd in self.commands:
-            cmd = cmd.replace("{compiler}", compiler)
-            stdout = StringIO()
-            if build.run_cmd(["sh", "-c", cmd], output=stdout):
-                stdout.seek(0)
-                v = stdout.read().strip()
-                if v:
-                    output[key] = self.cast(key, v)
-        if output:
-            return {self.name: output}
+        self.commands = dict(self.config["commands"])
 
     def cast(self, key, v):
         t = self.types.get(key, str)
