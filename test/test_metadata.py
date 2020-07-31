@@ -102,7 +102,7 @@ class TestTools:
 
 class TestArtifacts:
     def test_modules(self, build):
-        assert type(build.metadata["artifacts"]["modules"]) is list
+        assert len(build.metadata["artifacts"]["modules"]) > 0
 
     def test_dtbs(self, build):
         assert type(build.metadata["artifacts"]["dtbs"]) is list
