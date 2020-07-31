@@ -174,14 +174,15 @@ class Build:
                 + self.make_args
             )
         else:
-            return [
-                part.format(
-                    build_dir=self.build_dir,
-                    target_arch=self.target_arch.name,
-                    toolchain=self.toolchain.name,
-                    kconfig=self.kconfig,
-                )
-            ]
+            return [self.format_cmd_part(part)]
+
+    def format_cmd_part(self, part):
+        return part.format(
+            build_dir=self.build_dir,
+            target_arch=self.target_arch.name,
+            toolchain=self.toolchain.name,
+            kconfig=self.kconfig,
+        )
 
     @property
     def logger(self):
