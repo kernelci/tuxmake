@@ -17,10 +17,6 @@ class MetadataExtractor:
         return result
 
 
-def tabdict(s):
-    return dict([line.split("\t") for line in s.splitlines()])
-
-
 def linelist(s):
     return s.splitlines()
 
@@ -39,7 +35,7 @@ class Metadata(ConfigurableObject):
             pass  # no order, use default
         try:
             for k, t in self.config["types"].items():
-                if t not in ["int", "str", "tabdict", "linelist"]:
+                if t not in ["int", "str", "linelist"]:
                     raise UnsupportedMetadataType(t)
                 self.types[k] = eval(t)
         except KeyError:
