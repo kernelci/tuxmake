@@ -103,8 +103,28 @@ def main(*argv):
     info.add_argument(
         "-V", "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    info.add_argument(
+        "--list-architectures",
+        action="store_true",
+        help="List supported architectures and exit",
+    )
+    info.add_argument(
+        "--list-toolchains",
+        action="store_true",
+        help="List supported toolchains and exit",
+    )
 
     options = parser.parse_args(argv)
+
+    if options.list_architectures:
+        for arch in sorted(supported.architectures):
+            print(arch)
+        return
+    elif options.list_toolchains:
+        for toolchain in sorted(supported.toolchains):
+            print(toolchain)
+        return
+
     if options.environment:
         options.environment = dict(options.environment)
 

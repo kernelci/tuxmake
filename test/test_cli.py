@@ -152,3 +152,19 @@ class TestBuildStatus:
         _, err = capsys.readouterr()
         assert "config: PASS" in err
         assert "kernel: FAIL" in err
+
+
+class TestList:
+    def test_list_architectures(self, builder, capsys):
+        tuxmake("--list-architectures")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "x86_64" in out
+        assert "arm64" in out
+
+    def test_list_toolchains(self, builder, capsys):
+        tuxmake("--list-toolchains")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "gcc" in out
+        assert "clang" in out
