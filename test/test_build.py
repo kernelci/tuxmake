@@ -278,6 +278,10 @@ class TestArchitecture:
         result = build(linux, target_arch="riscv")
         assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
+    def test_arc(self, linux):
+        result = build(linux, target_arch="arc")
+        assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
+
     def test_invalid_arch(self):
         with pytest.raises(tuxmake.exceptions.UnsupportedArchitecture):
             Architecture("foobar")

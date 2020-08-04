@@ -83,4 +83,12 @@ riscv_clang-8  cross-clang-build  clang-8           monthly          amd64,arm64
 riscv_clang-9  cross-clang-build  clang-9           monthly          amd64,arm64
 riscv_clang-10 cross-clang-build  clang-10          monthly          amd64,arm64
 
+# Cross build images: arc
+# arc is not available in Debian, so we only support the latest release
+# available from ... DesignWare, I guess? The base container, and the host
+# compiler, is chosen to match the gcc version used as based for their patched
+# cross compiler. Also, they only release for x86_64 hosts.
+arc_gcc       arc                 gcc-9             monthly          amd64
+arc_gcc-9     arc                 gcc-9             monthly          amd64
+
 # vim: ts=2 ts=2 sw=2 et

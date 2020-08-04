@@ -158,6 +158,10 @@ class CrossClangBuildImage(CrossBuildMixin, BuildImage):
         ]
 
 
+class ArcImage(Image):
+    kind = "arc"
+    lists = ["crossbuild_images", "all_images"]
+
 def generate(name, kind, base, when, hosts):
     if TAG:
         host_arch = re.sub("^-", "", TAG)
