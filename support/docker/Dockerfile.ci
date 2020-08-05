@@ -5,6 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
+        bzip2 \
+        clang \
         codespell \
         flake8 \
         gcc \
