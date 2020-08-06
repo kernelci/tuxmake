@@ -65,6 +65,22 @@ test_arm64() {
     'file ${tmpdir}/Image | grep -qi aarch64'
 }
 
+test_clang_x86_64() {
+  run tuxmake --target-arch=x86_64 --toolchain=clang
+  assertEquals 0 "$rc"
+  bunzip2 < "${XDG_CACHE_HOME}/tuxmake/builds/1/bzImage" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for x86_64' \
+    'file ${tmpdir}/Image | grep -qi x86-64'
+}
+
+test_clang_arm64() {
+  run tuxmake --target-arch=arm64 --toolchain=clang
+  assertEquals 0 "$rc"
+  gunzip < "${XDG_CACHE_HOME}/tuxmake/builds/1/Image.gz" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for arm64' \
+    'file ${tmpdir}/Image | grep -qi aarch64'
+}
+
 test_toolchain() {
   run tuxmake --toolchain="${gcc_v}"
   assertEquals 0 "$rc"

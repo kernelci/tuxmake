@@ -5,14 +5,17 @@ VERSION := $(shell uname -r)
 
 ifeq ($(LLVM), )
 HOSTCC = gcc
+CC     = $(CROSS_COMPILE)gcc
 else
 HOSTCC = clang
+CC     = clang
 endif
 
-ifeq ($(CROSS_COMPILE),)
-CC = gcc
-else
-CC = $(CROSS_COMPILE)gcc
+ifneq ($(CROSS_COMPILE),)
+ifneq ($(shell $(CC) --version 2>&1 | head -n1 | grep clang),)
+triplet := $(patsubst %-,%,$(CROSS_COMPILE))
+CFLAGS += --target=$(triplet) -I/usr/$(triplet)/include
+endif
 endif
 
 all:
@@ -53,7 +56,7 @@ CLEAN += $(O)/vmlinux
 $(O)/vmlinux: $(O)/.config
 $(O)/vmlinux: vmlinux.c
 	$(call maybefail,debugkernel)
-	$(CC) -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 
 ########################################################################

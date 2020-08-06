@@ -38,7 +38,9 @@ class MetadataExtractor:
         result = {}
         for handler in handlers:
             for key in handler.commands.keys():
-                v = metadata[handler.name][key].strip()
+                v = metadata[handler.name][key]
+                if v:
+                    v = v.strip()
                 if v:
                     result.setdefault(handler.name, {})
                     result[handler.name][key] = handler.cast(key, v)
