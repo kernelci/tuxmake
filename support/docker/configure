@@ -15,13 +15,34 @@ from tuxmake.arch import Architecture
 
 TAG = os.getenv("TAG")
 
+
+class ImageList:
+    __all__ = []
+
+    @classmethod
+    def register(cls, name):
+        if name not in cls.__all__:
+            cls.__all__.append(name)
+
+    @classmethod
+    def dump(cls, stream):
+        for name in cls.__all__:
+            stream.write(f"{name}: $({name}_images)\n")
+        lists = " ".join(cls.__all__)
+        stream.write(f"releases = {lists}\n")
+
+        stream.write("list: checkconfig\n")
+        for name in cls.__all__:
+            stream.write(f"\t@echo {name}_images = $({name}_images)\n")
+
+
 class Image:
     kind = "base"
     extra_lists = []
 
     @property
     def lists(self):
-        return self.extra_lists + ["all_images"]
+        return self.extra_lists + ["all", self.when]
 
     def __init__(self, name, base, when):
         self.name = name
@@ -46,8 +67,8 @@ class Image:
     def generate(self, stream):
         self.emit()
         for l in self.lists:
-            stream.write(f"{l} += {self.name}\n")
-        stream.write(f"{self.when}_images += {self.name}\n")
+            stream.write(f"{l}_images += {self.name}\n")
+            ImageList.register(l)
         if self.dependency:
             stream.write(f"{self.name}: {self.dependency} log\n")
         else:
@@ -61,7 +82,7 @@ class Image:
 
 
 class BaseImage(Image):
-    extra_lists = ["base_images"]
+    extra_lists = ["base"]
 
     @property
     def dependency(self):
@@ -74,7 +95,7 @@ class BaseImage(Image):
 
 class CiImage(BaseImage):
     kind = "ci"
-    extra_lists = ["ci_images"]
+    extra_lists = ["ci"]
 
 
 class GccMixin:
@@ -85,8 +106,8 @@ class GccMixin:
 
 class BuildImage(Image):
     kind = "build"
-    extra_lists = ["build_images"]
-    build_cross_images = False
+    extra_lists = ["build"]
+    build_cross = False
 
     def __init__(self, name, base, when):
         super().__init__(name, base, when)
@@ -103,7 +124,7 @@ class BuildImage(Image):
 
 
 class GccBuildImage(GccMixin, BuildImage):
-    build_cross_images = True
+    build_cross = True
 
 
 class CrossBuildMixin:
@@ -115,6 +136,11 @@ class CrossBuildMixin:
             a = re.sub(r"_(gcc|clang).*$", "", self.name)
             self.__arch__ = Architecture(a)
             return self.__arch__
+
+    @property
+    def lists(self):
+        arch = self.arch.name
+        return super().lists + [f"{arch}"]
 
     @property
     def full_arch(self):
@@ -134,7 +160,7 @@ class CrossBuildMixin:
 
 
 class CrossGccBuildImage(GccMixin, CrossBuildMixin, BuildImage):
-    extra_lists = ["crossbuild_images", "gcc_images"]
+    extra_lists = ["crossbuild", "gcc_all"]
 
     def __init__(self, name, base, when):
         super().__init__(name, base, when)
@@ -147,7 +173,7 @@ class CrossGccBuildImage(GccMixin, CrossBuildMixin, BuildImage):
 
 
 class CrossClangBuildImage(CrossBuildMixin, BuildImage):
-    extra_lists = ["crossbuild_images", "clang_images"]
+    extra_lists = ["crossbuild", "clang_all"]
 
     @property
     def packages(self):
@@ -160,7 +186,7 @@ class CrossClangBuildImage(CrossBuildMixin, BuildImage):
 
 class ArcImage(Image):
     kind = "arc"
-    lists = ["crossbuild_images", "all_images"]
+    extra_lists = ["crossbuild", "arc"]
 
 def generate(name, kind, base, when, hosts):
     if TAG:
@@ -193,5 +219,7 @@ else:
 
 for item in read_file("base.in"):
     generate(*item)
+ImageList.dump(output)
+
 
 output.close()

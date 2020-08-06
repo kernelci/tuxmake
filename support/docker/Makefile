@@ -12,17 +12,6 @@ checkconfig:
 
 -include configure.mk
 
-all: $(all_images)
-base: $(base_images)
-build: $(build_images)
-crossbuild: $(crossbuild_images)
-gcc_all: $(gcc_images)
-clang_all: $(clang_images)
-ci: $(ci_images)
-daily: $(daily_images)
-weekly: $(weekly_images)
-monthly: $(monthly_images)
-releases = all base build crossbuild gcc_all clang_all ci daily weekly monthly
 noop_releases = $(patsubst %, noop-%, $(releases))
 publish_releases = $(patsubst %, publish-%, $(releases))
 publish_multiarch_releases = $(patsubst %, publish-multiarch-%, $(releases))
@@ -58,18 +47,6 @@ test:
 
 show:
 	@docker images $(PROJECT)/\* | sort
-
-list: checkconfig
-	@echo base_images = $(base_images)
-	@echo build_images = $(build_images)
-	@echo crossbuild_images = $(crossbuild_images)
-	@echo gcc_all_images = $(gcc_images)
-	@echo clang_all_images = $(clang_images)
-	@echo all_images = $(all_images)
-	@echo daily_images = $(daily_images)
-	@echo weekly_images = $(weekly_images)
-	@echo monthly_images = $(monthly_images)
-	@echo ci_images = $(ci_images)
 
 clean:
 	$(RM) configure.mk
