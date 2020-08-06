@@ -17,7 +17,11 @@ TAG = os.getenv("TAG")
 
 class Image:
     kind = "base"
-    lists = []
+    extra_lists = []
+
+    @property
+    def lists(self):
+        return self.extra_lists + ["all_images"]
 
     def __init__(self, name, base, when):
         self.name = name
@@ -57,7 +61,7 @@ class Image:
 
 
 class BaseImage(Image):
-    lists = ["base_images", "all_images"]
+    extra_lists = ["base_images"]
 
     @property
     def dependency(self):
@@ -70,7 +74,7 @@ class BaseImage(Image):
 
 class CiImage(BaseImage):
     kind = "ci"
-    lists = ["ci_images", "all_images"]
+    extra_lists = ["ci_images"]
 
 
 class GccMixin:
@@ -81,7 +85,7 @@ class GccMixin:
 
 class BuildImage(Image):
     kind = "build"
-    lists = ["build_images", "all_images"]
+    extra_lists = ["build_images"]
     build_cross_images = False
 
     def __init__(self, name, base, when):
@@ -130,7 +134,7 @@ class CrossBuildMixin:
 
 
 class CrossGccBuildImage(GccMixin, CrossBuildMixin, BuildImage):
-    lists = ["crossbuild_images", "all_images"]
+    extra_lists = ["crossbuild_images", "gcc_images"]
 
     def __init__(self, name, base, when):
         super().__init__(name, base, when)
@@ -143,7 +147,8 @@ class CrossGccBuildImage(GccMixin, CrossBuildMixin, BuildImage):
 
 
 class CrossClangBuildImage(CrossBuildMixin, BuildImage):
-    lists = ["crossbuild_images", "all_images"]
+    extra_lists = ["crossbuild_images", "clang_images"]
+
     @property
     def packages(self):
         cross = self.cross_package_suffix
