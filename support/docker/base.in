@@ -63,4 +63,32 @@ arm_clang-8   cross-clang-build   clang-8           monthly          amd64,arm64
 arm_clang-9   cross-clang-build   clang-9           monthly          amd64,arm64
 arm_clang-10  cross-clang-build   clang-10          monthly          amd64,arm64
 
+# Cross build images: mips
+# In Debian 11+ the mips gcc cross compilers are not well supported, so for now
+# only gcc-8 from Debian 10 on amd64 is supported, and consequently only clang
+# from there as well.
+mips_gcc      cross-gcc-build     gcc               monthly          amd64
+mips_gcc-8    cross-gcc-build     gcc-8             monthly          amd64
+mips_clang    cross-clang-build   clang             monthly          amd64
+
+# Cross build images: riscv
+# Official Debian packages for riscv cross compilers for both amd64 and arm64
+# are available on Debian 11+ and gcc 10 only. gcc-8 is available from Debian
+# 10, but for amd64 only. all clangs from Debian 11 can be used as well.
+riscv_gcc     cross-gcc-build     gcc-10            monthly          amd64,arm64
+riscv_gcc-10  cross-gcc-build     gcc-10            monthly          amd64,arm64
+riscv_gcc-8   cross-gcc-build     gcc-8             monthly          amd64
+riscv_clang    cross-clang-build  clang             monthly          amd64
+riscv_clang-8  cross-clang-build  clang-8           monthly          amd64,arm64
+riscv_clang-9  cross-clang-build  clang-9           monthly          amd64,arm64
+riscv_clang-10 cross-clang-build  clang-10          monthly          amd64,arm64
+
+# Cross build images: arc
+# arc is not available in Debian, so we only support the latest release
+# available from ... DesignWare, I guess? The base container, and the host
+# compiler, is chosen to match the gcc version used as based for their patched
+# cross compiler. Also, they only release for x86_64 hosts.
+arc_gcc       arc                 gcc-9             monthly          amd64
+arc_gcc-9     arc                 gcc-9             monthly          amd64
+
 # vim: ts=2 ts=2 sw=2 et
