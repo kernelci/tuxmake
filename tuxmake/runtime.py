@@ -8,6 +8,8 @@ import sys
 from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import InvalidRuntimeError
+from tuxmake.toolchain import Toolchain
+from tuxmake.arch import host_arch
 
 
 DEFAULT_RUNTIME = "null"
@@ -32,7 +34,10 @@ class Runtime(ConfigurableObject):
         super().__init__(self.name)
 
     def __init_config__(self):
-        pass
+        self.toolchains = Toolchain.supported()
+
+    def is_supported(self, arch, toolchain):
+        return True
 
     def get_command_line(self, build, cmd):
         return cmd
@@ -77,10 +82,12 @@ class DockerRuntime(Runtime):
         self.base_images = []
         self.ci_images = []
         self.toolchain_images = []
+        self.support_matrix = {}
+        self.toolchains = split(self.config["runtime"]["toolchains"])
         for image_list, config in (
             (self.base_images, self.config["runtime"]["bases"]),
             (self.ci_images, self.config["runtime"]["ci"]),
-            (self.toolchain_images, self.config["runtime"]["toolchains"]),
+            (self.toolchain_images, self.toolchains),
         ):
             for entry in split(config):
                 image = Image(name=entry, **self.config[entry])
@@ -97,7 +104,17 @@ class DockerRuntime(Runtime):
                         hosts=hosts,
                     )
                     image_list.append(cross_image)
+                    self.support_matrix[(target, image.name)] = cross_image
         self.images = self.base_images + self.ci_images + self.toolchain_images
+
+    def is_supported(self, arch, toolchain):
+        image = self.support_matrix.get((arch, toolchain))
+        if image:
+            return host_arch.name in image.hosts or any(
+                [a in image.hosts for a in host_arch.aliases]
+            )
+        else:
+            return False
 
     def get_image(self, build):
         return os.getenv("TUXMAKE_DOCKER_IMAGE") or build.toolchain.get_docker_image(

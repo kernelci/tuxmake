@@ -3,6 +3,7 @@ import sys
 from tuxmake import __version__
 from tuxmake.build import build, supported, defaults
 from tuxmake.exceptions import TuxMakeException
+from tuxmake.runtime import get_runtime
 
 
 def key_value(s):
@@ -117,18 +118,68 @@ def main(*argv):
     info.add_argument(
         "--list-toolchains",
         action="store_true",
-        help="List supported toolchains and exit",
+        help="List supported toolchains and exit. Combine with --runtime to list toolchains supported by that particular runtime.",
+    )
+    info.add_argument(
+        "--print-support-matrix",
+        action="store_true",
+        help="Print support matrix (architectures x toolchains). Combine with --runtime to list support matrix for that particular runtime.",
+    )
+    info.add_argument(
+        "-c",
+        "--color",
+        type=str,
+        default="auto",
+        choices=["always", "never", "auto"],
+        help="Control use of colored output. `always` and `never` do what you expect; `auto` (the default) outputs colors when stdou is a tty",
     )
 
     options = parser.parse_args(argv)
+
+    if options.color == "always" or (options.color == "auto" and sys.stdout.isatty()):
+
+        def format_yes_no(b, length):
+            if b:
+                return "\033[32myes\033[m" + " " * (length - 3)
+            else:
+                return "\033[31mno\033[m" + " " * (length - 2)
+
+    else:
+
+        def format_yes_no(b, length):
+            return f"%-{length}s" % (b and "yes" or "no")
 
     if options.list_architectures:
         for arch in sorted(supported.architectures):
             print(arch)
         return
     elif options.list_toolchains:
-        for toolchain in sorted(supported.toolchains):
+        runtime = get_runtime(options.runtime)
+        for toolchain in sorted(runtime.toolchains):
             print(toolchain)
+        return
+    elif options.print_support_matrix:
+        runtime = get_runtime(options.runtime)
+        architectures = sorted(supported.architectures)
+        toolchains = sorted(runtime.toolchains)
+        matrix = {}
+        for a in architectures:
+            matrix[a] = {}
+            for t in toolchains:
+                matrix[a][t] = runtime.is_supported(a, t)
+        length_a = max([len(a) for a in architectures])
+        length_t = max([len(t) for t in toolchains])
+        arch_format = f"%-{length_a}s"
+        toolchain_format = f"%-{length_t}s"
+        print(" ".join([" " * length_t] + [arch_format % a for a in architectures]))
+        for t in toolchains:
+            print(
+                " ".join(
+                    [toolchain_format % t]
+                    + [format_yes_no(matrix[a][t], length_a) for a in architectures]
+                )
+            )
+
         return
 
     if options.environment:
@@ -139,7 +190,7 @@ def main(*argv):
     else:
         err = sys.stderr
 
-    build_args = {k: v for k, v in options.__dict__.items() if v}
+    build_args = {k: v for k, v in options.__dict__.items() if v and k != "color"}
     try:
         result = build(**build_args)
         for target, info in result.status.items():

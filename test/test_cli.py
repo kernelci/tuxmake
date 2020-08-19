@@ -178,3 +178,33 @@ class TestList:
         out, _ = capsys.readouterr()
         assert "gcc" in out
         assert "clang" in out
+
+    def test_list_docker_toolchains(self, builder, capsys):
+        tuxmake("--runtime=docker", "--list-toolchains")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "gcc" in out
+        assert "gcc-10" in out
+        assert "clang" in out
+        assert "clang-10" in out
+
+
+class TestPrintSupportMatrix:
+    def test_print_support_matrix(self, builder, capsys):
+        tuxmake("--print-support-matrix")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert out
+
+    def test_print_support_matrix_docker(self, builder, capsys):
+        tuxmake("--runtime=docker", "--print-support-matrix")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "yes" in out
+        assert "no" in out
+
+    def test_output_colors_when_requested(self, builder, capsys):
+        tuxmake("--runtime=docker", "--color=always", "--print-support-matrix")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "\033" in out
