@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-from tuxmake.config import ConfigurableObject
+from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import InvalidRuntimeError
 
@@ -40,28 +40,12 @@ class Runtime(ConfigurableObject):
     def prepare(self, build):
         pass
 
+    def is_supported(self, arch, toolchain):
+        return True
+
 
 class NullRuntime(Runtime):
     name = "null"
-
-
-def split(s, sep=r",\s*"):
-    if not s:
-        return []
-    if type(s) is list:
-        return s
-    result = re.split(sep, s.replace("\n", ""))
-    if result[-1] == "":
-        result.pop()
-    return result
-
-
-def splitmap(s):
-    return {k: v for k, v in [split(pair, ":") for pair in split(s)]}
-
-
-def splitlistmap(s):
-    return {k: split(v, r"\+") for k, v in splitmap(s).items()}
 
 
 class Image:

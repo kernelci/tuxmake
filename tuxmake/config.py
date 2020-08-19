@@ -1,3 +1,4 @@
+import re
 from typing import Optional, Type
 from configparser import ConfigParser
 from pathlib import Path
@@ -38,3 +39,22 @@ class ConfigurableObject:
             for f in files
             if f.name != "common.ini" and not f.is_symlink()
         ]
+
+
+def split(s, sep=r",\s*"):
+    if not s:
+        return []
+    if type(s) is list:
+        return s
+    result = re.split(sep, s.replace("\n", ""))
+    if result[-1] == "":
+        result.pop()
+    return result
+
+
+def splitmap(s):
+    return {k: v for k, v in [split(pair, ":") for pair in split(s)]}
+
+
+def splitlistmap(s):
+    return {k: split(v, r"\+") for k, v in splitmap(s).items()}
