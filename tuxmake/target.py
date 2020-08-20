@@ -146,7 +146,7 @@ class Config(Target):
 
     def handle_inline_fragment(self, config, frag):
         accepted_patterns = [
-            r"^CONFIG_\w+=[ym]$",
+            r"^CONFIG_\w+=[ymn]$",
             r"^#\s*CONFIG_\w+\s*is\s*not\s*set\s*$",
         ]
         accepted = False
