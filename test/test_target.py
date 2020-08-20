@@ -73,4 +73,4 @@ class TestDtbs:
 
     def test_artifacts(self, build):
         dtbs = Target("dtbs", build)
-        assert dtbs.artifacts["dtbs.tar.gz"] == "dtbs.tar.gz"
+        assert dtbs.artifacts["dtbs.tar.xz"] == "dtbs.tar.xz"

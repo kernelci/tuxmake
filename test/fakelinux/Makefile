@@ -57,6 +57,9 @@ $(O)/vmlinux: $(O)/.config
 $(O)/vmlinux: vmlinux.c
 	$(call maybefail,debugkernel)
 	$(CC) $(CFLAGS) -o $@ $<
+	@echo SYSMAP System.map
+	@printf "0000000000000000 D __per_cpu_start\n0000000000000000 D fixed_percpu_data\n" \
+		> $(O)/System.map
 
 
 ########################################################################

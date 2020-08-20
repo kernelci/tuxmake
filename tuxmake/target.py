@@ -145,9 +145,16 @@ class Config(Target):
             return False
 
     def handle_inline_fragment(self, config, frag):
-        if not re.match(r"^CONFIG_\w+=[ym]$", frag) and not re.match(
-            r"^#\s*CONFIG_\w+\s*is\s*not\s*set\s*$", frag
-        ):
+        accepted_patterns = [
+            r"^CONFIG_\w+=[ymn]$",
+            r"^#\s*CONFIG_\w+\s*is\s*not\s*set\s*$",
+        ]
+        accepted = False
+        for pattern in accepted_patterns:
+            if re.match(pattern, frag):
+                accepted = True
+
+        if not accepted:
             return False
 
         with config.open("a") as f:

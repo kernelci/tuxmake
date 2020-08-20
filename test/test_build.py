@@ -173,6 +173,14 @@ def test_kconfig_add_inline_not_set(linux, output_dir):
     assert "CONFIG_FOO is not set\n" in config.read_text()
 
 
+def test_kconfig_add_inline_set_to_no(linux, output_dir):
+    build(
+        linux, targets=["config"], kconfig_add=["CONFIG_FOO=n"], output_dir=output_dir
+    )
+    config = output_dir / "config"
+    assert "CONFIG_FOO=n\n" in config.read_text()
+
+
 def test_kconfig_add_in_tree(linux, output_dir):
     build(
         linux,
@@ -319,38 +327,40 @@ class TestDebugKernel:
     def test_build_with_debugkernel(self, linux):
         result = build(linux, targets=["config", "debugkernel"])
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "vmlinux" in artifacts
+        assert "vmlinux.xz" in artifacts
+        assert "System.map" in artifacts
 
     def test_build_with_debugkernel_arm64(self, linux):
         result = build(linux, targets=["config", "debugkernel"], target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "vmlinux" in artifacts
+        assert "vmlinux.xz" in artifacts
+        assert "System.map" in artifacts
 
 
 class TestModules:
     def test_modules(self, linux):
         result = build(linux, targets=["config", "kernel", "modules"])
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "modules.tar.gz" in artifacts
+        assert "modules.tar.xz" in artifacts
 
     def test_skip_if_not_configured_for_modules(self, linux):
         result = build(
             linux, targets=["config", "kernel", "modules"], kconfig="tinyconfig"
         )
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "modules.tar.gz" not in artifacts
+        assert "modules.tar.xz" not in artifacts
 
 
 class TestDtbs:
     def test_dtbs(self, linux):
         result = build(linux, targets=["dtbs"], target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "dtbs.tar.gz" in artifacts
+        assert "dtbs.tar.xz" in artifacts
 
     def test_skip_on_arch_with_no_dtbs(self, linux):
         result = build(linux, targets=["dtbs"], target_arch="x86_64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-        assert "dtbs.tar.gz" not in artifacts
+        assert "dtbs.tar.xz" not in artifacts
 
 
 class TestTargetDependencies:
