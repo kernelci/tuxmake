@@ -124,7 +124,7 @@ class Build:
             "# command line: "
             + " ".join(["tuxmake"] + [shlex.quote(a) for a in sys.argv[1:]])
         )
-        self.wrapper.prepare()
+        self.wrapper.prepare(self)
         self.runtime.prepare(self)
 
     def get_silent(self):
@@ -183,6 +183,7 @@ class Build:
             build_dir=self.build_dir,
             target_arch=self.target_arch.name,
             toolchain=self.toolchain.name,
+            wrapper=self.wrapper.name,
             kconfig=self.kconfig,
         )
 

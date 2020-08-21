@@ -1,6 +1,7 @@
+import io
 import os
 from pathlib import Path
-from tuxmake.config import ConfigurableObject
+from tuxmake.config import ConfigurableObject, split_commands
 from tuxmake.exceptions import UnsupportedWrapper
 
 
@@ -26,11 +27,15 @@ class Wrapper(ConfigurableObject):
         self.environment = {
             k: expand(k, v) for k, v in self.config["environment"].items()
         }
+        self.prepare_cmds = split_commands(self.config["commands"]["prepare"])
 
-    def prepare(self):
+    def prepare(self, build):
         for k, v in self.environment.items():
             if k.endswith("_DIR"):
                 Path(v).mkdir(parents=True, exist_ok=True)
+        silence = io.StringIO()
+        for cmd in self.prepare_cmds:
+            build.run_cmd(cmd, output=silence)
 
     def wrap(self, makevars):
         cross = makevars.get("CROSS_COMPILE", "")
@@ -44,7 +49,7 @@ class NoWrapper(Wrapper):
         self.environment = {}
         self.name = "none"
 
-    def prepare(self):
+    def prepare(self, build):
         pass
 
     def wrap(self, makevars):

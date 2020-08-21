@@ -12,9 +12,11 @@ class Test_ccache:
         ccache = Wrapper("ccache")
         assert ccache.environment["CCACHE_DIR"] == "/ccache"
 
-    def test_prepare(self, home):
-        Wrapper("ccache").prepare()
+    def test_prepare(self, home, mocker):
+        build = mocker.MagicMock()
+        Wrapper("ccache").prepare(build)
         assert (home / ".ccache").exists()
+        build.run_cmd.assert_called_with(["ccache", "--zero-stats"], output=mocker.ANY)
 
 
 class Test_sccache:
