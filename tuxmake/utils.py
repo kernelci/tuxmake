@@ -19,7 +19,7 @@ class supported:
 class defaults:
     kconfig = "defconfig"
     targets = ["config", "kernel", "modules", "dtbs", "debugkernel"]
-    jobs = multiprocessing.cpu_count() * 2
+    jobs = multiprocessing.cpu_count()
 
 
 def quote_command_line(cmd):
