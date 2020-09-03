@@ -8,6 +8,7 @@ author = "Antonio Terceiro"
 author-email = "antonio.terceiro@linaro.org"
 home-page = "https://gitlab.com/Linaro/tuxmake"
 classifiers = ["License :: OSI Approved :: MIT License"]
+requires-python = ">=3.6"
 
 [tool.flit.scripts]
 tuxmake = "tuxmake.cli:main"
