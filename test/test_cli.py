@@ -1,4 +1,5 @@
 import argparse
+import os
 import pytest
 import sys
 from tuxmake.build import BuildInfo
@@ -95,6 +96,26 @@ class TestRuntime:
     def test_docker(self, builder):
         tuxmake("--runtime=docker")
         assert args(builder).runtime == "docker"
+
+
+class TestDockerImage:
+    @pytest.fixture(autouse=True)
+    def environment(self, monkeypatch):
+        env = {}
+        monkeypatch.setattr(os, "environ", env)
+        return env
+
+    def test_implies_runtime_docker(self, builder):
+        tuxmake("--docker-image=foobar")
+        assert args(builder).runtime == "docker"
+
+    def test_not_passed_to_builder_class(self, builder):
+        tuxmake("--docker-image=foobar")
+        assert "docker_image" not in builder.call_args[1].keys()
+
+    def test_sets_TUXMAKE_DOCKER_IMAGE(self, environment):
+        tuxmake("--docker-image=foobar")
+        assert environment["TUXMAKE_DOCKER_IMAGE"] == "foobar"
 
 
 class TestVerbosity:

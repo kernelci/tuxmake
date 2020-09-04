@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from tuxmake import __version__
 from tuxmake.build import build, supported, defaults
@@ -90,7 +91,7 @@ def main(*argv):
     buildenv.add_argument(
         "-i",
         "--docker-image",
-        help="Docker image to build with (implies --docker). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. (default: tuxmake-provided images)",
+        help="Docker image to build with (implies --docker). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. Implies --runtime=docker. (default: tuxmake-provided images)",
     )
     buildenv.add_argument(
         "-v",
@@ -190,7 +191,15 @@ def main(*argv):
     else:
         err = sys.stderr
 
-    build_args = {k: v for k, v in options.__dict__.items() if v and k != "color"}
+    if options.docker_image:
+        options.runtime = "docker"
+        os.environ["TUXMAKE_DOCKER_IMAGE"] = options.docker_image
+
+    build_args = {
+        k: v
+        for k, v in options.__dict__.items()
+        if v and k not in ["color", "docker_image"]
+    }
     try:
         result = build(**build_args)
         for target, info in result.status.items():
