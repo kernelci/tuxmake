@@ -53,6 +53,7 @@ $(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE): $(O)/vmlinux
 #########################################################################
 vmlinux: $(O)/vmlinux
 CLEAN += $(O)/vmlinux
+CLEAN += $(O)/System.map
 $(O)/vmlinux: $(O)/.config
 $(O)/vmlinux: $(O)/vmlinux.o
 	$(call maybefail,debugkernel)
