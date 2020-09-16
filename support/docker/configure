@@ -194,6 +194,20 @@ class CrossClangBuildImage(CrossBuildMixin, BuildImage):
 class ArcImage(Image):
     kind = "arc"
     extra_lists = ["crossbuild", "arc"]
+    releases = {
+        'arc_gcc-9': (
+            ('RELEASE', 'arc-2020.03-release'),
+            ('TARBALL', 'arc_gnu_2020.03_prebuilt_elf32_le_linux_install.tar.gz'),
+            ('GCC_VERSION', '9'),
+            ('GCC_VERSION_FULL', '9.3.1'),
+        ),
+    }
+    releases['arc_gcc'] = releases['arc_gcc-9']
+
+    def emit(self):
+        super().emit()
+        for k, v in self.releases[self.name]:
+            self.arg(k, v)
 
 
 def generate(name, kind, base, when, hosts):
