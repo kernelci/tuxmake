@@ -135,6 +135,14 @@ def main(*argv):
         help="Control use of colored output. `always` and `never` do what you expect; `auto` (the default) outputs colors when stdou is a tty",
     )
 
+    debug = parser.add_argument_group("Debugging options")
+    debug.add_argument(
+        "-s",
+        "--shell",
+        action="store_true",
+        help="Opens a shell in the runtime after the build, regardless of its result, for debugging",
+    )
+
     options = parser.parse_args(argv)
 
     if options.color == "always" or (options.color == "auto" and sys.stdout.isatty()):
@@ -198,10 +206,12 @@ def main(*argv):
     build_args = {
         k: v
         for k, v in options.__dict__.items()
-        if v and k not in ["color", "docker_image"]
+        if v and k not in ["color", "docker_image", "shell"]
     }
     try:
         result = build(**build_args)
+        if options.shell:
+            result.run_cmd(["bash"], interactive=True)
         for target, info in result.status.items():
             print(f"I: {target}: {info.status} in {info.duration}", file=err)
         print(f"I: build output in {result.output_dir}", file=err)

@@ -54,8 +54,7 @@ class BuildInfo:
 class Build:
     def __init__(
         self,
-        source_tree,
-        *,
+        tree=".",
         output_dir=None,
         target_arch=None,
         toolchain=None,
@@ -69,7 +68,7 @@ class Build:
         verbose=False,
         quiet=False,
     ):
-        self.source_tree = source_tree
+        self.source_tree = tree
 
         if output_dir is None:
             self.output_dir = get_new_output_dir()
@@ -133,28 +132,32 @@ class Build:
         else:
             return ["--silent"]
 
-    def run_cmd(self, origcmd, output=None):
+    def run_cmd(self, origcmd, output=None, interactive=False):
         cmd = []
         for c in origcmd:
             cmd += self.expand_cmd_part(c)
 
-        final_cmd = self.runtime.get_command_line(self, cmd)
+        final_cmd = self.runtime.get_command_line(self, cmd, interactive)
         env = dict(os.environ, **self.wrapper.environment, **self.environment)
 
         logger = self.logger.stdin
-        if output:
-            stdout = subprocess.PIPE
-            stderr = logger
+        if interactive:
+            stdout = stderr = stdin = None
         else:
-            self.log(" ".join([shlex.quote(c) for c in cmd]))
-            stdout = logger
-            stderr = subprocess.STDOUT
+            stdin = subprocess.DEVNULL
+            if output:
+                stdout = subprocess.PIPE
+                stderr = logger
+            else:
+                self.log(" ".join([shlex.quote(c) for c in cmd]))
+                stdout = logger
+                stderr = subprocess.STDOUT
 
         process = subprocess.Popen(
             final_cmd,
             cwd=self.source_tree,
             env=env,
-            stdin=subprocess.DEVNULL,
+            stdin=stdin,
             stdout=stdout,
             stderr=stderr,
         )
@@ -329,7 +332,7 @@ class Build:
         self.cleanup()
 
 
-def build(tree, **kwargs):
-    builder = Build(tree, **kwargs)
+def build(**kwargs):
+    builder = Build(**kwargs)
     builder.run()
     return builder

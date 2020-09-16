@@ -33,7 +33,7 @@ class TestGetRuntime:
 
 class TestNullRuntime:
     def test_get_command_line(self, build):
-        assert NullRuntime().get_command_line(build, ["date"]) == ["date"]
+        assert NullRuntime().get_command_line(build, ["date"], False) == ["date"]
 
 
 @pytest.fixture
@@ -59,36 +59,41 @@ class TestDockerRuntime:
         check_call.assert_called_with(["docker", "pull", "myimage"])
 
     def test_get_command_line(self, build):
-        cmd = DockerRuntime().get_command_line(build, ["date"])
+        cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert cmd[0:2] == ["docker", "run"]
         assert cmd[-1] == "date"
 
     def test_environment(self, build):
         build.environment = {"FOO": "BAR"}
-        cmd = DockerRuntime().get_command_line(build, ["date"])
+        cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert "--env=FOO=BAR" in cmd
 
     def test_ccache(self, build, home):
         ccache = Wrapper("ccache")
         orig_ccache_dir = ccache.environment["CCACHE_DIR"]
         build.wrapper = ccache
-        cmd = DockerRuntime().get_command_line(build, ["date"])
+        cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert "--env=CCACHE_DIR=/ccache-dir" in cmd
         assert f"--volume={orig_ccache_dir}:/ccache-dir" in cmd
 
     def test_sccache_with_path(self, build, home):
         sccache_from_host = Wrapper("/opt/bin/sccache")
         build.wrapper = sccache_from_host
-        cmd = DockerRuntime().get_command_line(build, ["date"])
+        cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert "--volume=/opt/bin/sccache:/usr/local/bin/sccache" in cmd
 
     def test_TUXMAKE_DOCKER_RUN(self, build, monkeypatch):
         monkeypatch.setenv(
             "TUXMAKE_DOCKER_RUN", "--hostname=foobar --env=FOO='bar baz'"
         )
-        cmd = DockerRuntime().get_command_line(build, ["bash"])
+        cmd = DockerRuntime().get_command_line(build, ["bash"], False)
         assert "--hostname=foobar" in cmd
         assert "--env=FOO=bar baz" in cmd
+
+    def test_interactive(self, build):
+        cmd = DockerRuntime().get_command_line(build, ["bash"], True)
+        assert "--interactive" in cmd
+        assert "--tty" in cmd
 
     def test_bases(self):
         assert "base-debian" in [t.name for t in DockerRuntime().base_images]

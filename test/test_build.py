@@ -49,18 +49,18 @@ def kwargs(called):
 def test_invalid_directory(tmp_path):
     (tmp_path / "Makefile").touch()
     with pytest.raises(tuxmake.exceptions.UnrecognizedSourceTree):
-        build(tmp_path)
+        build(tree=tmp_path)
 
 
 def test_build(linux, home, kernel):
-    result = build(linux)
+    result = build(tree=linux)
     assert kernel in result.artifacts
     assert (home / ".cache/tuxmake/builds/1" / kernel).exists()
     assert result.passed
 
 
 def test_build_with_output_dir(linux, output_dir, kernel):
-    result = build(linux, output_dir=output_dir)
+    result = build(tree=linux, output_dir=output_dir)
     assert kernel in result.artifacts
     assert (output_dir / kernel).exists()
     assert result.output_dir == output_dir
@@ -68,24 +68,24 @@ def test_build_with_output_dir(linux, output_dir, kernel):
 
 def test_unsupported_target(linux):
     with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
-        build(linux, targets=["unknown-target"])
+        build(tree=linux, targets=["unknown-target"])
 
 
 def test_kconfig_default(linux, Popen):
-    b = Build(linux, targets=["config"])
+    b = Build(tree=linux, targets=["config"])
     b.build(b.targets[0])
     assert "defconfig" in args(Popen)
 
 
 def test_kconfig_named(linux, Popen):
-    b = Build(linux, targets=["config"], kconfig="fooconfig")
+    b = Build(tree=linux, targets=["config"], kconfig="fooconfig")
     b.build(b.targets[0])
     assert "fooconfig" in args(Popen)
 
 
 def test_kconfig_named_invalid(linux, mocker):
     with pytest.raises(tuxmake.exceptions.UnsupportedKconfig):
-        build(linux, targets=["config"], kconfig="foobar")
+        build(tree=linux, targets=["config"], kconfig="foobar")
 
 
 def test_kconfig_url(linux, mocker, output_dir):
@@ -95,7 +95,7 @@ def test_kconfig_url(linux, mocker, output_dir):
     mocker.patch("urllib.request.urlopen", return_value=response)
 
     build(
-        linux,
+        tree=linux,
         targets=["config"],
         kconfig="https://example.com/config.txt",
         output_dir=output_dir,
@@ -113,13 +113,15 @@ def test_kconfig_url_not_found(linux, mocker):
     )
 
     with pytest.raises(tuxmake.exceptions.InvalidKConfig):
-        build(linux, targets=["config"], kconfig="https://example.com/config.txt")
+        build(tree=linux, targets=["config"], kconfig="https://example.com/config.txt")
 
 
 def test_kconfig_localfile(linux, tmp_path, output_dir):
     extra_config = tmp_path / "extra_config"
     extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
-    build(linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir)
+    build(
+        tree=linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir
+    )
     config = output_dir / "config"
     assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
 
@@ -131,7 +133,7 @@ def test_kconfig_add_url(linux, mocker, output_dir):
     mocker.patch("urllib.request.urlopen", return_value=response)
 
     build(
-        linux,
+        tree=linux,
         targets=["config"],
         kconfig="defconfig",
         kconfig_add=["https://example.com/config.txt"],
@@ -145,7 +147,7 @@ def test_kconfig_add_localfile(linux, tmp_path, output_dir):
     extra_config = tmp_path / "extra_config"
     extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
     build(
-        linux,
+        tree=linux,
         targets=["config"],
         kconfig_add=[str(extra_config)],
         output_dir=output_dir,
@@ -156,7 +158,10 @@ def test_kconfig_add_localfile(linux, tmp_path, output_dir):
 
 def test_kconfig_add_inline(linux, output_dir):
     build(
-        linux, targets=["config"], kconfig_add=["CONFIG_FOO=y"], output_dir=output_dir
+        tree=linux,
+        targets=["config"],
+        kconfig_add=["CONFIG_FOO=y"],
+        output_dir=output_dir,
     )
     config = output_dir / "config"
     assert "CONFIG_FOO=y\n" in config.read_text()
@@ -164,7 +169,7 @@ def test_kconfig_add_inline(linux, output_dir):
 
 def test_kconfig_add_inline_not_set(linux, output_dir):
     build(
-        linux,
+        tree=linux,
         targets=["config"],
         kconfig_add=["# CONFIG_FOO is not set"],
         output_dir=output_dir,
@@ -175,7 +180,10 @@ def test_kconfig_add_inline_not_set(linux, output_dir):
 
 def test_kconfig_add_inline_set_to_no(linux, output_dir):
     build(
-        linux, targets=["config"], kconfig_add=["CONFIG_FOO=n"], output_dir=output_dir
+        tree=linux,
+        targets=["config"],
+        kconfig_add=["CONFIG_FOO=n"],
+        output_dir=output_dir,
     )
     config = output_dir / "config"
     assert "CONFIG_FOO=n\n" in config.read_text()
@@ -183,7 +191,7 @@ def test_kconfig_add_inline_set_to_no(linux, output_dir):
 
 def test_kconfig_add_in_tree(linux, output_dir):
     build(
-        linux,
+        tree=linux,
         targets=["config"],
         kconfig_add=["kvm_guest.config"],
         output_dir=output_dir,
@@ -194,11 +202,11 @@ def test_kconfig_add_in_tree(linux, output_dir):
 
 def test_kconfig_add_invalid(linux):
     with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
-        build(linux, targets=["config"], kconfig_add=["foo"])
+        build(tree=linux, targets=["config"], kconfig_add=["foo"])
 
 
 def test_output_dir(linux, output_dir, kernel):
-    build(linux, output_dir=output_dir)
+    build(tree=linux, output_dir=output_dir)
     artifacts = [str(f.name) for f in output_dir.glob("*")]
     assert "config" in artifacts
     assert kernel in artifacts
@@ -206,7 +214,7 @@ def test_output_dir(linux, output_dir, kernel):
 
 
 def test_saves_log(linux):
-    result = build(linux)
+    result = build(tree=linux)
     artifacts = [str(f.name) for f in result.output_dir.glob("*")]
     assert "build.log" in result.artifacts
     assert "build.log" in artifacts
@@ -216,7 +224,7 @@ def test_saves_log(linux):
 
 def test_build_failure(linux, kernel, monkeypatch):
     monkeypatch.setenv("FAIL", "kernel")
-    result = build(linux, targets=["config", "kernel"])
+    result = build(tree=linux, targets=["config", "kernel"])
     assert not result.passed
     assert result.failed
     artifacts = [str(f.name) for f in result.output_dir.glob("*")]
@@ -226,25 +234,25 @@ def test_build_failure(linux, kernel, monkeypatch):
 
 
 def test_concurrency_default(linux, Popen):
-    b = Build(linux, targets=["config"])
+    b = Build(tree=linux, targets=["config"])
     b.build(b.targets[0])
     assert f"--jobs={defaults.jobs}" in args(Popen)
 
 
 def test_concurrency_set(linux, Popen):
-    b = Build(linux, targets=["config"], jobs=99)
+    b = Build(tree=linux, targets=["config"], jobs=99)
     b.build(b.targets[0])
     assert "--jobs=99" in args(Popen)
 
 
 def test_verbose(linux, mocker, Popen):
-    b = Build(linux, targets=["config"], verbose=True)
+    b = Build(tree=linux, targets=["config"], verbose=True)
     b.build(b.targets[0])
     assert "--silent" not in args(Popen)
 
 
 def test_quiet(linux, capfd):
-    build(linux, quiet=True)
+    build(tree=linux, quiet=True)
     out, err = capfd.readouterr()
     assert out == ""
     assert err == ""
@@ -256,38 +264,38 @@ def test_ctrl_c(linux, mocker, Popen):
     Popen.return_value = process
     process.communicate.side_effect = KeyboardInterrupt()
     with pytest.raises(SystemExit):
-        b = Build(linux)
+        b = Build(tree=linux)
         b.build(b.targets[0])
     process.terminate.assert_called()
 
 
 class TestArchitecture:
     def test_x86_64(self, linux):
-        result = build(linux, target_arch="x86_64")
+        result = build(tree=linux, target_arch="x86_64")
         assert "bzImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_arm64(self, linux):
-        result = build(linux, target_arch="arm64")
+        result = build(tree=linux, target_arch="arm64")
         assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_arm(self, linux):
-        result = build(linux, target_arch="arm")
+        result = build(tree=linux, target_arch="arm")
         assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_i386(self, linux):
-        result = build(linux, target_arch="i386")
+        result = build(tree=linux, target_arch="i386")
         assert "bzImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_mips(self, linux):
-        result = build(linux, target_arch="mips")
+        result = build(tree=linux, target_arch="mips")
         assert "vmlinux.bin.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_riscv(self, linux):
-        result = build(linux, target_arch="riscv")
+        result = build(tree=linux, target_arch="riscv")
         assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_arc(self, linux):
-        result = build(linux, target_arch="arc")
+        result = build(tree=linux, target_arch="arc")
         assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_invalid_arch(self):
@@ -301,19 +309,21 @@ class TestToolchain:
     # mechanism to check which toolchain was used to build a given binary (and
     # for test/fakelinux/ to produce real binaries)
     def test_gcc_10(self, linux, Popen):
-        b = Build(linux, targets=["config"], toolchain="gcc-10")
+        b = Build(tree=linux, targets=["config"], toolchain="gcc-10")
         b.build(b.targets[0])
         cmdline = args(Popen)
         assert "CC=gcc-10" in cmdline
 
     def test_gcc_10_cross(self, linux, Popen):
-        b = Build(linux, targets=["config"], toolchain="gcc-10", target_arch="arm64")
+        b = Build(
+            tree=linux, targets=["config"], toolchain="gcc-10", target_arch="arm64"
+        )
         b.build(b.targets[0])
         cmdline = args(Popen)
         assert "CC=aarch64-linux-gnu-gcc-10" in cmdline
 
     def test_clang(self, linux, Popen):
-        b = Build(linux, targets=["config"], toolchain="clang")
+        b = Build(tree=linux, targets=["config"], toolchain="clang")
         b.build(b.targets[0])
         cmdline = args(Popen)
         assert "CC=clang" in cmdline
@@ -325,13 +335,15 @@ class TestToolchain:
 
 class TestDebugKernel:
     def test_build_with_debugkernel(self, linux):
-        result = build(linux, targets=["config", "debugkernel"])
+        result = build(tree=linux, targets=["config", "debugkernel"])
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "vmlinux.xz" in artifacts
         assert "System.map" in artifacts
 
     def test_build_with_debugkernel_arm64(self, linux):
-        result = build(linux, targets=["config", "debugkernel"], target_arch="arm64")
+        result = build(
+            tree=linux, targets=["config", "debugkernel"], target_arch="arm64"
+        )
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "vmlinux.xz" in artifacts
         assert "System.map" in artifacts
@@ -339,13 +351,13 @@ class TestDebugKernel:
 
 class TestModules:
     def test_modules(self, linux):
-        result = build(linux, targets=["config", "kernel", "modules"])
+        result = build(tree=linux, targets=["config", "kernel", "modules"])
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "modules.tar.xz" in artifacts
 
     def test_skip_if_not_configured_for_modules(self, linux):
         result = build(
-            linux, targets=["config", "kernel", "modules"], kconfig="tinyconfig"
+            tree=linux, targets=["config", "kernel", "modules"], kconfig="tinyconfig"
         )
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "modules.tar.xz" not in artifacts
@@ -353,12 +365,12 @@ class TestModules:
 
 class TestDtbs:
     def test_dtbs(self, linux):
-        result = build(linux, targets=["dtbs"], target_arch="arm64")
+        result = build(tree=linux, targets=["dtbs"], target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" in artifacts
 
     def test_skip_on_arch_with_no_dtbs(self, linux):
-        result = build(linux, targets=["dtbs"], target_arch="x86_64")
+        result = build(tree=linux, targets=["dtbs"], target_arch="x86_64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" not in artifacts
 
@@ -366,17 +378,17 @@ class TestDtbs:
 class TestTargetDependencies:
     def test_dont_build_kernel_if_config_fails(self, linux, monkeypatch):
         monkeypatch.setenv("FAIL", "defconfig")
-        result = build(linux)
+        result = build(tree=linux)
         assert result.status["config"].failed
         assert result.status["kernel"].skipped
 
     def test_include_dependencies_in_targets(self, linux):
-        result = build(linux, targets=["kernel"])
+        result = build(tree=linux, targets=["kernel"])
         assert result.status["config"].passed
         assert result.status["kernel"].passed
 
     def test_recursive_dependencies(self, linux):
-        result = build(linux, targets=["modules"])
+        result = build(tree=linux, targets=["modules"])
         assert result.status["config"].passed
         assert result.status["kernel"].passed
         assert result.status["modules"].passed
@@ -384,18 +396,27 @@ class TestTargetDependencies:
 
 class TestRuntime:
     def test_null(self, linux):
-        build = Build(linux)
+        build = Build(tree=linux)
         assert build.runtime
 
     def test_docker(self, linux):
-        build = Build(linux, runtime="docker")
+        build = Build(tree=linux, runtime="docker")
         assert build.runtime
+
+    def test_interactive_command(self, linux, mocker):
+        runtime = mocker.patch("tuxmake.build.get_runtime").return_value
+        runtime.get_command_line.return_value = ["true"]
+        build = Build(tree=linux, runtime="docker")
+        build.run_cmd(["true"], interactive=True)
+        runtime.get_command_line.assert_called_with(build, ["true"], True)
 
 
 class TestEnvironment:
     def test_basics(self, linux, Popen):
         b = Build(
-            linux, environment={"KCONFIG_ALLCONFIG": "foo.config"}, targets=["config"]
+            tree=linux,
+            environment={"KCONFIG_ALLCONFIG": "foo.config"},
+            targets=["config"],
         )
         b.build(b.targets[0])
         assert kwargs(Popen)["env"]["KCONFIG_ALLCONFIG"] == "foo.config"
@@ -403,26 +424,26 @@ class TestEnvironment:
 
 class TestCompilerWrappers:
     def test_ccache(self, linux, Popen):
-        b = Build(linux, targets=["config"], wrapper="ccache")
+        b = Build(tree=linux, targets=["config"], wrapper="ccache")
         b.build(b.targets[0])
         assert "CC=ccache gcc" in args(Popen)
         assert "HOSTCC=ccache gcc" in args(Popen)
         assert "CCACHE_DIR" in kwargs(Popen)["env"]
 
     def test_ccache_gcc_v(self, linux, Popen):
-        b = Build(linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")
+        b = Build(tree=linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")
         b.build(b.targets[0])
         assert "CC=ccache gcc-10" in args(Popen)
         assert "HOSTCC=ccache gcc-10" in args(Popen)
 
     def test_ccache_target_arch(self, linux, Popen):
-        b = Build(linux, targets=["config"], target_arch="arm64", wrapper="ccache")
+        b = Build(tree=linux, targets=["config"], target_arch="arm64", wrapper="ccache")
         b.build(b.targets[0])
         assert "CC=ccache aarch64-linux-gnu-gcc" in args(Popen)
 
     def test_ccache_target_arch_and_gcc_v(self, linux, Popen):
         b = Build(
-            linux,
+            tree=linux,
             targets=["config"],
             toolchain="gcc-10",
             target_arch="arm64",
@@ -438,7 +459,7 @@ class TestCompilerWrappers:
 class TestMetadata:
     @pytest.fixture(scope="class")
     def build(self, linux):
-        build = Build(linux, environment={"WARN": "kernel", "FAIL": "modules"})
+        build = Build(tree=linux, environment={"WARN": "kernel", "FAIL": "modules"})
         build.run()
         return build
 
@@ -465,7 +486,7 @@ warning: ssadas
 class TestParseLog:
     @pytest.fixture(scope="class")
     def build(linux):
-        b = Build(linux)
+        b = Build(tree=linux)
         (b.output_dir / "build.log").write_text(LOG)
         return b
 
