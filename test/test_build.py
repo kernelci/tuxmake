@@ -403,6 +403,13 @@ class TestRuntime:
         build = Build(tree=linux, runtime="docker")
         assert build.runtime
 
+    def test_interactive_command(self, linux, mocker):
+        runtime = mocker.patch("tuxmake.build.get_runtime").return_value
+        runtime.get_command_line.return_value = ["true"]
+        build = Build(tree=linux, runtime="docker")
+        build.run_cmd(["true"], interactive=True)
+        runtime.get_command_line.assert_called_with(build, ["true"], True)
+
 
 class TestEnvironment:
     def test_basics(self, linux, Popen):

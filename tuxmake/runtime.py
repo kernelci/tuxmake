@@ -39,7 +39,7 @@ class Runtime(ConfigurableObject):
     def is_supported(self, arch, toolchain):
         return True
 
-    def get_command_line(self, build, cmd):
+    def get_command_line(self, build, cmd, interactive):
         return cmd
 
     def prepare(self, build):
@@ -133,9 +133,14 @@ class DockerRuntime(Runtime):
     def do_prepare(self, build):
         subprocess.check_call(["docker", "pull", self.get_image(build)])
 
-    def get_command_line(self, build, cmd):
+    def get_command_line(self, build, cmd, interactive):
         source_tree = os.path.abspath(build.source_tree)
         build_dir = os.path.abspath(build.build_dir)
+
+        if interactive:
+            interactive_opts = ["--interactive", "--tty"]
+        else:
+            interactive_opts = []
 
         wrapper = build.wrapper
         wrapper_opts = []
@@ -159,6 +164,7 @@ class DockerRuntime(Runtime):
             "run",
             "--rm",
             "--init",
+            *interactive_opts,
             *wrapper_opts,
             *env,
             f"--user={uid}:{gid}",

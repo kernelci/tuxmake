@@ -229,3 +229,10 @@ class TestPrintSupportMatrix:
         builder.assert_not_called()
         out, _ = capsys.readouterr()
         assert "\033" in out
+
+
+class TestDebug:
+    def test_shell(self, builder, mocker):
+        run_cmd = builder.return_value.run_cmd
+        tuxmake("--shell")
+        run_cmd.assert_called_with(["bash"], interactive=True)
