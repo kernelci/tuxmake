@@ -17,4 +17,7 @@ RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
         $PACKAGES; \
     fi
 
+# For clang images, symlink all the binaries in $PATH
+RUN if [ -d /usr/lib/llvm-*/bin ]; then ln -sfv /usr/lib/llvm-*/bin/* /usr/local/bin/; fi
+
 # vim: ft=dockerfile
