@@ -37,3 +37,19 @@ def test_compiler_name(gcc, arm64):
     assert gcc.compiler(arm64) == "aarch64-linux-gnu-gcc"
     assert default.compiler(Native()) == "gcc"
     assert default.compiler(arm64) == "aarch64-linux-gnu-gcc"
+
+
+class TestLLVM:
+    def test_docker_image_unversioned(self, arm64):
+        llvm = Toolchain("llvm")
+        assert llvm.get_docker_image(arm64) == "tuxmake/arm64_clang"
+
+    def test_docker_image_versioned(self, arm64):
+        llvm = Toolchain("llvm-10")
+        assert llvm.get_docker_image(arm64) == "tuxmake/arm64_clang-10"
+
+    def test_compiler_unversioned(self, arm64):
+        assert Toolchain("llvm").compiler(arm64) == "clang"
+
+    def test_compiler_versioned(self, arm64):
+        assert Toolchain("llvm-10").compiler(arm64) == "clang-10"
