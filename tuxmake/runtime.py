@@ -165,6 +165,7 @@ class DockerRuntime(Runtime):
             "--init",
             *interactive_opts,
             *wrapper_opts,
+            "--env=KBUILD_BUILD_USER=tuxmake",
             *env,
             f"--user={uid}:{gid}",
             f"--volume={source_tree}:{source_tree}",
