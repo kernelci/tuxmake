@@ -81,6 +81,24 @@ test_clang_arm64() {
     'file ${tmpdir}/Image | grep -qi aarch64'
 }
 
+test_llvm_x86_64() {
+  run tuxmake --target-arch=x86_64 --toolchain=llvm
+  assertTrue 'LLVM=1 in output' 'grep LLVM=1 stdout'
+  assertEquals 'exits with 0' 0 "$rc"
+  bunzip2 < "${XDG_CACHE_HOME}/tuxmake/builds/1/bzImage" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for x86_64' \
+    'file ${tmpdir}/Image | grep -qi x86-64'
+}
+
+test_llvm_arm64() {
+  run tuxmake --target-arch=arm64 --toolchain=llvm
+  assertTrue 'LLVM=1 in output' 'grep LLVM=1 stdout'
+  assertEquals 'exits with 0' 0 "$rc"
+  gunzip < "${XDG_CACHE_HOME}/tuxmake/builds/1/Image.gz" > "${tmpdir}/Image"
+  assertTrue 'Image is compiled for arm64' \
+    'file ${tmpdir}/Image | grep -qi aarch64'
+}
+
 test_toolchain() {
   run tuxmake --toolchain="${gcc_v}"
   assertEquals 0 "$rc"
@@ -143,5 +161,14 @@ test_ccache() {
   assertTrue 'CC=' "grep \"'CC=ccache gcc'\" stdout"
 }
 
+if [ $# -gt 0 ]; then
+  export TESTCASES="$(echo "$@")"
+  set --
+  suite() {
+    for t in $TESTCASES; do
+      suite_addTest "$t"
+    done
+  }
+fi
 
 . shunit2
