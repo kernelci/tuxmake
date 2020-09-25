@@ -168,10 +168,31 @@ test_output_dir() {
   assertTrue 'test -f output/build.log'
 }
 
+test_reuse_output_dir() {
+  mkdir output
+  run tuxmake --output-dir=output config
+  assertEquals 0 "$rc"
+  assertTrue 'config copied to output dir' 'test -f output/config'
+}
+
 test_build_dir() {
   run tuxmake --build-dir=build config
   assertTrue 'test -f build/.config'
 }
+
+test_build_dir_with_incremental_build() {
+  run tuxmake --build-dir=build config
+  assertEquals 0 "$rc"
+  assertTrue 'runs config target' 'grep defconfig stdout'
+  assertTrue "config copied to output directory" "test -f $XDG_CACHE_HOME/tuxmake/builds/1/config"
+  run tuxmake --build-dir=build debugkernel
+  assertEquals 0 "$rc"
+  assertFalse 'does not run config target' 'grep defconfig stdout'
+  assertTrue "config copied to output directory" "test -f $XDG_CACHE_HOME/tuxmake/builds/2/config"
+  assertTrue "config copied to output directory" "test -f $XDG_CACHE_HOME/tuxmake/builds/2/vmlinux.xz"
+  assertTrue 'test -f build/vmlinux.xz'
+}
+
 
 if [ $# -gt 0 ]; then
   export TESTCASES="$(echo "$@")"

@@ -43,6 +43,12 @@ class TestConfig:
     def test_artifacts(self, config):
         assert config.artifacts["config"] == ".config"
 
+    def test_does_nothing_if_dot_config_already_exists(self, config, build):
+        build.kconfig = "defconfig"
+        (build.build_dir / ".config").touch()
+        config.prepare()
+        assert config.commands == []
+
 
 class TestDebugKernel:
     def test_commands(self, build):

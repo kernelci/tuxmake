@@ -74,8 +74,8 @@ class Build:
         if output_dir is None:
             self.output_dir = get_new_output_dir()
         else:
-            self.output_dir = output_dir
-            os.mkdir(self.output_dir)
+            self.output_dir = Path(output_dir)
+            self.output_dir.mkdir(exist_ok=True)
 
         if build_dir:
             self.build_dir = Path(build_dir)
