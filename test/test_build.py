@@ -66,6 +66,11 @@ def test_build_with_output_dir(linux, output_dir, kernel):
     assert result.output_dir == output_dir
 
 
+def test_build_with_build_dir(linux, tmp_path):
+    build(tree=linux, build_dir=tmp_path)
+    assert (tmp_path / ".config").exists
+
+
 def test_unsupported_target(linux):
     with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
         build(tree=linux, targets=["unknown-target"])
@@ -451,6 +456,17 @@ class TestCompilerWrappers:
         )
         b.build(b.targets[0])
         assert "CC=ccache aarch64-linux-gnu-gcc-10" in args(Popen)
+
+    def test_ccache_llvm(self, linux, Popen):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="llvm",
+            target_arch="arm64",
+            wrapper="ccache",
+        )
+        b.build(b.targets[0])
+        assert "CC=ccache clang" in args(Popen)
 
 
 @pytest.mark.skipif(

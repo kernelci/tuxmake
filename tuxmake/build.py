@@ -56,6 +56,7 @@ class Build:
         self,
         tree=".",
         output_dir=None,
+        build_dir=None,
         target_arch=None,
         toolchain=None,
         wrapper=None,
@@ -73,11 +74,16 @@ class Build:
         if output_dir is None:
             self.output_dir = get_new_output_dir()
         else:
-            self.output_dir = output_dir
-            os.mkdir(self.output_dir)
+            self.output_dir = Path(output_dir)
+            self.output_dir.mkdir(exist_ok=True)
 
-        self.build_dir = self.output_dir / "tmp"
-        os.mkdir(self.build_dir)
+        if build_dir:
+            self.build_dir = Path(build_dir)
+            self.keep_build_dir = True
+        else:
+            self.build_dir = self.output_dir / "tmp"
+            self.build_dir.mkdir()
+            self.keep_build_dir = False
 
         self.target_arch = target_arch and Architecture(target_arch) or host_arch
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
@@ -313,7 +319,8 @@ class Build:
         self.logger.terminate()
 
     def cleanup(self):
-        shutil.rmtree(self.build_dir)
+        if not self.keep_build_dir:
+            shutil.rmtree(self.build_dir)
 
     def run(self):
         self.validate()

@@ -1,5 +1,6 @@
 import argparse
 import os
+from pathlib import Path
 import sys
 from tuxmake import __version__
 from tuxmake.build import build, supported, defaults
@@ -10,6 +11,10 @@ from tuxmake.runtime import get_runtime
 def key_value(s):
     parts = s.split("=")
     return (parts[0], "=".join(parts[1:]))
+
+
+def abspath(path):
+    return Path(path).absolute()
 
 
 def main(*argv):
@@ -34,6 +39,18 @@ def main(*argv):
     build_input = parser.add_argument_group("Build input options")
     build_input.add_argument(
         "-C", "--directory", dest="tree", default=".", help="Tree to build (default: .)"
+    )
+
+    build_output = parser.add_argument_group("Output options")
+    build_output.add_argument(
+        "-o",
+        "--output-dir",
+        type=abspath,
+        default=None,
+        help="Output directory for artifacts",
+    )
+    build_output.add_argument(
+        "-b", "--build-dir", type=abspath, default=None, help="Build directory"
     )
 
     target = parser.add_argument_group("Build output options")

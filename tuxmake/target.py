@@ -61,6 +61,8 @@ class Config(Target):
         build_dir = self.build.build_dir
         config = build_dir / ".config"
         conf = self.build.kconfig
+        if config.exists():
+            return
         if self.handle_url(config, conf) or self.handle_local_file(config, conf):
             self.build.log(f"# {conf} -> {config}")
         elif self.handle_make_target(conf):

@@ -39,6 +39,8 @@ class Wrapper(ConfigurableObject):
 
     def wrap(self, makevars):
         cross = makevars.get("CROSS_COMPILE", "")
+        if makevars.get("LLVM") == "1":
+            return {"CC": f"{self.name} clang", "HOSTCC": f"{self.name} clang"}
         return {
             k: f"{self.name} {v}" for k, v in makevars.items() if k in ("CC", "HOSTCC")
         } or {"CC": f"{self.name} {cross}gcc", "HOSTCC": f"{self.name} gcc"}
