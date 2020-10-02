@@ -1,3 +1,5 @@
+. $(dirname $0)/test_helper.sh
+
 setUp() {
   tmpdir=$(mktemp --directory --tmpdir tuxmake-integration-tests-XXXXXXXXXX)
   export XDG_CACHE_HOME="${tmpdir}/cache"
