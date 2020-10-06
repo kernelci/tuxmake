@@ -66,6 +66,10 @@ class InvalidRuntimeError(TuxMakeUserError):
     msg = "Invalid runtime: {name}"
 
 
+class UnsupportedArchitectureToolchainCombination(TuxMakeUserError):
+    msg = "Unsupported architecture/toolchain combination: {name}"
+
+
 class RuntimePreparationFailed(TuxMakeInfrastructureError):
     msg = "Runtime preparation failed: {name}"
 

@@ -107,7 +107,7 @@ class DockerRuntime(Runtime):
         self.images = self.base_images + self.ci_images + self.toolchain_images
 
     def is_supported(self, arch, toolchain):
-        image = self.support_matrix.get((arch, toolchain))
+        image = self.support_matrix.get((str(arch), str(toolchain)))
         if image:
             return host_arch.name in image.hosts or any(
                 [a in image.hosts for a in host_arch.aliases]

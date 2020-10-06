@@ -513,3 +513,12 @@ class TestParseLog:
     def test_errors(self, build):
         errors, _ = build.parse_log()
         assert errors == 1
+
+
+class TestUnsupportedToolchainArchitectureCombination:
+    def test_exception(self, linux, mocker):
+        mocker.patch("tuxmake.runtime.Runtime.is_supported", return_value=False)
+        with pytest.raises(
+            tuxmake.exceptions.UnsupportedArchitectureToolchainCombination
+        ):
+            Build(tree=linux, target_arch="arc", toolchain="clang")

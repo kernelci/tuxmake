@@ -17,6 +17,7 @@ from tuxmake.target import create_target, supported_targets
 from tuxmake.runtime import get_runtime
 from tuxmake.metadata import MetadataExtractor
 from tuxmake.exceptions import UnrecognizedSourceTree
+from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 
 
 class supported:
@@ -101,6 +102,10 @@ class Build:
         self.jobs = jobs
 
         self.runtime = get_runtime(runtime)
+        if not self.runtime.is_supported(self.target_arch, self.toolchain):
+            raise UnsupportedArchitectureToolchainCombination(
+                f"{self.target_arch}/{self.toolchain}"
+            )
 
         self.verbose = verbose
         self.quiet = quiet
