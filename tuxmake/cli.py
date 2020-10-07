@@ -77,7 +77,7 @@ def build_parser(**kwargs):
         "--kconfig-add",
         type=str,
         action="append",
-        help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. Path to local file, URL, `CONFIG_*=[y|m|n]`, or `# CONFIG_* is not set`. Can be specified multiple times, and will be merged in the order given.",
+        help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. In tree configuration fragment (e.g. `kvm_guest.config`), path to local file, URL, `CONFIG_*=[y|m|n]`, or `# CONFIG_* is not set`. Can be specified multiple times, and will be merged in the order given.",
     )
 
     buildenv = parser.add_argument_group("Build environment options")
