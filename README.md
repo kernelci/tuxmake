@@ -4,9 +4,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI - License](https://img.shields.io/pypi/l/tuxmake)](https://gitlab.com/Linaro/tuxmake/blob/master/LICENSE)
 
-TuxMake is a python utility that provides portable and repeatable Linux kernel
-builds across a variety of architectures, toolchains, kernel configurations,
-and make targets.
+TuxMake is a command line tool and Python library that provides portable and
+repeatable Linux kernel builds across a variety of architectures, toolchains,
+kernel configurations, and make targets.
 
 [[_TOC_]]
 

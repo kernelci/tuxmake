@@ -1,6 +1,12 @@
 strict: true
 site_name: tuxmake documentation
+site_description: |
+  Documentation for TuxMake, a command line tool and Python library utility
+  that provides portable and repeatable Linux kernel builds across a variety of
+  architectures, toolchains, kernel configurations, and make targets.
+site_author: Tuxmake Team
 site_dir: public
+repo_url: https://gitlab.com/Linaro/tuxmake/
 theme:
   name: readthedocs
 markdown_extensions:
@@ -22,5 +28,8 @@ nav:
   - Runtimes: runtimes.md
   - Metadata: metadata.md
 - TuxMake community:
-  - Contributing: contributing.md
   - Code of Conduct: code-of-conduct.md
+  - Contributing: contributing.md
+  - License: license.md
+  - Source Code: https://gitlab.com/Linaro/tuxmake
+  - Issue Tracker: https://gitlab.com/Linaro/tuxmake/-/issues
