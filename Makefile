@@ -49,6 +49,7 @@ docs/index.md: README.md scripts/readme2index.sh
 	scripts/readme2index.sh $@
 
 doc: docs/cli.md docs/index.md
+	python3 -m pytest scripts/test_doc.py
 	PYTHONPATH=. mkdocs build
 
 clean:
