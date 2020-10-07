@@ -1,3 +1,4 @@
+strict: true
 site_name: tuxmake documentation
 site_dir: public
 theme:
