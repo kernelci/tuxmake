@@ -20,7 +20,7 @@ codespell:
 	find . -name \*.py | xargs codespell
 
 integration-tests:
-	sh test/integration/fakelinux.sh
+	run-parts --verbose test/integration
 
 docker-build-tests:
 	$(MAKE) -C support/docker test
