@@ -127,6 +127,7 @@ integration-python3.6-arm64:
   before_script:
     - apt-get update -q
     - apt-get install -qy python3-docutils mkdocs
+    - python3 -m pip install mkautodoc  # FIXME not in Debian
   script:
     - make man
     - make doc

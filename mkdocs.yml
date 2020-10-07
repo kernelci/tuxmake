@@ -2,15 +2,21 @@ site_name: tuxmake documentation
 site_dir: public
 theme:
   name: readthedocs
+markdown_extensions:
+  - mkautodoc
+extra_css:
+  - mkautodoc.css
 
 nav:
 - Introduction:
   - Getting Started: index.md
   - Command line reference: cli.md
+  - Python API: python.md
 - Reference Documentation:
   - Targets: targets.md
   - Target architectures: architectures.md
   - Toolchains: toolchains.md
+  - Kernel Configuration: kconfig.md
   - Compiler wrappers: wrappers.md
   - Runtimes: runtimes.md
   - Metadata: metadata.md

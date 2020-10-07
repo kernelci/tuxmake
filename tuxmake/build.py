@@ -35,24 +35,99 @@ class defaults:
 
 
 class BuildInfo:
+    """
+    Instances of this class represent the build results of each target (see
+    `Build.status`).
+    """
+
     def __init__(self, status, duration=None):
-        self.status = status
-        self.duration = duration
+        self.__status__ = status
+        self.__duration__ = duration
+
+    @property
+    def status(self):
+        """
+        The target build status. `"PASS"`, `"FAIL"`, or `"SKIP"`.
+        """
+        return self.__status__
+
+    @property
+    def duration(self):
+        """
+        Time this target took to build; a `datetime.timedelta` object.
+        """
+        return self.__duration__
+
+    @duration.setter
+    def duration(self, d):
+        self.__duration__ = d
 
     @property
     def failed(self):
+        """
+        `True` if this target failed.
+        """
         return self.status == "FAIL"
 
     @property
     def passed(self):
+        """
+        `True` if this target passed.
+        """
         return self.status == "PASS"
 
     @property
     def skipped(self):
+        """
+        `True` if this target was skipped.
+        """
         return self.status == "SKIP"
 
 
 class Build:
+    """
+    This class encapsulates a tuxmake build.
+
+    The class constructor takes in more or less the same parameters as the the
+    command line API, and will raise an exception if any of the arguments, or
+    combinarion of them, is not supported. For example, if you want to only
+    validate a set of build arguments, but not actually run the build, you can
+    just instantiate this class.
+
+    Only the methods and properties that are documented here can be considered
+    as the public API of this class. All other methods must be considered as
+    implementation details.
+
+    All constructor parameters are optional, and have sane defaults. They are:
+
+    - **tree**: the source directory to build. Defaults to the current
+      directory.
+    - **output_dir**: directory where the build artifacts will be copied.
+      Defaults to a new directory under `~/.cache/tuxmake/builds`.
+    - **build_dir**: directory where the build will be performed. Defaults to
+      a temporary directory under `output_dir`. An existing directory can be
+      specified to do an incremental build on top of a previous one.
+    - **target_arch**: target architecture name (`str`). Defaults to the native
+      architecture of the hosts where tuxmake is running.
+    - **toolchain**: toolchain to use in the build (`str`). Defaults to whatever Linux
+      uses by default (`gcc`).
+    - **wrapper**: compiler wrapper to use (`str`).
+    - **environment**: environment variables to use in the build (`dict` with
+      `str` as keys and values).
+    - **kconfig**: which configuration to build (`str`). Defaults to
+      `defconfig`.
+    - **kconfig_add**: additional kconfig fragments/options to use. List of
+      `str`, defaulting to an empty list.
+    - **targets**: targets to build, list of `str`.
+    - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
+      defaults to twice the number of available CPU cores.
+    - **runtime:** name of the runtime to use (`str`).
+    - **verbose**: do a verbose build. The default is to do a silent build
+      (i.e.  `make -s`).
+    - **quiet**: don't show the build logs in the console. The build log is
+      still saved to the output directory, unconditionally.
+    """
+
     def __init__(
         self,
         tree=".",
@@ -65,7 +140,7 @@ class Build:
         kconfig=defaults.kconfig,
         kconfig_add=[],
         targets=defaults.targets,
-        jobs=defaults.jobs,
+        jobs=None,
         runtime=None,
         verbose=False,
         quiet=False,
@@ -99,7 +174,10 @@ class Build:
         for t in targets:
             self.add_target(t)
 
-        self.jobs = jobs
+        if jobs:
+            self.jobs = jobs
+        else:
+            self.jobs = defaults.jobs
 
         self.runtime = get_runtime(runtime)
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
@@ -112,8 +190,19 @@ class Build:
 
         self.artifacts = ["build.log"]
         self.__logger__ = None
-        self.status = {}
+        self.__status__ = {}
         self.metadata = OrderedDict()
+
+    @property
+    def status(self):
+        """
+        A dictionary with target names (`str`) as keys, and `BuildInfo` objects
+        as values.
+
+        This property is only guaranteed to have a meaningful value after
+        `run()` has been called.
+        """
+        return self.__status__
 
     def add_target(self, target_name):
         target = create_target(target_name, self)
@@ -144,6 +233,12 @@ class Build:
             return ["--silent"]
 
     def run_cmd(self, origcmd, output=None, interactive=False):
+        """
+        Performs the build.
+
+        After the build is finished, the results can be inspected via
+        `status`, `passed`, and `failed`.
+        """
         cmd = []
         for c in origcmd:
             cmd += self.expand_cmd_part(c)
@@ -275,10 +370,22 @@ class Build:
 
     @property
     def passed(self):
+        """
+        `False` if any targets failed, `True` otherwise.
+
+        This property is only guaranteed to have a meaningful value after
+        `run()` has been called.
+        """
         return not self.failed
 
     @property
     def failed(self):
+        """
+        `True` if any target failed to build, `False` otherwise.
+
+        This property is only guaranteed to have a meaningful value after
+        `run()` has been called.
+        """
         s = [info.failed for info in self.status.values()]
         return s and True in set(s)
 
@@ -329,6 +436,11 @@ class Build:
             shutil.rmtree(self.build_dir)
 
     def run(self):
+        """
+        Performs the build. After this method completes, the results of the
+        build can be inspected though the `status`, `passed`, and `failed`
+        properties.
+        """
         self.validate()
 
         self.prepare()
@@ -347,6 +459,15 @@ class Build:
 
 
 def build(**kwargs):
+    """
+    This function instantiates a `Build` objecty, forwarding all the options
+    received in `**kwargs`. It hen calls `run()` on that instance, and returns
+    it. It can be used as quick way of running a build and inspecting the
+    results.
+
+    For full control over the build, you will probably want to use the `Build`
+    class directly.
+    """
     builder = Build(**kwargs)
     builder.run()
     return builder

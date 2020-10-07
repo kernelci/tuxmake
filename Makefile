@@ -49,7 +49,7 @@ docs/index.md: README.md scripts/readme2index.sh
 	scripts/readme2index.sh $@
 
 doc: docs/cli.md docs/index.md
-	mkdocs build
+	PYTHONPATH=. mkdocs build
 
 clean:
 	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md
