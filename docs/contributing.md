@@ -16,6 +16,10 @@ or if you don't (want to) have a gitlab account:
 git clone https://gitlab.com/Linaro/tuxmake.git
 ```
 
+## Issue tracker
+
+The tuxmake issue tracker is also on Gitlab:
+<https://gitlab.com/Linaro/tuxmake/-/issues>.
 
 ## Development dependencies
 
