@@ -1,6 +1,7 @@
 from pathlib import Path
 from tuxmake.arch import Architecture
 from tuxmake.target import Target
+from tuxmake.toolchain import Toolchain
 from tuxmake.wrapper import Wrapper
 
 
@@ -47,6 +48,11 @@ class TestDoc:
     def test_architectures(self):
         check_documented_table(
             Architecture.supported(), "docs/architectures.md", "architectures"
+        )
+
+    def test_toolchains(self):
+        check_documented_sections(
+            Toolchain.supported(), "docs/toolchains.md", "toolchains"
         )
 
     def test_wrappers(self):
