@@ -14,7 +14,7 @@ from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper, NoWrapper
 from tuxmake.output import get_new_output_dir
 from tuxmake.target import create_target, supported_targets
-from tuxmake.runtime import get_runtime
+from tuxmake.runtime import get_runtime, Runtime
 from tuxmake.metadata import MetadataExtractor
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
@@ -24,7 +24,7 @@ class supported:
     architectures = Architecture.supported()
     targets = supported_targets()
     toolchains = Toolchain.supported()
-    runtimes = ["docker"]  # FIXME don't hardcode here
+    runtimes = Runtime.supported()
     wrappers = Wrapper.supported()
 
 
