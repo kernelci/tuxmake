@@ -1,6 +1,7 @@
 from pathlib import Path
 from tuxmake.arch import Architecture
 from tuxmake.target import Target
+from tuxmake.wrapper import Wrapper
 
 
 root = Path(__file__).parent.parent
@@ -47,3 +48,6 @@ class TestDoc:
         check_documented_table(
             Architecture.supported(), "docs/architectures.md", "architectures"
         )
+
+    def test_wrappers(self):
+        check_documented_sections(Wrapper.supported(), "docs/wrappers.md", "wrappers")
