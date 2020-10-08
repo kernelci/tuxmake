@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+import shlex
 import sys
 from tuxmake import __version__
 from tuxmake.build import build, supported, defaults
@@ -179,7 +180,11 @@ def build_parser(**kwargs):
 
 def main(*argv):
     if not argv:
-        argv = sys.argv[1:]
+        argv = tuple(sys.argv[1:])
+
+    env_options = os.getenv("TUXMAKE")
+    if env_options:
+        argv = tuple(shlex.split(env_options)) + argv
 
     parser = build_parser()
     options = parser.parse_args(argv)

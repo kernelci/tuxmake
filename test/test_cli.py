@@ -258,3 +258,22 @@ class TestBuildDir:
     def test_build_dir(self, builder):
         tuxmake("--build-dir=/path/to/build")
         assert args(builder).build_dir == Path("/path/to/build")
+
+
+class TestOptionsFromEnvironment:
+    def test_options_from_environment(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--debug --verbose")
+        tuxmake("config")
+        assert args(builder).debug
+        assert args(builder).verbose
+
+    def test_command_line_overrides_environment(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--toolchain=gcc")
+        tuxmake("--toolchain=clang")
+        assert args(builder).toolchain == "clang"
+
+    def test_command_line_plus_sys_argv(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--toolchain=gcc")
+        monkeypatch.setattr(sys, "argv", ["tuxmake", "--toolchain=clang"])
+        tuxmake()
+        assert args(builder).toolchain == "clang"
