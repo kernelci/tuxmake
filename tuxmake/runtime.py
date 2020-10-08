@@ -86,7 +86,6 @@ class DockerRuntime(Runtime):
         self.base_images = []
         self.ci_images = []
         self.toolchain_images = []
-        self.support_matrix = {}
         self.toolchains = split(self.config["runtime"]["toolchains"])
         for image_list, config in (
             (self.base_images, self.config["runtime"]["bases"]),
@@ -105,11 +104,14 @@ class DockerRuntime(Runtime):
                     cross_config["hosts"] = image.target_hosts.get(target, image.hosts)
                     cross_image = Image(name=f"{target}_{image.name}", **cross_config)
                     image_list.append(cross_image)
-                    self.support_matrix[(target, image.name)] = cross_image
         self.images = self.base_images + self.ci_images + self.toolchain_images
+        self.toolchain_images_map = {
+            f"tuxmake/{image.name}": image for image in self.toolchain_images
+        }
 
     def is_supported(self, arch, toolchain):
-        image = self.support_matrix.get((str(arch), str(toolchain)))
+        image_name = toolchain.get_docker_image(arch)
+        image = self.toolchain_images_map.get(image_name)
         if image:
             return host_arch.name in image.hosts or any(
                 [a in image.hosts for a in host_arch.aliases]

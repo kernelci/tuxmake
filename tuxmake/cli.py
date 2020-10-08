@@ -4,6 +4,8 @@ from pathlib import Path
 import shlex
 import sys
 from tuxmake import __version__
+from tuxmake.arch import Architecture
+from tuxmake.toolchain import Toolchain
 from tuxmake.build import build, supported, defaults
 from tuxmake.exceptions import TuxMakeException
 from tuxmake.runtime import get_runtime
@@ -219,7 +221,7 @@ def main(*argv):
         for a in architectures:
             matrix[a] = {}
             for t in toolchains:
-                matrix[a][t] = runtime.is_supported(a, t)
+                matrix[a][t] = runtime.is_supported(Architecture(a), Toolchain(t))
         length_a = max([len(a) for a in architectures])
         length_t = max([len(t) for t in toolchains])
         arch_format = f"%-{length_a}s"
