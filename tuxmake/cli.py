@@ -163,6 +163,12 @@ def build_parser(**kwargs):
 
     debug = parser.add_argument_group("Debugging options")
     debug.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        help="Provides extra output on stderr for debugging tuxmake itself. This output will not appear in the build log.",
+    )
+    debug.add_argument(
         "-s",
         "--shell",
         action="store_true",

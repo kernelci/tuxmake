@@ -238,6 +238,10 @@ class TestDebug:
         tuxmake("--shell")
         run_cmd.assert_called_with(["bash"], interactive=True)
 
+    def test_debug(self, builder, mocker):
+        tuxmake("--debug")
+        assert args(builder).debug
+
 
 class TestOutputDir:
     def test_output_dir(self, builder):

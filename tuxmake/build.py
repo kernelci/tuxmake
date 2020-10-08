@@ -126,6 +126,8 @@ class Build:
       (i.e.  `make -s`).
     - **quiet**: don't show the build logs in the console. The build log is
       still saved to the output directory, unconditionally.
+    - **debug**: produce extra output for debugging tuxmake itself. This output
+      will not appear in the build log.
     """
 
     def __init__(
@@ -144,6 +146,7 @@ class Build:
         runtime=None,
         verbose=False,
         quiet=False,
+        debug=False,
     ):
         self.source_tree = tree
 
@@ -187,6 +190,7 @@ class Build:
 
         self.verbose = verbose
         self.quiet = quiet
+        self.debug = debug
 
         self.artifacts = ["build.log"]
         self.__logger__ = None
@@ -244,7 +248,8 @@ class Build:
             cmd += self.expand_cmd_part(c)
 
         final_cmd = self.runtime.get_command_line(self, cmd, interactive)
-        env = dict(os.environ, **self.wrapper.environment, **self.environment)
+        extra_env = dict(**self.wrapper.environment, **self.environment)
+        env = dict(os.environ, **extra_env)
 
         logger = self.logger.stdin
         if interactive:
@@ -259,6 +264,10 @@ class Build:
                 stdout = logger
                 stderr = subprocess.STDOUT
 
+        if self.debug:
+            self.log_debug(f"D: Command: {final_cmd}")
+            if extra_env:
+                self.log_debug(f"D: Environment: {extra_env}")
         process = subprocess.Popen(
             final_cmd,
             cwd=self.source_tree,
@@ -313,6 +322,9 @@ class Build:
 
     def log(self, *stuff):
         subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
+
+    def log_debug(self, *stuff):
+        print(*stuff, file=sys.stderr)
 
     @property
     def make_args(self):
