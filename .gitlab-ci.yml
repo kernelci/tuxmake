@@ -88,8 +88,9 @@ build:
   stage: testbuild
   needs:
     - build
-  script:
+  before_script:
     - python3 -m pip install dist/*.whl
+  script:
     - make integration-tests TMV=1
 
 integration-python3.8:
@@ -121,6 +122,21 @@ integration-python3.6-arm64:
   tags:
     - arm64
   image: tuxmake/ci-python3.6
+
+integration-docker:
+  extends: integration-python3.8
+  services:
+    - name: docker:19.03-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  script:
+    # Run integration tests as a non-root user, on purpose. HOME and TMPDIR
+    # must be inside $(pwd) so that they are available to the docker server
+    # (which is running in a separate container)
+    - mkdir -p nobody/home nobody/tmp
+    - chown -R nobody:nogroup nobody
+    - runuser -u nobody make integration-tests-docker TMV=1 HOME=$(pwd)/nobody TMPDIR=$(pwd)/nobody/tmp
 
 .docs:
   extends: .tuxmake

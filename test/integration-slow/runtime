@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+testdir=$(dirname $0)
+set -x
+export TUXMAKE="--runtime=$(basename $0) ${TUXMAKE:-}"
+"${testdir%-slow}/fakelinux" "$@"

@@ -22,6 +22,9 @@ codespell:
 integration-tests:
 	run-parts --verbose test/integration
 
+integration-tests-docker:
+	run-parts --verbose --regex=docker test/integration-slow
+
 docker-build-tests:
 	$(MAKE) -C support/docker test
 
