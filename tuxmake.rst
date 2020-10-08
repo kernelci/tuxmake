@@ -33,6 +33,19 @@ OPTIONS
 .. include:: cli_options.rst
 
 
+ENVIRONMENT VARIABLES
+=====================
+
+* `TUXMAKE`: defines default options for tuxmake. Those options can be
+  overriden in the command line.
+* `TUXMAKE_DOCKER_RUN`: defines extra options for the `docker run` calls made
+  by the docker runtime.
+* `TUXMAKE_DOCKER_IMAGE`: defines docker image to use with the docker runtime.
+  The same substitutions described in `--docker-image` apply.
+
+..
+    END OF ENVIRONMENT VARIABLES
+
 SEE ALSO
 ========
 

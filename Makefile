@@ -42,7 +42,7 @@ tuxmake.1: tuxmake.rst cli_options.rst
 cli_options.rst: tuxmake/cli.py scripts/cli2rst.sh
 	scripts/cli2rst.sh $@
 
-docs/cli.md: tuxmake/cli.py scripts/cli2md.sh
+docs/cli.md: tuxmake.rst tuxmake/cli.py scripts/cli2md.sh
 	scripts/cli2md.sh $@
 
 docs/index.md: README.md scripts/readme2index.sh
