@@ -162,6 +162,7 @@ class Build:
 
         if build_dir:
             self.build_dir = Path(build_dir)
+            self.build_dir.mkdir(exist_ok=True)
             self.auto_cleanup = False
         else:
             self.build_dir = self.output_dir / "tmp"
