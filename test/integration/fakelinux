@@ -90,14 +90,14 @@ test_cross_toolchain() {
 }
 
 test_fail() {
-  failrun kernel tuxmake
+  run tuxmake --env=FAIL=kernel
   assertEquals 2 "$rc"
   assertTrue 'grep "config: PASS" stderr'
   assertTrue 'grep "kernel: FAIL" stderr'
 }
 
 test_skip_kernel_if_config_fails() {
-  failrun defconfig tuxmake
+  run tuxmake --env=FAIL=defconfig
   assertTrue 'grep "config: FAIL" stderr'
   assertTrue 'grep "kernel: SKIP" stderr'
 }

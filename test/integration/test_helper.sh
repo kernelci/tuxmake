@@ -30,10 +30,3 @@ run() {
   fi
   export rc
 }
-
-failrun() {
-  export FAIL="$1"
-  shift
-  run "$@"
-  unset FAIL
-}
