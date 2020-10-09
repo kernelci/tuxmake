@@ -31,7 +31,7 @@ class supported:
 
 class defaults:
     kconfig = "defconfig"
-    targets = ["config", "kernel", "modules", "dtbs"]
+    targets = ["config", "debugkernel", "kernel", "modules", "dtbs"]
     jobs = multiprocessing.cpu_count() * 2
 
 
