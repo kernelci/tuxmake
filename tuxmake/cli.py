@@ -1,8 +1,11 @@
 import argparse
 import os
 from pathlib import Path
+import shlex
 import sys
 from tuxmake import __version__
+from tuxmake.arch import Architecture
+from tuxmake.toolchain import Toolchain
 from tuxmake.build import build, supported, defaults
 from tuxmake.exceptions import TuxMakeException
 from tuxmake.runtime import get_runtime
@@ -147,6 +150,12 @@ def build_parser(**kwargs):
         help="List supported toolchains and exit. Combine with --runtime to list toolchains supported by that particular runtime.",
     )
     info.add_argument(
+        "-R",
+        "--list-runtimes",
+        action="store_true",
+        help="List supported runtimes and exit.",
+    )
+    info.add_argument(
         "-p",
         "--print-support-matrix",
         action="store_true",
@@ -163,6 +172,12 @@ def build_parser(**kwargs):
 
     debug = parser.add_argument_group("Debugging options")
     debug.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        help="Provides extra output on stderr for debugging tuxmake itself. This output will not appear in the build log.",
+    )
+    debug.add_argument(
         "-s",
         "--shell",
         action="store_true",
@@ -173,7 +188,11 @@ def build_parser(**kwargs):
 
 def main(*argv):
     if not argv:
-        argv = sys.argv[1:]
+        argv = tuple(sys.argv[1:])
+
+    env_options = os.getenv("TUXMAKE")
+    if env_options:
+        argv = tuple(shlex.split(env_options)) + argv
 
     parser = build_parser()
     options = parser.parse_args(argv)
@@ -200,6 +219,10 @@ def main(*argv):
         for toolchain in sorted(runtime.toolchains):
             print(toolchain)
         return
+    elif options.list_runtimes:
+        for runtime in supported.runtimes:
+            print(runtime)
+        return
     elif options.print_support_matrix:
         runtime = get_runtime(options.runtime)
         architectures = sorted(supported.architectures)
@@ -208,7 +231,7 @@ def main(*argv):
         for a in architectures:
             matrix[a] = {}
             for t in toolchains:
-                matrix[a][t] = runtime.is_supported(a, t)
+                matrix[a][t] = runtime.is_supported(Architecture(a), Toolchain(t))
         length_a = max([len(a) for a in architectures])
         length_t = max([len(t) for t in toolchains])
         arch_format = f"%-{length_a}s"
@@ -242,9 +265,10 @@ def main(*argv):
         if v and k not in ["color", "docker_image", "shell"]
     }
     try:
-        result = build(**build_args)
+        result = build(**build_args, auto_cleanup=(not options.shell))
         if options.shell:
             result.run_cmd(["bash"], interactive=True)
+            result.cleanup()
         for target, info in result.status.items():
             print(f"I: {target}: {info.status} in {info.duration}", file=err)
         print(f"I: build output in {result.output_dir}", file=err)

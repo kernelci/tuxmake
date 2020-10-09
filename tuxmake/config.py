@@ -1,6 +1,6 @@
 import re
 import shlex
-from typing import Optional, Type
+from typing import Optional, Type, List
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -8,6 +8,7 @@ from pathlib import Path
 class ConfigurableObject:
     basedir: Optional[str] = None
     exception: Optional[Type[Exception]] = None
+    not_aliases: List[str] = []
 
     def __init__(self, name):
         commonconf = Path(__file__).parent / self.basedir / "common.ini"
@@ -38,7 +39,8 @@ class ConfigurableObject:
         return [
             str(f.name).replace(".ini", "")
             for f in files
-            if f.name != "common.ini" and not f.is_symlink()
+            if f.name != "common.ini"
+            and (not f.is_symlink() or f.name in cls.not_aliases)
         ]
 
 

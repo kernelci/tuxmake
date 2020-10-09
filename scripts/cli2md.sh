@@ -18,4 +18,12 @@ s/^usage:/## Usage\n/
 s/^\(\S.*\):$/## \1/
 s/^  \(\S.*\)/### \1/
 ' "${tmpfile}"
+
+sed -e '
+/^ENVIRONMENT VARIABLES/,/^\.\./ !d
+s/^[A-Z]/## &/
+s/ENVIRONMENT VARIABLES/Environment variables/
+/^==/d
+/^\.\./d' tuxmake.rst >> "${tmpfile}"
+
 cp "${tmpfile}" "$1"

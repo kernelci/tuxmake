@@ -2,38 +2,7 @@
 
 . $(dirname $0)/test_helper.sh
 
-setUp() {
-  tmpdir=$(mktemp --directory --tmpdir tuxmake-integration-tests-XXXXXXXXXX)
-  export XDG_CACHE_HOME="${tmpdir}/cache"
-  cp -r $testdir/fakelinux/ "${tmpdir}/linux"
-  cd "${tmpdir}/linux"
-}
-
-tearDown() {
-  cd - >/dev/null
-  rm -rf "${tmpdir}"
-}
-
-failrun() {
-  export FAIL="$1"
-  shift
-  run "$@"
-  unset FAIL
-}
-
 gcc_v=$(readlink /usr/bin/gcc) # gcc-8, gcc-9, gcc-10 etc
-
-run() {
-  if [ "${TMV:-}" = 1 ]; then
-    echo '    $' "$@"
-  fi
-  rc=0
-  "$@" > stdout 2> stderr || rc=$?
-  if [ "${TMV:-}" = 1 ]; then
-    cat stdout stderr | sed -e 's/^/    /'
-  fi
-  export rc
-}
 
 test_basic() {
   run tuxmake
@@ -121,14 +90,14 @@ test_cross_toolchain() {
 }
 
 test_fail() {
-  failrun kernel tuxmake
+  run tuxmake --env=FAIL=kernel
   assertEquals 2 "$rc"
   assertTrue 'grep "config: PASS" stderr'
   assertTrue 'grep "kernel: FAIL" stderr'
 }
 
 test_skip_kernel_if_config_fails() {
-  failrun defconfig tuxmake
+  run tuxmake --env=FAIL=defconfig
   assertTrue 'grep "config: FAIL" stderr'
   assertTrue 'grep "kernel: SKIP" stderr'
 }

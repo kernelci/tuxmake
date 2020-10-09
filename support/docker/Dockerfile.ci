@@ -9,6 +9,7 @@ RUN apt-get update \
         ccache \
         clang \
         codespell \
+        docker.io \
         flake8 \
         gcc \
         git \

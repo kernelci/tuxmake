@@ -28,13 +28,13 @@ def args(called):
 def test_basic_build(builder, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["tuxmake"])
     tuxmake()
-    assert builder.call_args[1] == {"tree": "."}
+    assert args(builder).tree == "."
 
 
 def test_basic_build_with_directory(linux, builder):
     tree = str(linux)
     tuxmake("--directory", tree)
-    assert builder.call_args[1] == {"tree": tree}
+    assert args(builder).tree == tree
 
 
 def test_build_from_sys_argv(monkeypatch, builder):
@@ -210,6 +210,13 @@ class TestList:
         assert "clang" in out
         assert "clang-10" in out
 
+    def test_list_runtimes(self, builder, capsys):
+        tuxmake("--list-runtimes")
+        builder.assert_not_called()
+        out, _ = capsys.readouterr()
+        assert "null" in out
+        assert "docker" in out
+
 
 class TestPrintSupportMatrix:
     def test_print_support_matrix(self, builder, capsys):
@@ -238,6 +245,10 @@ class TestDebug:
         tuxmake("--shell")
         run_cmd.assert_called_with(["bash"], interactive=True)
 
+    def test_debug(self, builder, mocker):
+        tuxmake("--debug")
+        assert args(builder).debug
+
 
 class TestOutputDir:
     def test_output_dir(self, builder):
@@ -254,3 +265,22 @@ class TestBuildDir:
     def test_build_dir(self, builder):
         tuxmake("--build-dir=/path/to/build")
         assert args(builder).build_dir == Path("/path/to/build")
+
+
+class TestOptionsFromEnvironment:
+    def test_options_from_environment(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--debug --verbose")
+        tuxmake("config")
+        assert args(builder).debug
+        assert args(builder).verbose
+
+    def test_command_line_overrides_environment(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--toolchain=gcc")
+        tuxmake("--toolchain=clang")
+        assert args(builder).toolchain == "clang"
+
+    def test_command_line_plus_sys_argv(self, builder, monkeypatch):
+        monkeypatch.setenv("TUXMAKE", "--toolchain=gcc")
+        monkeypatch.setattr(sys, "argv", ["tuxmake", "--toolchain=clang"])
+        tuxmake()
+        assert args(builder).toolchain == "clang"

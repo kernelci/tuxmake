@@ -522,3 +522,21 @@ class TestUnsupportedToolchainArchitectureCombination:
             tuxmake.exceptions.UnsupportedArchitectureToolchainCombination
         ):
             Build(tree=linux, target_arch="arc", toolchain="clang")
+
+
+class TestDebug:
+    def test_debug_option(self, linux):
+        b = Build(tree=linux, debug=True)
+        assert b.debug
+
+    def test_log_commands(self, linux, capfd):
+        b = Build(tree=linux, debug=True)
+        b.run_cmd(["true"])
+        out, err = capfd.readouterr()
+        assert "D: Command: " in err
+
+    def test_log_command_environment(self, linux, capfd):
+        b = Build(tree=linux, debug=True, environment={"FOO": "BAR"})
+        b.run_cmd(["true"])
+        out, err = capfd.readouterr()
+        assert "D: Environment: " in err

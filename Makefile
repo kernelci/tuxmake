@@ -22,6 +22,9 @@ codespell:
 integration-tests:
 	run-parts --verbose test/integration
 
+integration-tests-docker:
+	run-parts --verbose --regex=docker test/integration-slow
+
 docker-build-tests:
 	$(MAKE) -C support/docker test
 
@@ -42,7 +45,7 @@ tuxmake.1: tuxmake.rst cli_options.rst
 cli_options.rst: tuxmake/cli.py scripts/cli2rst.sh
 	scripts/cli2rst.sh $@
 
-docs/cli.md: tuxmake/cli.py scripts/cli2md.sh
+docs/cli.md: tuxmake.rst tuxmake/cli.py scripts/cli2md.sh
 	scripts/cli2md.sh $@
 
 docs/index.md: README.md scripts/readme2index.sh

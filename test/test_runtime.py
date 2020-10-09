@@ -5,6 +5,7 @@ from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.runtime import get_runtime
+from tuxmake.runtime import Runtime
 from tuxmake.runtime import NullRuntime
 from tuxmake.runtime import DockerRuntime
 from tuxmake.runtime import DockerLocalRuntime
@@ -104,6 +105,9 @@ class TestDockerRuntime:
     def test_toolchains(self):
         assert "gcc" in [t.name for t in DockerRuntime().toolchain_images]
 
+    def test_listed_as_supported(self):
+        assert "docker" in Runtime.supported()
+
 
 class TestDockerLocalRuntime:
     def test_prepare_checks_local_image(self, build, get_docker_image, mocker):
@@ -129,3 +133,6 @@ class TestDockerLocalRuntime:
         with pytest.raises(RuntimePreparationFailed) as exc:
             DockerLocalRuntime().prepare(build)
         assert "image foobar not found locally" in str(exc)
+
+    def test_listed_as_supported(self):
+        assert "docker-local" in Runtime.supported()

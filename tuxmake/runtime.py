@@ -29,6 +29,7 @@ def get_runtime(runtime):
 class Runtime(ConfigurableObject):
     basedir = "runtime"
     exception = InvalidRuntimeError
+    not_aliases = ["docker-local.ini"]
 
     def __init__(self):
         super().__init__(self.name)
@@ -78,13 +79,13 @@ class Image:
 
 class DockerRuntime(Runtime):
     name = "docker"
+    command = "docker"
     prepare_failed_msg = "failed to pull remote image {image}"
 
     def __init_config__(self):
         self.base_images = []
         self.ci_images = []
         self.toolchain_images = []
-        self.support_matrix = {}
         self.toolchains = split(self.config["runtime"]["toolchains"])
         for image_list, config in (
             (self.base_images, self.config["runtime"]["bases"]),
@@ -103,11 +104,14 @@ class DockerRuntime(Runtime):
                     cross_config["hosts"] = image.target_hosts.get(target, image.hosts)
                     cross_image = Image(name=f"{target}_{image.name}", **cross_config)
                     image_list.append(cross_image)
-                    self.support_matrix[(target, image.name)] = cross_image
         self.images = self.base_images + self.ci_images + self.toolchain_images
+        self.toolchain_images_map = {
+            f"tuxmake/{image.name}": image for image in self.toolchain_images
+        }
 
     def is_supported(self, arch, toolchain):
-        image = self.support_matrix.get((str(arch), str(toolchain)))
+        image_name = toolchain.get_docker_image(arch)
+        image = self.toolchain_images_map.get(image_name)
         if image:
             return host_arch.name in image.hosts or any(
                 [a in image.hosts for a in host_arch.aliases]
@@ -130,7 +134,7 @@ class DockerRuntime(Runtime):
             )
 
     def do_prepare(self, build):
-        subprocess.check_call(["docker", "pull", self.get_image(build)])
+        subprocess.check_call([self.command, "pull", self.get_image(build)])
 
     def get_command_line(self, build, cmd, interactive):
         source_tree = os.path.abspath(build.source_tree)
@@ -159,7 +163,7 @@ class DockerRuntime(Runtime):
         gid = os.getgid()
         extra_opts = self.__get_extra_opts__()
         return [
-            "docker",
+            self.command,
             "run",
             "--rm",
             "--init",
@@ -184,12 +188,9 @@ class DockerLocalRuntime(DockerRuntime):
     name = "docker-local"
     prepare_failed_msg = "image {image} not found locally"
 
-    def __init_config__(self):
-        pass
-
     def do_prepare(self, build):
         subprocess.check_call(
-            ["docker", "image", "inspect", self.get_image(build)],
+            [self.command, "image", "inspect", self.get_image(build)],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )

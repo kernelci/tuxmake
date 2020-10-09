@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. $(dirname $0)/test_helper.sh
+
+test_null() {
+  run tuxmake --print-support-matrix
+  assertEquals 0 "${rc}"
+}
+
+test_docker() {
+  run tuxmake --runtime=docker --print-support-matrix
+  assertEquals 0 "${rc}"
+}
+
+test_docker_local() {
+  run tuxmake --runtime=docker-local --print-support-matrix
+  assertEquals 0 "${rc}"
+}
+
+. shunit2
