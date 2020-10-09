@@ -6,14 +6,16 @@ image:
     - schedules
 
 stages:
-  - test
+  - unit-tests
+  - code-checks
+  - integration-tests
   - build
-  - testbuild
   - publish
 
 .unit-tests:
   extends: .tuxmake
-  stage: test
+  needs: []
+  stage: unit-tests
   script:
     - make unit-tests
 
@@ -47,48 +49,39 @@ unit-tests-python3.6-arm64:
     - arm64
   image: tuxmake/ci-python3.6
 
-style:
+.code-checks:
   extends: .tuxmake
-  stage: test
+  stage: code-checks
+  needs: []
+
+style:
+  extends: .code-checks
   script:
     - make style
 
 typecheck:
-  extends: .tuxmake
-  stage: test
+  extends: .code-checks
   script:
     - make typecheck
 
 codespell:
-  extends: .tuxmake
-  stage: test
+  extends: .code-checks
   script:
     - make codespell
 
 docker-build-tests:
-  extends: .tuxmake
-  stage: test
+  extends: .code-checks
   script:
     - make docker-build-tests
 
-build:
+.integration:
   extends: .tuxmake
-  stage: build
+  stage: integration-tests
   needs: []
-  script:
+  before_script:
     - git status
     - rm -rf dist/
     - flit --debug build
-  artifacts:
-    paths:
-      - dist/
-
-.integration:
-  extends: .tuxmake
-  stage: testbuild
-  needs:
-    - build
-  before_script:
     - python3 -m pip install dist/*.whl
   script:
     - make integration-tests TMV=1
@@ -140,10 +133,11 @@ integration-docker:
 
 .docs:
   extends: .tuxmake
+  stage: build
+  needs: []
   image: tuxmake/ci-python3.8
   before_script:
     - apt-get update -q
-    - apt-get install -qy python3-docutils mkdocs
     - python3 -m pip install mkautodoc  # FIXME not in Debian
   script:
     - make man
@@ -194,6 +188,9 @@ docker-images-arm64:
 
 docker-images-multiarch:
   stage: publish
+  needs:
+    - docker-images-amd64
+    - docker-images-arm64
   extends: .docker
   variables:
     DOCKER_CLI_EXPERIMENTAL: "enabled"
