@@ -18,6 +18,7 @@ from tuxmake.runtime import get_runtime, Runtime
 from tuxmake.metadata import MetadataExtractor
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
+from tuxmake.log import LogParser
 
 
 class supported:
@@ -436,14 +437,9 @@ class Build:
             f.write("\n")
 
     def parse_log(self):
-        errors = 0
-        warnings = 0
-        for line in (self.output_dir / "build.log").open("r"):
-            if "error:" in line:
-                errors += 1
-            if "warning:" in line:
-                warnings += 1
-        return errors, warnings
+        parser = LogParser()
+        parser.parse(self.output_dir / "build.log")
+        return parser.errors, parser.warnings
 
     def terminate(self):
         self.logger.terminate()

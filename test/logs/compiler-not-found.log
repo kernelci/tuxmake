@@ -1,0 +1,14 @@
+# command line: tuxmake -t gcc-1
+make --silent --keep-going --jobs=8 O=/home/terceiro/.cache/tuxmake/builds/470/tmp HOSTCC=gcc-1 CC=gcc-1 defconfig
+/bin/sh: 1: gcc-1: not found
+make[2]: *** [scripts/Makefile.host:95: scripts/basic/fixdep] Error 127
+make[2]: Target '__build' not remade because of errors.
+make[1]: *** [/home/terceiro/src/linaro/linux/Makefile:539: scripts_basic] Error 2
+make[1]: Target 'defconfig' not remade because of errors.
+make: *** [Makefile:185: __sub-make] Error 2
+make: Target 'defconfig' not remade because of errors.
+I: config: FAIL in 0:00:00.128368
+I: kernel: SKIP in 0:00:00
+I: modules: SKIP in 0:00:00
+I: dtbs: SKIP in 0:00:00
+I: build output in /home/terceiro/.cache/tuxmake/builds/470

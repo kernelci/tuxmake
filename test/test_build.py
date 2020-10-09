@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import pytest
 import re
 import urllib
@@ -494,9 +495,7 @@ class TestMetadata:
         assert build.metadata["results"]["status"] == "FAIL"
 
 
-LOG = """error: asdasdas
-warning: ssadas
-"""
+LOG = (Path(__file__).parent / "logs/simple.log").read_text()
 
 
 class TestParseLog:
