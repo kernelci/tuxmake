@@ -30,15 +30,22 @@
 use strict;
 use warnings;
 use JSON::PP;
+use File::Temp;
 
 my $json = JSON::PP->new->utf8->pretty->indent(4);
 my @input = <>;
 my $metadata = $json->decode(join("", @input));
 
+my $tempdir = File::Temp->newdir();
 for my $section (keys(%$metadata)) {
   for my $key (keys(%{$metadata->{$section}})) {
     my $cmd = $metadata->{$section}->{$key};
-    my $result = `${cmd}`;
+    my $file = File::Temp->new(DIR => $tempdir);
+    print $file $cmd;
+    close $file;
+    my $script = $file->filename;
+
+    my $result = `sh ${script} 2>/dev/null`;
     chomp $result if $result;
     $metadata->{$section}->{$key} = $result;
   }
