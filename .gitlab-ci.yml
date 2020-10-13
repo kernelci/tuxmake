@@ -8,6 +8,12 @@ variables:
   except:
     - schedules
 
+.arm64:
+  only:
+    - branches@Linaro/tuxmake
+  tags:
+    - arm64
+
 stages:
   - unit-tests
   - code-checks
@@ -35,21 +41,15 @@ unit-tests-python3.6:
   image: tuxmake/ci-python3.6
 
 unit-tests-python3.8-arm64:
-  extends: .unit-tests
-  tags:
-    - arm64
+  extends: [.unit-tests, .arm64]
   image: tuxmake/ci-python3.8
 
 unit-tests-python3.7-arm64:
-  extends: .unit-tests
-  tags:
-    - arm64
+  extends: [.unit-tests, .arm64]
   image: tuxmake/ci-python3.7
 
 unit-tests-python3.6-arm64:
-  extends: .unit-tests
-  tags:
-    - arm64
+  extends: [.unit-tests, .arm64]
   image: tuxmake/ci-python3.6
 
 .code-checks:
@@ -102,21 +102,15 @@ integration-python3.6:
   image: tuxmake/ci-python3.7
 
 integration-python3.8-arm64:
-  extends: .integration
-  tags:
-    - arm64
+  extends: [.integration, .arm64]
   image: tuxmake/ci-python3.8
 
 integration-python3.7-arm64:
-  extends: .integration
-  tags:
-    - arm64
+  extends: [.integration, .arm64]
   image: tuxmake/ci-python3.7
 
 integration-python3.6-arm64:
-  extends: .integration
-  tags:
-    - arm64
+  extends: [.integration, .arm64]
   image: tuxmake/ci-python3.6
 
 integration-docker:
