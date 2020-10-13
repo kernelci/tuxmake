@@ -1,6 +1,11 @@
 from pathlib import Path
 
-ERRORS = ("compiler lacks", "no configuration exists", "not found")
+ERRORS = (
+    "compiler lacks",
+    "no configuration exists",
+    "not found",
+    "no such file or directory",
+)
 
 
 class LogParser:

@@ -5,4 +5,3 @@ make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tm
 make[1]: *** [/builds/14626a244b976271b725b8cfad5e85217add14b7/Makefile:562: invalid.config] Error 2
 make: *** [Makefile:179: sub-make] Error 2
 make: Target 'invalid.config' not remade because of errors.
-make: gcc: No such file or directory

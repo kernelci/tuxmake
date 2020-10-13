@@ -1,0 +1,60 @@
+#
+# make -sk KBUILD_BUILD_USER=TuxBuild -C/linux ARCH=mips CROSS_COMPILE=mips-linux-gnu- HOSTCC=gcc CC="sccache mips-linux-gnu-gcc" O=build allmodconfig
+#
+#
+# make -sk KBUILD_BUILD_USER=TuxBuild -C/linux -j16 ARCH=mips CROSS_COMPILE=mips-linux-gnu- HOSTCC=gcc CC="sccache mips-linux-gnu-gcc" O=build
+#
+mv: cannot stat 'arch/mips/boot/dts/brcm/.bcm6358-neufbox4-sercomm.dtb.tmp': No such file or directory
+make[3]: *** [scripts/Makefile.lib:294: arch/mips/boot/dts/brcm/bcm6358-neufbox4-sercomm.dtb] Error 1
+make[3]: *** Deleting file 'arch/mips/boot/dts/brcm/bcm6358-neufbox4-sercomm.dtb'
+make[3]: Target '__build' not remade because of errors.
+make[2]: *** [../scripts/Makefile.build:544: arch/mips/boot/dts/brcm] Error 2
+make[2]: Target '__build' not remade because of errors.
+make[1]: *** [/linux/Makefile:1074: arch/mips/boot/dts] Error 2
+../kernel/kprobes.c: In function ‘kill_kprobe’:
+../kernel/kprobes.c:1070:33: warning: statement with no effect [-Wunused-value]
+ #define disarm_kprobe_ftrace(p) (-ENODEV)
+                                 ^
+../kernel/kprobes.c:2089:3: note: in expansion of macro ‘disarm_kprobe_ftrace’
+   disarm_kprobe_ftrace(p);
+   ^~~~~~~~~~~~~~~~~~~~
+../drivers/input/joystick/analog.c:172:2: warning: #warning Precise timer not defined for this architecture. [-Wcpp]
+ #warning Precise timer not defined for this architecture.
+  ^~~~~~~
+../drivers/spi/spi-sh-msiof.c:78: warning: "STR" redefined
+ #define STR 0x40 /* Status Register */
+ 
+In file included from ../arch/mips/include/asm/mach-generic/spaces.h:15,
+                 from ../arch/mips/include/asm/addrspace.h:13,
+                 from ../arch/mips/include/asm/barrier.h:11,
+                 from ../include/linux/compiler.h:250,
+                 from ../arch/mips/include/asm/bitops.h:16,
+                 from ../include/linux/bitops.h:19,
+                 from ../include/linux/bitmap.h:8,
+                 from ../drivers/spi/spi-sh-msiof.c:14:
+../arch/mips/include/asm/mipsregs.h:30: note: this is the location of the previous definition
+ #define STR(x) __STR(x)
+ 
+In file included from ../arch/mips/include/asm/sibyte/sb1250.h:41,
+                 from ../drivers/watchdog/sb_wdog.c:58:
+../arch/mips/include/asm/sibyte/bcm1480_scd.h:274: warning: "M_SPC_CFG_CLEAR" redefined
+ #define M_SPC_CFG_CLEAR   M_BCM1480_SPC_CFG_CLEAR
+ 
+In file included from ../arch/mips/include/asm/sibyte/sb1250.h:40,
+                 from ../drivers/watchdog/sb_wdog.c:58:
+../arch/mips/include/asm/sibyte/sb1250_scd.h:405: note: this is the location of the previous definition
+ #define M_SPC_CFG_CLEAR  _SB_MAKEMASK1(32)
+ 
+In file included from ../arch/mips/include/asm/sibyte/sb1250.h:41,
+                 from ../drivers/watchdog/sb_wdog.c:58:
+../arch/mips/include/asm/sibyte/bcm1480_scd.h:275: warning: "M_SPC_CFG_ENABLE" redefined
+ #define M_SPC_CFG_ENABLE  M_BCM1480_SPC_CFG_ENABLE
+ 
+In file included from ../arch/mips/include/asm/sibyte/sb1250.h:40,
+                 from ../drivers/watchdog/sb_wdog.c:58:
+../arch/mips/include/asm/sibyte/sb1250_scd.h:406: note: this is the location of the previous definition
+ #define M_SPC_CFG_ENABLE _SB_MAKEMASK1(33)
+ 
+make[1]: Target '_all' not remade because of errors.
+make: *** [Makefile:146: sub-make] Error 2
+make: Target '_all' not remade because of errors.
