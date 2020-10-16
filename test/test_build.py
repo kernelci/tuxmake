@@ -310,15 +310,15 @@ class TestArchitecture:
 
 
 class TestToolchain:
-    # Test that the righ CC= argument is passed. Ideally we want more black box
-    # tests that check the results of the build, but for that we need a
-    # mechanism to check which toolchain was used to build a given binary (and
-    # for test/fakelinux/ to produce real binaries)
+    # Test that the righ make arguments are passed, when needed. Ideally we
+    # would want more black box tests that check the results of the build, but
+    # for that we would need a reliable mechanism to check which toolchain was
+    # used to build a given binary.
     def test_gcc_10(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="gcc-10")
         b.build(b.targets[0])
         cmdline = args(Popen)
-        assert "CC=gcc-10" in cmdline
+        assert all(["CC=" not in arg for arg in cmdline])
 
     def test_gcc_10_cross(self, linux, Popen):
         b = Build(
@@ -326,7 +326,8 @@ class TestToolchain:
         )
         b.build(b.targets[0])
         cmdline = args(Popen)
-        assert "CC=aarch64-linux-gnu-gcc-10" in cmdline
+        assert all(["CC=" not in arg for arg in cmdline])
+        assert "CROSS_COMPILE=aarch64-linux-gnu-" in cmdline
 
     def test_clang(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="clang")
@@ -439,8 +440,8 @@ class TestCompilerWrappers:
     def test_ccache_gcc_v(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")
         b.build(b.targets[0])
-        assert "CC=ccache gcc-10" in args(Popen)
-        assert "HOSTCC=ccache gcc-10" in args(Popen)
+        assert "CC=ccache gcc" in args(Popen)
+        assert "HOSTCC=ccache gcc" in args(Popen)
 
     def test_ccache_target_arch(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], target_arch="arm64", wrapper="ccache")
@@ -456,7 +457,7 @@ class TestCompilerWrappers:
             wrapper="ccache",
         )
         b.build(b.targets[0])
-        assert "CC=ccache aarch64-linux-gnu-gcc-10" in args(Popen)
+        assert "CC=ccache aarch64-linux-gnu-gcc" in args(Popen)
 
     def test_ccache_llvm(self, linux, Popen):
         b = Build(

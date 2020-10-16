@@ -52,4 +52,4 @@ class TestLLVM:
         assert Toolchain("llvm").compiler(arm64) == "clang"
 
     def test_compiler_versioned(self, arm64):
-        assert Toolchain("llvm-10").compiler(arm64) == "clang-10"
+        assert Toolchain("llvm-10").compiler(arm64) == "clang"

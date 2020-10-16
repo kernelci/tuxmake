@@ -77,7 +77,6 @@ test_toolchain() {
   assertEquals 0 "$rc"
   assertFalse 'no ARCH=' 'grep ARCH= stdout'
   assertFalse 'no CROSS_COMPILE=' 'grep CROSS_COMPILE= stdout'
-  assertTrue 'CC=' "grep 'CC=${gcc_v}' stdout"
 }
 
 test_cross_toolchain() {
@@ -85,7 +84,6 @@ test_cross_toolchain() {
   assertEquals 0 "$rc"
   assertTrue 'ARCH=' "grep 'ARCH=arm64' stdout"
   assertTrue 'CROSS_COMPILE=' "grep 'CROSS_COMPILE=aarch64-linux-gnu-' stdout"
-  assertTrue 'CC=' "grep 'CC=aarch64-linux-gnu-${gcc_v}' stdout"
   assertTrue 'Image.gz' 'test -f $XDG_CACHE_HOME/tuxmake/builds/1/Image.gz'
 }
 

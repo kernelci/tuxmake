@@ -36,6 +36,13 @@ class TestNullRuntime:
     def test_get_command_line(self, build):
         assert NullRuntime().get_command_line(build, ["date"], False) == ["date"]
 
+    def test_prepare_warns_about_versioned_toolchain(self, build, mocker):
+        build.toolchain.version_suffix = "-10"
+        log = mocker.patch("tuxmake.build.Build.log")
+        runtime = NullRuntime()
+        runtime.prepare(build)
+        log.assert_called()
+
 
 @pytest.fixture
 def get_docker_image(mocker):

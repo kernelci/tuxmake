@@ -19,10 +19,7 @@ class Toolchain(ConfigurableObject):
     def __init_config__(self):
         self.makevars = self.config["makevars"]
         self.docker_image = self.config["docker"]["image"]
-        try:
-            self.__compiler__ = self.config["metadata"]["compiler"]
-        except KeyError:
-            self.__compiler__ = None
+        self.__compiler__ = self.config["metadata"]["compiler"]
 
     def expand_makevars(self, arch):
         archvars = {"CROSS_COMPILE": "", **arch.makevars}
@@ -37,16 +34,12 @@ class Toolchain(ConfigurableObject):
         )
 
     def compiler(self, arch):
-        if self.__compiler__:
-            return self.__compiler__.format(version_suffix=self.version_suffix)
-        else:
-            return self.expand_makevars(arch).get("CC")
+        return self.__compiler__.format(
+            CROSS_COMPILE=arch.makevars.get("CROSS_COMPILE", "")
+        )
 
 
 class NoExplicitToolchain(Toolchain):
     def __init__(self):
         super().__init__("gcc")
         self.makevars = {}
-
-    def compiler(self, arch):
-        return arch.makevars.get("CROSS_COMPILE", "") + self.name
