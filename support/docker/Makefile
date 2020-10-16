@@ -30,6 +30,7 @@ xargs = xargs -r -t
 endif
 
 $(publish_releases): publish-%: %
+	$(MAKE) $(patsubst %, test-%, $(shell ./list-images $*))
 	@echo $(patsubst %, $(PROJECT)/%:latest$(TAG), $(shell ./list-images $*)) | \
 		$(xargs) -n 1 $(docker) push
 
@@ -44,6 +45,8 @@ $(publish_multiarch_releases): publish-multiarch-%: noop-%
 
 test:
 	sh test/test_configure.sh
+
+test-images: $(patsubst %, test-%, $(all_images))
 
 show:
 	@docker images $(PROJECT)/\* | sort

@@ -50,6 +50,7 @@ class Image:
         self.when = when
         self.packages = packages
         self.args = []
+        self.test_args = [name]
 
     @property
     def dependency(self):
@@ -86,6 +87,10 @@ class Image:
         stream.write(f"\t\t--file=Dockerfile.{self.kind} \\\n")
         stream.write(f"\t\t--tag=$(PROJECT)/{self.name}:latest$(TAG) \\\n")
         stream.write("\t\t. $(LOG)\n\n")
+
+        test_args = " ".join(self.test_args)
+        stream.write(f"test-{self.name}: {self.name}\n")
+        stream.write(f"\tdocker run --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name} /test {test_args}\n\n")
 
 
 class BaseImage(Image):
@@ -157,6 +162,7 @@ class CrossBuildMixin:
     def emit(self):
         super().emit()
         self.arg("HOSTARCH", self.gnu_arch)
+        self.test_args.append(self.arch.makevars["CROSS_COMPILE"])
 
 
 class CrossGccBuildImage(CrossBuildMixin, BuildImage):

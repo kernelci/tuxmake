@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Test::More;
+
+my $image = shift;
+my $cross_compile = shift;
+
+sub check($$) {
+  my ($name, $command) = @_;
+  my $output = `$command 2>&1`;
+  my $rc = $?;
+  is($rc, 0, "${name} (\`${command}\`)");
+  if ($rc == 0) {
+    my @lines = split(/\n/, $output);
+    diag($lines[0]);
+  } else {
+    diag($output);
+  }
+}
+
+sub check_program($) {
+  my $program = shift;
+  check("${program} in PATH", "which ${program}");
+}
+
+sub check_base_image() {
+  check_program("bash");
+  check_program("bc");
+  check_program("bison");
+  check_program("bzip2");
+  check_program("cpio");
+  check_program("flex");
+  check_program("git");
+  check_program("gzip");
+  check_program("lzop");
+  check_program("make");
+  check_program("rsync");
+  check_program("tar");
+  check_program("wget");
+  check_program("xz");
+}
+
+sub check_toolchain_image() {
+  my ($arch, $compiler, $version);
+  if ($image =~ /^(.*)_(.*)$/) {
+    $arch = $1;
+    $compiler = $2;
+  } else {
+    $compiler = $image;
+  }
+  if ($compiler =~ /^(.*)-(\d+)$/) {
+    $compiler = $1;
+    $version = $2;
+  }
+
+  $arch ||= `arch`; chomp $arch;
+  my @prefixes = ("");
+  push @prefixes, $cross_compile if $cross_compile;
+  for my $prefix (@prefixes) {
+    check_program($prefix . $compiler) unless ($prefix ne "" && $compiler =~ /clang/);
+    check_program($prefix . "ld");
+    check_program($prefix . "as");
+  }
+
+  if ($version) {
+    my $compiler_bin = $cross_compile ? ($cross_compile . $compiler) : $compiler;
+    my $actual_version = `${compiler_bin} -dumpversion`;
+    chomp $actual_version;
+    like($actual_version, qr/^${version}(\.\d+)*/, "${compiler_bin} version ${version}");
+    diag("${compiler_bin} version: ${actual_version}");
+  }
+
+  if ($compiler =~ /clang/) {
+    check_program("ld.lld");
+    check_program("llvm-as");
+  }
+}
+
+exit(0) if ($image =~ /^ci-/);
+check_base_image();
+check_toolchain_image unless ($image =~ /^base-/);
+
+done_testing();

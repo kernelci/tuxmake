@@ -54,6 +54,60 @@ graph TD
   - Base images are built from [Dockerfile.base](Dockerfile.base).
   - Build and cross build images are built from [Dockerfile.build](Dockerfile.build).
 
+## Image Requirements
+
+- The compiler binary, as well as common tools such as the linker (`ld`) and
+  assembler (`as`) must be available in `$PATH`.
+- The cross compiler, if any, as well as the corresponding cross tools, must be
+  available in `$PATH`.
+- If the image name implies a compiler version (e.g. `gcc-10`, `clang-10`),
+  then the relevant compiler (or cross compiler if any) must match that
+  version.
+  - For cross build images, it is ok if the native compiler (`$HOSTCC`) has a
+    different version than the cross compiler (`$CC`), but the version of the
+    later **must** match the version in the container name.
+- For `clang` images, the LLVM tools such as linker (`ld.lld`) and assembler
+  (`llvm-as`), must be available in `$PATH`.
+- Additionally, the image must have `perl` installed (the metadata extraction
+  is done with a Perl script).
+- The following tools must also be available in PATH:
+  - `bash`
+  - `bc`
+  - `bison`
+  - `bzip2`
+  - `cpio`
+  - `flex`
+  - `git`
+  - `gzip`
+  - `lzop`
+  - `make`
+  - `rsync`
+  - `tar`
+  - `wget`
+  - `xz`
+
+These requirements can be automatically checked with the provided
+[test-image](test-image) script, like this:
+
+```
+docker run --volume=$(pwd)/test-image:/test $FULLIMAGE /test $IMAGE $CROSS_COMPILE
+```
+
+or, if you are adding your image to tuxmake, you can also use the `Makefile` in
+this directory, what makes it easier:
+
+```
+make test-$IMAGE
+```
+
+In the above commands, the meanings of the variables is:
+
+- `$FULLIMAGE` is the full image name, e.g. `tuxmake/arm64_gcc-10`.
+- `$IMAGE` is the shorter image name, containing the target architecture and
+  toolchain only, e.g. `arm64_gcc-10`.
+- `$CROSS_COMPILE` is the provided cross compiler prefix, the same used for
+  kernel builds.
+
 ## Automated builds
 
 The TuxMake repository has [scheduled CI
