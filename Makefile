@@ -18,6 +18,7 @@ typecheck:
 
 codespell:
 	find . -name \*.py | xargs codespell
+	find . -name \*.md | xargs codespell
 
 integration-tests:
 	run-parts --verbose test/integration
