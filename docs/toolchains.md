@@ -7,16 +7,16 @@ your `$PATH`, while `clang-10` will specifically use `clang` version 10.
 ## gcc
 
 This toolchain will use `gcc` as compiler. It is the default if you don't
-request a specific toolchain. Specificy `gcc-N` for requesting specific `gcc`
+request a specific toolchain. Specify `gcc-N` for requesting specific `gcc`
 versions.
 
 ## clang
 
 This toolchain uses `clang` as compiler, but the GNU binutils tools for
-assembling and linking. Specificy `clang-N` for specific versions.
+assembling and linking. Specify `clang-N` for specific versions.
 
 ## llvm
 
 This toolchain does a full LLBV build, i.e. one with `LLVM=1`: compile with
-clang, and assemble/link with the LLVM tools. Specificy `llvm-N` for requesting
+clang, and assemble/link with the LLVM tools. Specify `llvm-N` for requesting
 specific LLVM versions.

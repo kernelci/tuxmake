@@ -1,6 +1,6 @@
 # Target architectures
 
-TuxMake supports building for a set of achitectures, and they are documented
+TuxMake supports building for a set of architectures, and they are documented
 here in alphabetical order. For each architecture, we specify which toolchains
 are used
 

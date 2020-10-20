@@ -47,7 +47,7 @@ graph TD
   - `make show` will list all the images that you have already built.
   - `make test` runs tests for [`configure`](configure).
   - `make` builds all the images
-- The list of achitectures to build cross toolchain images for is provided by
+- The list of architectures to build cross toolchain images for is provided by
   tuxmake itself, i.e. all architectures defined in tuxmake will have their
   images built.
 - The dockerfiles are parameterized:
