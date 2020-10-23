@@ -55,14 +55,14 @@ def test_invalid_directory(tmp_path):
 
 def test_build(linux, home, kernel):
     result = build(tree=linux)
-    assert kernel in result.artifacts
+    assert kernel in result.artifacts["kernel"]
     assert (home / ".cache/tuxmake/builds/1" / kernel).exists()
     assert result.passed
 
 
 def test_build_with_output_dir(linux, output_dir, kernel):
     result = build(tree=linux, output_dir=output_dir)
-    assert kernel in result.artifacts
+    assert kernel in result.artifacts["kernel"]
     assert (output_dir / kernel).exists()
     assert result.output_dir == output_dir
 
@@ -222,7 +222,7 @@ def test_output_dir(linux, output_dir, kernel):
 def test_saves_log(linux):
     result = build(tree=linux)
     artifacts = [str(f.name) for f in result.output_dir.glob("*")]
-    assert "build.log" in result.artifacts
+    assert "build.log" in result.artifacts["log"]
     assert "build.log" in artifacts
     log = result.output_dir / "build.log"
     assert "make --silent" in log.read_text()

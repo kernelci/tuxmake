@@ -47,7 +47,8 @@ available.
     - **status**: "PASS" or "FAIL" (string).
     - **targets**: key/value with target names as keys, and target status
       ("PASS"/"FAIL"/"SKIP") as values (string/string).
-    - **artifacts**: list of artifacts build (list of strings).
+    - **artifacts**: key/value with target names (string) as keys, and list of
+      artifacts built for that target (list of strings).
     - **errors**: number of errors in the build (integer).
     - **warnings**: number of warnings in the build (integer).
 - **sccache**: sccache statistics.
