@@ -102,6 +102,8 @@ class DockerRuntime(Runtime):
             (self.toolchain_images, self.toolchains),
         ):
             for entry in split(config):
+                if entry not in self.config:
+                    continue
                 image = Image(name=entry, **self.config[entry])
                 image_list.append(image)
                 for target in image.targets:

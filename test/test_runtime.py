@@ -109,8 +109,16 @@ class TestDockerRuntime:
     def test_ci_images(self):
         assert "ci-python3.8" in [t.name for t in DockerRuntime().ci_images]
 
+    def test_toolchain_images(self):
+        images = [t.name for t in DockerRuntime().toolchain_images]
+        assert "gcc" in images
+        assert "clang" in images
+
     def test_toolchains(self):
-        assert "gcc" in [t.name for t in DockerRuntime().toolchain_images]
+        toolchains = DockerRuntime().toolchains
+        assert "gcc" in toolchains
+        assert "clang" in toolchains
+        assert "llvm" in toolchains
 
     def test_listed_as_supported(self):
         assert "docker" in Runtime.supported()
