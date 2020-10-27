@@ -59,7 +59,7 @@ $(O)/vmlinux: $(O)/vmlinux.o
 	$(call maybefail,debugkernel)
 	$(CC) $(CFLAGS) -o $@ $<
 	@echo SYSMAP System.map
-	@printf "0000000000000000 D __per_cpu_start\n0000000000000000 D fixed_percpu_data\n" \
+	@printf "c1000000 T _text\n0000000000000000 D __per_cpu_start\n0000000000000000 D fixed_percpu_data\n" \
 		> $(O)/System.map
 
 CLEAN += $(O)/vmlinux.o

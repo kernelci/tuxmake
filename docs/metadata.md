@@ -47,7 +47,8 @@ available.
     - **status**: "PASS" or "FAIL" (string).
     - **targets**: key/value with target names as keys, and target status
       ("PASS"/"FAIL"/"SKIP") as values (string/string).
-    - **artifacts**: list of artifacts build (list of strings).
+    - **artifacts**: key/value with target names (string) as keys, and list of
+      artifacts built for that target (list of strings).
     - **errors**: number of errors in the build (integer).
     - **warnings**: number of warnings in the build (integer).
 - **sccache**: sccache statistics.
@@ -55,6 +56,8 @@ available.
     - **cache_misses**: number of cache misses (integer).
 - **source**: metadata about the source tree.
     - **kernelversion**: output of `make --silent kernelversion`
+- **system_map**: metadata about `System.map`.
+    - **text_offset**: offset of the .text section in hexadecimal (string).
 - **tools**: metadata about tools present in the build system. key/value, with
   the tool name (e.g. "gcc", "make", "ld", etc), and their version
 - **uname**: different components of *uname(1)*.
@@ -63,3 +66,8 @@ available.
     - **kernel_version**: output of `uname --kernel-version`.
     - **machine**: output of `uname --machine`.
     - **operating_system**: output of `uname --operating-system`.
+- **vmlinux**: information about the `vmlinux` kernel binary.
+    - **bss_size**: size in bytes of the `.bss` section in the ELF file.
+    - **data_size**: size in bytes of the `.data` section in the ELF file.
+    - **text_size**: size in bytes of the `.text` section in the ELF file.
+    - **file_size**: total file size in bytes

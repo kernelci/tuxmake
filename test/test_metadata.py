@@ -101,3 +101,16 @@ class TestArtifacts:
 
     def test_dtbs(self, build):
         assert type(build.metadata["artifacts"]["dtbs"]) is list
+
+
+class TestVmlinux:
+    @pytest.mark.parametrize(
+        "field", ["bss_size", "data_size", "text_size", "file_size"]
+    )
+    def test_field(self, build, field):
+        assert type(build.metadata["vmlinux"][field]) is int
+
+
+class TestSystemMap:
+    def test_text_offset(self, build):
+        assert build.metadata["system_map"]["text_offset"] == "0xc1000000"

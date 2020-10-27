@@ -198,7 +198,7 @@ class Build:
         self.quiet = quiet
         self.debug = debug
 
-        self.artifacts = ["build.log"]
+        self.artifacts = {"log": ["build.log"]}
         self.__logger__ = None
         self.__status__ = {}
         self.metadata = OrderedDict()
@@ -380,11 +380,12 @@ class Build:
     def copy_artifacts(self, target):
         if not self.status[target.name].passed:
             return
+        self.artifacts[target.name] = []
         for origdest, origsrc in target.artifacts.items():
             dest = self.output_dir / origdest
             src = self.build_dir / origsrc
             shutil.copy(src, Path(self.output_dir / dest))
-            self.artifacts.append(origdest)
+            self.artifacts[target.name].append(origdest)
 
     @property
     def passed(self):
