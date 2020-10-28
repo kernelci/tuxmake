@@ -7,7 +7,7 @@ all: unit-tests integration-tests docker-build-tests man doc typecheck codespell
 
 
 unit-tests:
-	python3 -m pytest --cov=tuxmake --cov-report=term-missing --cov-fail-under=100
+	python3 -m pytest --cov=tuxmake --cov-report=term-missing --cov-fail-under=100 test
 
 style:
 	black --check --diff .
