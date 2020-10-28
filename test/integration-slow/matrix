@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+import argparse
+import os
+import re
+import subprocess
+import sys
+import tempfile
+
+
+def comma_or_space_separated(s):
+    return [item for item in re.split(r"\s*,\s*|\s+", s) if item]
+
+
+palette = {
+    "pass": "\033[32mpass\033[m",
+    "fail": "\033[31mfail\033[m",
+}
+
+color = lambda s, l: f"%-{l}s" % s
+if sys.stdout.isatty():
+    color = lambda s, l: palette.get(s, s) + " " * (l - len(s))
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-a",
+    "--target_arch",
+    type=comma_or_space_separated,
+    help="comma- or whitespace-separated list of architectures to test. defaults to all",
+)
+parser.add_argument(
+    "-t",
+    "--toolchain",
+    type=comma_or_space_separated,
+    help="comma- or whitespace-separated list of toolchains to test. defaults to all",
+)
+parser.add_argument(
+    "-r", "--runtime", help="runtime to run tests against", default="null"
+)
+parser.add_argument("argv", nargs="*")
+
+options = parser.parse_args()
+
+if not options.target_arch:
+    options.target_arch = comma_or_space_separated(
+        subprocess.check_output(["tuxmake", "--list-architecture"], text=True)
+    )
+if not options.toolchain:
+    options.toolchain = comma_or_space_separated(
+        subprocess.check_output(
+            ["tuxmake", "--runtime", options.runtime, "--list-toolchains"], text=True
+        )
+    )
+
+
+logdir = Path(tempfile.mkdtemp(prefix="tuxmake-matrix-tests-"))
+
+support_matrix = [
+    comma_or_space_separated(line)
+    for line in subprocess.check_output(
+        ["tuxmake", "--runtime", options.runtime, "--print-support-matrix"], text=True
+    ).splitlines()
+]
+supported = {}
+supported_arch = support_matrix[0]
+for arch in supported_arch:
+    supported[arch] = {}
+for line in support_matrix[1:]:
+    toolchain = line[0]
+    for i, s in enumerate(line[1:]):
+        arch = supported_arch[i]
+        supported[arch][toolchain] = s == "yes"
+
+
+fail = 0
+status = {}
+for toolchain in options.toolchain:
+    for arch in options.target_arch:
+        log = logdir / (arch + "_" + toolchain + ".log")
+        status.setdefault(arch, {})
+        if not supported[arch][toolchain]:
+            status[arch][toolchain] = "n/a"
+            print(f"Not testing {toolchain} for {arch} (unsupported)")
+            continue
+        print(f"Testing {toolchain} for {arch} ... ", end="")
+        with log.open("w") as f:
+            rc = subprocess.call(
+                [
+                    os.getenv("tuxmake", "tuxmake"),
+                    "--target-arch",
+                    arch,
+                    "--toolchain",
+                    toolchain,
+                    "--runtime",
+                    options.runtime,
+                ]
+                + options.argv,
+                stdout=f,
+                stderr=subprocess.STDOUT,
+            )
+            if rc != 0:
+                fail = fail + 1
+            s = rc == 0 and "pass" or "fail"
+            status[arch][toolchain] = s
+            print(color(s, 4))
+
+print()
+print("Summary:")
+print(" " * 9, end="")
+for arch in options.target_arch:
+    print("%-9s" % arch, end="")
+print()
+for toolchain in options.toolchain:
+    print("%-9s" % toolchain, end="")
+    for arch in options.target_arch:
+        print(color(status[arch][toolchain], 9), end="")
+    print()
+print()
+print(f"Logs available in {logdir}")
+sys.exit(fail and 1 or 0)
