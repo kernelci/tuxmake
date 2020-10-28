@@ -1,4 +1,3 @@
-from io import StringIO
 import json
 from pathlib import Path
 import shutil
@@ -10,9 +9,9 @@ from tuxmake.exceptions import UnsupportedMetadataType
 class MetadataExtractor:
     def __init__(self, build):
         self.build = build
+        self.handlers = Metadata.all()
 
     def extract(self):
-        handlers = Metadata.all()
         build = self.build
         compiler = build.toolchain.compiler(build.target_arch)
         metadata_input_data = {
@@ -20,7 +19,7 @@ class MetadataExtractor:
                 key: build.format_cmd_part(cmd.replace("{compiler}", compiler))
                 for key, cmd in handler.commands.items()
             }
-            for handler in handlers
+            for handler in self.handlers
         }
         metadata_input = build.build_dir / "metadata.in.json"
         metadata_input.write_text(json.dumps(metadata_input_data))
@@ -29,14 +28,20 @@ class MetadataExtractor:
         script = build.build_dir / "metadata.pl"
         shutil.copy(script_src, script)
 
-        stdout = StringIO()
-        build.run_cmd(["perl", str(script), str(metadata_input)], output=stdout)
-        stdout.seek(0)
-        metadata_json = stdout.read()
+        stdout = build.build_dir / "extracted-metadata.json"
+        with stdout.open("w") as f:
+            build.run_cmd(["perl", str(script), str(metadata_input)], stdout=f)
+        return self.read_json(stdout.read_text())
+
+    def read_json(self, metadata_json):
+        if not metadata_json:
+            return {}
         metadata = json.loads(metadata_json)
+        if not metadata:
+            return {}
 
         result = {}
-        for handler in handlers:
+        for handler in self.handlers:
             for key in handler.commands.keys():
                 v = metadata[handler.name][key]
                 if v:

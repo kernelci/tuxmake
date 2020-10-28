@@ -16,7 +16,7 @@ class Test_ccache:
         build = mocker.MagicMock()
         Wrapper("ccache").prepare(build)
         assert (home / ".ccache").exists()
-        build.run_cmd.assert_called_with(["ccache", "--zero-stats"], output=mocker.ANY)
+        build.run_cmd.assert_called_with(["ccache", "--zero-stats"], stdout=mocker.ANY)
 
 
 class Test_sccache:

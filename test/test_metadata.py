@@ -7,6 +7,7 @@ import pytest
 from tuxmake.build import Build
 from tuxmake.exceptions import UnsupportedMetadataType
 from tuxmake.metadata import Metadata
+from tuxmake.metadata import MetadataExtractor
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -38,6 +39,16 @@ def build(linux):
     b = Build(linux, target_arch="arm64")
     b.run()
     return b
+
+
+class TestExtractor:
+    @pytest.fixture
+    def extractor(self, build):
+        return MetadataExtractor(build)
+
+    @pytest.mark.parametrize("data", [None, "", "{}"])
+    def test_dont_crash_on_corner_cases(self, extractor, data):
+        extractor.read_json(data)
 
 
 class TestMetadata:

@@ -242,7 +242,7 @@ class Build:
         else:
             return ["--silent"]
 
-    def run_cmd(self, origcmd, output=None, interactive=False):
+    def run_cmd(self, origcmd, stdout=None, interactive=False):
         """
         Performs the build.
 
@@ -262,13 +262,10 @@ class Build:
             stdout = stderr = stdin = None
         else:
             stdin = subprocess.DEVNULL
-            if output:
-                stdout = subprocess.PIPE
-                stderr = logger
-            else:
+            stderr = logger
+            if not stdout:
                 self.log(" ".join([shlex.quote(c) for c in cmd]))
                 stdout = logger
-                stderr = subprocess.STDOUT
 
         if self.debug:
             self.log_debug(f"D: Command: {final_cmd}")
@@ -283,9 +280,7 @@ class Build:
             stderr=stderr,
         )
         try:
-            out, _ = process.communicate()
-            if output:
-                output.write(out.decode("utf-8"))
+            process.communicate()
             return process.returncode == 0
         except KeyboardInterrupt:
             process.terminate()
