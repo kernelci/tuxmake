@@ -65,7 +65,7 @@ sub check_toolchain_image() {
   }
 
   if ($version) {
-    my $compiler_bin = $cross_compile ? ($cross_compile . $compiler) : $compiler;
+    my $compiler_bin = ($cross_compile && $compiler !~ /clang/) ? ($cross_compile . $compiler) : $compiler;
     my $actual_version = `${compiler_bin} -dumpversion`;
     chomp $actual_version;
     like($actual_version, qr/^${version}(\.\d+)*/, "${compiler_bin} version ${version}");
