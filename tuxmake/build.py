@@ -267,10 +267,9 @@ class Build:
                 self.log(" ".join([shlex.quote(c) for c in cmd]))
                 stdout = logger
 
-        if self.debug:
-            self.log_debug(f"D: Command: {final_cmd}")
-            if extra_env:
-                self.log_debug(f"D: Environment: {extra_env}")
+        self.log_debug(f"Command: {final_cmd}")
+        if extra_env:
+            self.log_debug(f"Environment: {extra_env}")
         process = subprocess.Popen(
             final_cmd,
             cwd=self.source_tree,
@@ -325,7 +324,8 @@ class Build:
         subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
 
     def log_debug(self, *stuff):
-        print(*stuff, file=sys.stderr)
+        if self.debug:
+            print("D:", *stuff, file=sys.stderr)
 
     @property
     def make_args(self):
