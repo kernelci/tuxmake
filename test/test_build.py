@@ -481,19 +481,27 @@ class TestMetadata:
         build.run()
         return build
 
-    def test_kernelversion(self, build):
-        assert re.match(r"^[0-9]+\.[0-9]+", build.metadata["source"]["kernelversion"])
+    @pytest.fixture(scope="class")
+    def metadata(self, build):
+        return json.loads((build.output_dir / "metadata.json").read_text())
 
-    def test_metadata_file(self, build):
-        metadata_file = build.output_dir / "metadata.json"
-        assert metadata_file.exists()
-        assert type(json.loads(metadata_file.open().read())) is dict
+    def test_kernelversion(self, metadata):
+        assert re.match(r"^[0-9]+\.[0-9]+", metadata["source"]["kernelversion"])
 
-    def test_build_metadata(self, build):
-        assert type(build.metadata["build"]) is dict
+    def test_metadata_file(self, metadata):
+        assert type(metadata) is dict
 
-    def test_status(self, build):
-        assert build.metadata["results"]["status"] == "FAIL"
+    def test_build_metadata(self, metadata):
+        assert type(metadata["build"]) is dict
+
+    def test_status(self, metadata):
+        assert metadata["results"]["status"] == "FAIL"
+
+    @pytest.mark.parametrize(
+        "stage", ["validate", "prepare", "build", "copy", "metadata", "cleanup"]
+    )
+    def test_duration(self, metadata, stage):
+        assert metadata["results"]["duration"][stage] > 0.0
 
 
 LOG = (Path(__file__).parent / "logs/simple.log").read_text()

@@ -202,6 +202,7 @@ class Build:
         self.artifacts = {"log": ["build.log"]}
         self.__logger__ = None
         self.__status__ = {}
+        self.__durations__ = {}
         self.metadata = OrderedDict()
 
     @property
@@ -288,12 +289,14 @@ class Build:
             sys.exit(1)
 
     @contextmanager
-    def measure_duration(self, name):
+    def measure_duration(self, name, metadata=None):
         start = time.time()
         try:
             yield
         finally:
             duration = time.time() - start
+            if metadata:
+                self.__durations__[metadata] = duration
             self.log_debug(f"{name} finished in {duration} seconds.")
 
     def expand_cmd_part(self, part):
@@ -434,11 +437,13 @@ class Build:
             "artifacts": self.artifacts,
             "errors": errors,
             "warnings": warnings,
+            "duration": self.__durations__,
         }
 
         extractor = MetadataExtractor(self)
         self.metadata.update(extractor.extract())
 
+    def save_metadata(self):
         with (self.output_dir / "metadata.json").open("w") as f:
             f.write(json.dumps(self.metadata, indent=4))
             f.write("\n")
@@ -460,22 +465,29 @@ class Build:
         build can be inspected though the `status`, `passed`, and `failed`
         properties.
         """
-        self.validate()
+        with self.measure_duration("Input validation", metadata="validate"):
+            self.validate()
 
-        self.prepare()
+        with self.measure_duration("Preparation", metadata="prepare"):
+            self.prepare()
 
-        for target in self.targets:
-            self.build(target)
+        with self.measure_duration("Build", metadata="build"):
+            for target in self.targets:
+                self.build(target)
 
-        for target in self.targets:
-            self.copy_artifacts(target)
+        with self.measure_duration("Copying Artifacts", metadata="copy"):
+            for target in self.targets:
+                self.copy_artifacts(target)
 
-        self.extract_metadata()
+        with self.measure_duration("Metadata Extraction", metadata="metadata"):
+            self.extract_metadata()
 
-        self.terminate()
+        with self.measure_duration("Cleanup", metadata="cleanup"):
+            self.terminate()
+            if self.auto_cleanup:
+                self.cleanup()
 
-        if self.auto_cleanup:
-            self.cleanup()
+        self.save_metadata()
 
 
 def build(**kwargs):
