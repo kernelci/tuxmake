@@ -503,6 +503,10 @@ class TestMetadata:
     def test_duration(self, metadata, stage):
         assert metadata["results"]["duration"][stage] > 0.0
 
+    def test_targets(self, metadata):
+        assert metadata["results"]["targets"]["kernel"]["status"] == "PASS"
+        assert metadata["results"]["targets"]["kernel"]["duration"] > 0.0
+
 
 LOG = (Path(__file__).parent / "logs/simple.log").read_text()
 

@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from collections import OrderedDict
 from pathlib import Path
-import datetime
 import multiprocessing
 import json
 import os
@@ -56,7 +55,8 @@ class BuildInfo:
     @property
     def duration(self):
         """
-        Time this target took to build; a `datetime.timedelta` object.
+        Time this target took to build; a `float`, representing the duration in
+        seconds.
         """
         return self.__duration__
 
@@ -353,38 +353,31 @@ class Build:
         mvars.update(self.wrapper.wrap(mvars))
         return mvars
 
+    def build_all_targets(self):
+        for target in self.targets:
+            start = time.time()
+            result = self.build(target)
+            result.duration = time.time() - start
+            self.status[target.name] = result
+
     def build(self, target):
         for dep in target.dependencies:
             if not self.status[dep].passed:
-                self.status[target.name] = BuildInfo(
-                    "SKIP", datetime.timedelta(seconds=0)
-                )
-                return
+                self.log(f"# Skipping {target.name} because dependency {dep} failed")
+                return BuildInfo("SKIP")
 
         for precondition in target.preconditions:
             if not self.run_cmd(precondition):
-                self.status[target.name] = BuildInfo(
-                    "SKIP", datetime.timedelta(seconds=0)
-                )
                 self.log(f"# Skipping {target.name} because precondition failed")
-                return
-
-        start = time.time()
+                return BuildInfo("SKIP")
 
         target.prepare()
 
-        status = None
         for cmd in target.commands:
             if not self.run_cmd(cmd):
-                status = BuildInfo("FAIL")
-                break
-        if not status:
-            status = BuildInfo("PASS")
+                return BuildInfo("FAIL")
 
-        finish = time.time()
-        status.duration = datetime.timedelta(seconds=finish - start)
-
-        self.status[target.name] = status
+        return BuildInfo("PASS")
 
     def copy_artifacts(self, target):
         if not self.status[target.name].passed:
@@ -433,7 +426,10 @@ class Build:
         errors, warnings = self.parse_log()
         self.metadata["results"] = {
             "status": "PASS" if self.passed else "FAIL",
-            "targets": {k: s.status for k, s in self.status.items()},
+            "targets": {
+                name: {"status": s.status, "duration": s.duration}
+                for name, s in self.status.items()
+            },
             "artifacts": self.artifacts,
             "errors": errors,
             "warnings": warnings,
@@ -472,8 +468,7 @@ class Build:
             self.prepare()
 
         with self.measure_duration("Build", metadata="build"):
-            for target in self.targets:
-                self.build(target)
+            self.build_all_targets()
 
         with self.measure_duration("Copying Artifacts", metadata="copy"):
             for target in self.targets:

@@ -1,4 +1,5 @@
 import argparse
+from datetime import timedelta
 import os
 from pathlib import Path
 import shlex
@@ -270,7 +271,8 @@ def main(*argv):
             result.run_cmd(["bash"], interactive=True)
             result.cleanup()
         for target, info in result.status.items():
-            print(f"I: {target}: {info.status} in {info.duration}", file=err)
+            duration = timedelta(seconds=info.duration)
+            print(f"I: {target}: {info.status} in {duration}", file=err)
         print(f"I: build output in {result.output_dir}", file=err)
         if result.failed:
             sys.exit(2)

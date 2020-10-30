@@ -45,8 +45,10 @@ available.
     - **version**: OS version.
 - **results**: metadata about the build results
     - **status**: "PASS" or "FAIL" (string).
-    - **targets**: key/value with target names as keys, and target status
-      ("PASS"/"FAIL"/"SKIP") as values (string/string).
+    - **targets**: key/value with target names as keys. Values are objects with
+      the following fields:
+        * **status**: target status: "PASS", "FAIL", or "SKIP" (string).
+        * **duration**: duration of this target build, in seconds (number).
     - **artifacts**: key/value with target names (string) as keys, and list of
       artifacts built for that target (list of strings).
     - **errors**: number of errors in the build (integer).
