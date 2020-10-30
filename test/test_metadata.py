@@ -58,6 +58,12 @@ class TestMetadata:
         with pytest.raises(UnsupportedMetadataType):
             m.__init_config__()
 
+    def test_order_all(self):
+        cls = Metadata.all()
+        source = next(c for c in cls if c.name == "source")
+        git = next(c for c in cls if c.name == "git")
+        assert cls.index(source) < cls.index(git)
+
 
 class TestKernelVersion:
     def test_happy_path(self, build):
