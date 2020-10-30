@@ -22,7 +22,7 @@ supports multiple ways of configuring the kernel, multiple architectures,
 toolchains, and can build multiple targets.
 
 You can specify what **targets** to build using positional arguments.  If none
-are privided, tuxmake will build a default set of targets: config, kernel,
+are provided, tuxmake will build a default set of targets: config, kernel,
 modules and DTBs (if applicable). Other build options, such as target
 architecture, toolchain to use, etc can be provided with command line options.
 
@@ -37,7 +37,7 @@ ENVIRONMENT VARIABLES
 =====================
 
 * `TUXMAKE`: defines default options for tuxmake. Those options can be
-  overriden in the command line.
+  overridden in the command line.
 * `TUXMAKE_DOCKER_RUN`: defines extra options for the `docker run` calls made
   by the docker runtime.
 * `TUXMAKE_DOCKER_IMAGE`: defines docker image to use with the docker runtime.
