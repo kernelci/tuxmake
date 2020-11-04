@@ -1,0 +1,520 @@
+# command line: tuxmake
+Unable to find image '740873956006.dkr.ecr.us-east-1.amazonaws.com/tuxmake/arm64_gcc-9:latest' locally
+latest: Pulling from tuxmake/arm64_gcc-9
+54c60ac96416: Pulling fs layer
+c26bf133c879: Pulling fs layer
+5896774bf0e6: Pulling fs layer
+104da7034036: Pulling fs layer
+0343a4da662b: Pulling fs layer
+98f3bf572d22: Pulling fs layer
+ddfa223defaa: Pulling fs layer
+98f3bf572d22: Waiting
+104da7034036: Waiting
+0343a4da662b: Waiting
+ddfa223defaa: Waiting
+5896774bf0e6: Download complete
+54c60ac96416: Verifying Checksum
+54c60ac96416: Download complete
+0343a4da662b: Verifying Checksum
+0343a4da662b: Download complete
+c26bf133c879: Verifying Checksum
+c26bf133c879: Download complete
+ddfa223defaa: Verifying Checksum
+ddfa223defaa: Download complete
+54c60ac96416: Pull complete
+98f3bf572d22: Verifying Checksum
+98f3bf572d22: Download complete
+c26bf133c879: Pull complete
+5896774bf0e6: Pull complete
+104da7034036: Verifying Checksum
+104da7034036: Download complete
+104da7034036: Pull complete
+0343a4da662b: Pull complete
+98f3bf572d22: Pull complete
+ddfa223defaa: Pull complete
+Digest: sha256:c939941c0fbbea1d406128c66130911011509f4035116b6d027042948c98b835
+Status: Downloaded newer image for 740873956006.dkr.ecr.us-east-1.amazonaws.com/tuxmake/arm64_gcc-9:latest
+# https://raw.githubusercontent.com/Linaro/meta-lkft/sumo/recipes-kernel/linux/files/lkft.config -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config
+# https://raw.githubusercontent.com/Linaro/meta-lkft/sumo/recipes-kernel/linux/files/lkft-crypto.config -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config
+# https://raw.githubusercontent.com/Linaro/meta-lkft/sumo/recipes-kernel/linux/files/distro-overrides.config -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config
+# https://raw.githubusercontent.com/Linaro/meta-lkft/sumo/recipes-kernel/linux/files/systemd.config -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config
+# https://raw.githubusercontent.com/Linaro/meta-lkft/sumo/recipes-kernel/linux/files/virtio.config -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/4.config
+# CONFIG_ARM64_MODULE_PLTS=y -> /home/tuxbuild/.cache/tuxmake/builds/1/tmp/5.config
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' defconfig
+scripts/kconfig/merge_config.sh -m -O /home/tuxbuild/.cache/tuxmake/builds/1/tmp /home/tuxbuild/.cache/tuxmake/builds/1/tmp/.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/4.config /home/tuxbuild/.cache/tuxmake/builds/1/tmp/5.config
+Using /home/tuxbuild/.cache/tuxmake/builds/1/tmp/.config as base
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config
+Value of CONFIG_MEDIA_TEST_SUPPORT is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_MEDIA_TEST_SUPPORT is not set
+New value: CONFIG_MEDIA_TEST_SUPPORT=y
+
+Value of CONFIG_MEDIA_SUPPORT is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_MEDIA_SUPPORT=m
+New value: CONFIG_MEDIA_SUPPORT=y
+
+Value of CONFIG_VIDEO_V4L2 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_VIDEO_V4L2=m
+New value: CONFIG_VIDEO_V4L2=y
+
+Value of CONFIG_VIDEO_DEV is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_VIDEO_DEV=m
+New value: CONFIG_VIDEO_DEV=y
+
+Value of CONFIG_USB_USBNET is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_USB_USBNET=m
+New value: CONFIG_USB_USBNET=y
+
+Value of CONFIG_USB_NET_AX8817X is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_USB_NET_AX8817X=m
+New value: CONFIG_USB_NET_AX8817X=y
+
+Value of CONFIG_USB_NET_AX88179_178A is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_USB_NET_AX88179_178A=m
+New value: CONFIG_USB_NET_AX88179_178A=y
+
+Value of CONFIG_PHY_QCOM_QMP is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_PHY_QCOM_QMP=m
+New value: CONFIG_PHY_QCOM_QMP=y
+
+Value of CONFIG_PHY_QCOM_USB_SS is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_PHY_QCOM_USB_SS is not set
+New value: CONFIG_PHY_QCOM_USB_SS=y
+
+Value of CONFIG_PHY_QCOM_QUSB2 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: CONFIG_PHY_QCOM_QUSB2=m
+New value: CONFIG_PHY_QCOM_QUSB2=y
+
+Value of CONFIG_PHY_QCOM_USB_HSIC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_PHY_QCOM_USB_HSIC is not set
+New value: CONFIG_PHY_QCOM_USB_HSIC=y
+
+Value of CONFIG_USB_DWC3_ULPI is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_USB_DWC3_ULPI is not set
+New value: CONFIG_USB_DWC3_ULPI=y
+
+Value of CONFIG_IOSCHED_BFQ is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_IOSCHED_BFQ is not set
+New value: CONFIG_IOSCHED_BFQ=m
+
+Value of CONFIG_CGROUP_FREEZER is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_CGROUP_FREEZER is not set
+New value: CONFIG_CGROUP_FREEZER=y
+
+Value of CONFIG_CGROUP_NET_PRIO is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_CGROUP_NET_PRIO is not set
+New value: CONFIG_CGROUP_NET_PRIO=y
+
+Value of CONFIG_NET_CLS_CGROUP is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_NET_CLS_CGROUP is not set
+New value: CONFIG_NET_CLS_CGROUP=y
+
+Value of CONFIG_SCHED_DEBUG is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_SCHED_DEBUG is not set
+New value: CONFIG_SCHED_DEBUG=y
+
+Value of CONFIG_UCLAMP_TASK is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_UCLAMP_TASK is not set
+New value: CONFIG_UCLAMP_TASK=y
+
+Value of CONFIG_QED is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_QED is not set
+New value: CONFIG_QED=y
+
+Value of CONFIG_TRANSPARENT_HUGEPAGE_MADVISE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_TRANSPARENT_HUGEPAGE_MADVISE is not set
+New value: CONFIG_TRANSPARENT_HUGEPAGE_MADVISE=y
+
+Value of CONFIG_DRM_LOAD_EDID_FIRMWARE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_DRM_LOAD_EDID_FIRMWARE is not set
+New value: CONFIG_DRM_LOAD_EDID_FIRMWARE=y
+
+Value of CONFIG_SND_SOC_MSM8916_WCD_ANALOG is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_SND_SOC_MSM8916_WCD_ANALOG is not set
+New value: CONFIG_SND_SOC_MSM8916_WCD_ANALOG=m
+
+Value of CONFIG_SND_SOC_MSM8916_WCD_DIGITAL is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_SND_SOC_MSM8916_WCD_DIGITAL is not set
+New value: CONFIG_SND_SOC_MSM8916_WCD_DIGITAL=m
+
+Value of CONFIG_KPROBES is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_KPROBES is not set
+New value: CONFIG_KPROBES=y
+
+Value of CONFIG_FTRACE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_FTRACE is not set
+New value: CONFIG_FTRACE=y
+
+Value of CONFIG_DYNAMIC_DEBUG is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/0.config:
+Previous value: # CONFIG_DYNAMIC_DEBUG is not set
+New value: CONFIG_DYNAMIC_DEBUG=y
+
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config
+Value of CONFIG_CRYPTO_KPP is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_KPP=m
+New value: CONFIG_CRYPTO_KPP=y
+
+Value of CONFIG_CRYPTO_DH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_DH=m
+New value: CONFIG_CRYPTO_DH=y
+
+Value of CONFIG_CRYPTO_ECDH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_ECDH=m
+New value: CONFIG_CRYPTO_ECDH=y
+
+Value of CONFIG_CRYPTO_USER is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_USER is not set
+New value: CONFIG_CRYPTO_USER=y
+
+Value of CONFIG_CRYPTO_PCRYPT is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_PCRYPT is not set
+New value: CONFIG_CRYPTO_PCRYPT=y
+
+Value of CONFIG_CRYPTO_AUTHENC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_AUTHENC=m
+New value: CONFIG_CRYPTO_AUTHENC=y
+
+Value of CONFIG_CRYPTO_ENGINE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_ENGINE=m
+New value: CONFIG_CRYPTO_ENGINE=y
+
+Value of CONFIG_CRYPTO_CCM is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_CCM=m
+New value: CONFIG_CRYPTO_CCM=y
+
+Value of CONFIG_CRYPTO_GCM is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_GCM=m
+New value: CONFIG_CRYPTO_GCM=y
+
+Value of CONFIG_CRYPTO_CHACHA20POLY1305 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CHACHA20POLY1305 is not set
+New value: CONFIG_CRYPTO_CHACHA20POLY1305=y
+
+Value of CONFIG_CRYPTO_SEQIV is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_SEQIV is not set
+New value: CONFIG_CRYPTO_SEQIV=y
+
+Value of CONFIG_CRYPTO_CBC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_CBC=m
+New value: CONFIG_CRYPTO_CBC=y
+
+Value of CONFIG_CRYPTO_CTR is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_CTR=m
+New value: CONFIG_CRYPTO_CTR=y
+
+Value of CONFIG_CRYPTO_CTS is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CTS is not set
+New value: CONFIG_CRYPTO_CTS=y
+
+Value of CONFIG_CRYPTO_ECB is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_ECB=m
+New value: CONFIG_CRYPTO_ECB=y
+
+Value of CONFIG_CRYPTO_LRW is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_LRW is not set
+New value: CONFIG_CRYPTO_LRW=y
+
+Value of CONFIG_CRYPTO_PCBC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_PCBC is not set
+New value: CONFIG_CRYPTO_PCBC=y
+
+Value of CONFIG_CRYPTO_XTS is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_XTS=m
+New value: CONFIG_CRYPTO_XTS=y
+
+Value of CONFIG_CRYPTO_KEYWRAP is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_KEYWRAP is not set
+New value: CONFIG_CRYPTO_KEYWRAP=y
+
+Value of CONFIG_CRYPTO_CMAC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_CMAC=m
+New value: CONFIG_CRYPTO_CMAC=y
+
+Value of CONFIG_CRYPTO_XCBC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_XCBC is not set
+New value: CONFIG_CRYPTO_XCBC=y
+
+Value of CONFIG_CRYPTO_VMAC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_VMAC is not set
+New value: CONFIG_CRYPTO_VMAC=y
+
+Value of CONFIG_CRYPTO_CRC32 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CRC32 is not set
+New value: CONFIG_CRYPTO_CRC32=y
+
+Value of CONFIG_CRYPTO_GHASH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_GHASH=m
+New value: CONFIG_CRYPTO_GHASH=y
+
+Value of CONFIG_CRYPTO_POLY1305 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_POLY1305 is not set
+New value: CONFIG_CRYPTO_POLY1305=y
+
+Value of CONFIG_CRYPTO_MD4 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_MD4 is not set
+New value: CONFIG_CRYPTO_MD4=y
+
+Value of CONFIG_CRYPTO_MD5 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_MD5=m
+New value: CONFIG_CRYPTO_MD5=y
+
+Value of CONFIG_CRYPTO_MICHAEL_MIC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_MICHAEL_MIC is not set
+New value: CONFIG_CRYPTO_MICHAEL_MIC=y
+
+Value of CONFIG_CRYPTO_RMD128 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_RMD128 is not set
+New value: CONFIG_CRYPTO_RMD128=y
+
+Value of CONFIG_CRYPTO_RMD160 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_RMD160 is not set
+New value: CONFIG_CRYPTO_RMD160=y
+
+Value of CONFIG_CRYPTO_RMD256 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_RMD256 is not set
+New value: CONFIG_CRYPTO_RMD256=y
+
+Value of CONFIG_CRYPTO_RMD320 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_RMD320 is not set
+New value: CONFIG_CRYPTO_RMD320=y
+
+Value of CONFIG_CRYPTO_SHA512 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_SHA512=m
+New value: CONFIG_CRYPTO_SHA512=y
+
+Value of CONFIG_CRYPTO_SHA3 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_SHA3=m
+New value: CONFIG_CRYPTO_SHA3=y
+
+Value of CONFIG_CRYPTO_SM3 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_SM3=m
+New value: CONFIG_CRYPTO_SM3=y
+
+Value of CONFIG_CRYPTO_TGR192 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_TGR192 is not set
+New value: CONFIG_CRYPTO_TGR192=y
+
+Value of CONFIG_CRYPTO_WP512 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_WP512 is not set
+New value: CONFIG_CRYPTO_WP512=y
+
+Value of CONFIG_CRYPTO_AES_TI is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_AES_TI is not set
+New value: CONFIG_CRYPTO_AES_TI=y
+
+Value of CONFIG_CRYPTO_ANUBIS is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_ANUBIS is not set
+New value: CONFIG_CRYPTO_ANUBIS=y
+
+Value of CONFIG_CRYPTO_ARC4 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_ARC4 is not set
+New value: CONFIG_CRYPTO_ARC4=y
+
+Value of CONFIG_CRYPTO_BLOWFISH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_BLOWFISH is not set
+New value: CONFIG_CRYPTO_BLOWFISH=y
+
+Value of CONFIG_CRYPTO_CAMELLIA is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CAMELLIA is not set
+New value: CONFIG_CRYPTO_CAMELLIA=y
+
+Value of CONFIG_CRYPTO_CAST5 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CAST5 is not set
+New value: CONFIG_CRYPTO_CAST5=y
+
+Value of CONFIG_CRYPTO_CAST6 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CAST6 is not set
+New value: CONFIG_CRYPTO_CAST6=y
+
+Value of CONFIG_CRYPTO_DES is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_DES=m
+New value: CONFIG_CRYPTO_DES=y
+
+Value of CONFIG_CRYPTO_FCRYPT is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_FCRYPT is not set
+New value: CONFIG_CRYPTO_FCRYPT=y
+
+Value of CONFIG_CRYPTO_KHAZAD is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_KHAZAD is not set
+New value: CONFIG_CRYPTO_KHAZAD=y
+
+Value of CONFIG_CRYPTO_SALSA20 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_SALSA20 is not set
+New value: CONFIG_CRYPTO_SALSA20=y
+
+Value of CONFIG_CRYPTO_CHACHA20 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_CHACHA20 is not set
+New value: CONFIG_CRYPTO_CHACHA20=y
+
+Value of CONFIG_CRYPTO_SEED is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_SEED is not set
+New value: CONFIG_CRYPTO_SEED=y
+
+Value of CONFIG_CRYPTO_SERPENT is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_SERPENT is not set
+New value: CONFIG_CRYPTO_SERPENT=y
+
+Value of CONFIG_CRYPTO_TEA is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_TEA is not set
+New value: CONFIG_CRYPTO_TEA=y
+
+Value of CONFIG_CRYPTO_TWOFISH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_TWOFISH is not set
+New value: CONFIG_CRYPTO_TWOFISH=y
+
+Value of CONFIG_CRYPTO_LZO is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_LZO is not set
+New value: CONFIG_CRYPTO_LZO=y
+
+Value of CONFIG_CRYPTO_842 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_842 is not set
+New value: CONFIG_CRYPTO_842=y
+
+Value of CONFIG_CRYPTO_LZ4 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_LZ4 is not set
+New value: CONFIG_CRYPTO_LZ4=y
+
+Value of CONFIG_CRYPTO_LZ4HC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_LZ4HC is not set
+New value: CONFIG_CRYPTO_LZ4HC=y
+
+Value of CONFIG_CRYPTO_DRBG_HASH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_DRBG_HASH is not set
+New value: CONFIG_CRYPTO_DRBG_HASH=y
+
+Value of CONFIG_CRYPTO_DRBG_CTR is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_DRBG_CTR is not set
+New value: CONFIG_CRYPTO_DRBG_CTR=y
+
+Value of CONFIG_CRYPTO_USER_API is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_USER_API=m
+New value: CONFIG_CRYPTO_USER_API=y
+
+Value of CONFIG_CRYPTO_USER_API_HASH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_USER_API_HASH is not set
+New value: CONFIG_CRYPTO_USER_API_HASH=y
+
+Value of CONFIG_CRYPTO_USER_API_SKCIPHER is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_USER_API_SKCIPHER is not set
+New value: CONFIG_CRYPTO_USER_API_SKCIPHER=y
+
+Value of CONFIG_CRYPTO_USER_API_RNG is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_USER_API_RNG=m
+New value: CONFIG_CRYPTO_USER_API_RNG=y
+
+Value of CONFIG_CRYPTO_USER_API_AEAD is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_USER_API_AEAD is not set
+New value: CONFIG_CRYPTO_USER_API_AEAD=y
+
+Value of CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC=m
+New value: # CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC is not set
+
+Value of CONFIG_CRYPTO_DEV_CCP is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_DEV_CCP is not set
+New value: CONFIG_CRYPTO_DEV_CCP=y
+
+Value of CONFIG_CRYPTO_DEV_VIRTIO is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/1.config:
+Previous value: # CONFIG_CRYPTO_DEV_VIRTIO is not set
+New value: CONFIG_CRYPTO_DEV_VIRTIO=y
+
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config
+Value of CONFIG_TUN is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: CONFIG_TUN=y
+New value: CONFIG_TUN=m
+
+Value of CONFIG_USB_TEST is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: # CONFIG_USB_TEST is not set
+New value: CONFIG_USB_TEST=m
+
+Value of CONFIG_DEBUG_INFO is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: CONFIG_DEBUG_INFO=y
+New value: # CONFIG_DEBUG_INFO is not set
+
+Value of CONFIG_USB_SERIAL_GENERIC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: # CONFIG_USB_SERIAL_GENERIC is not set
+New value: CONFIG_USB_SERIAL_GENERIC=y
+
+Value of CONFIG_USB_SERIAL_SIMPLE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: # CONFIG_USB_SERIAL_SIMPLE is not set
+New value: CONFIG_USB_SERIAL_SIMPLE=m
+
+Value of CONFIG_USB_SERIAL_PL2303 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/2.config:
+Previous value: # CONFIG_USB_SERIAL_PL2303 is not set
+New value: CONFIG_USB_SERIAL_PL2303=m
+
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config
+Value of CONFIG_CFS_BANDWIDTH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: # CONFIG_CFS_BANDWIDTH is not set
+New value: CONFIG_CFS_BANDWIDTH=y
+
+Value of CONFIG_CHECKPOINT_RESTORE is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: # CONFIG_CHECKPOINT_RESTORE is not set
+New value: CONFIG_CHECKPOINT_RESTORE=y
+
+Value of CONFIG_IPV6 is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: CONFIG_IPV6=m
+New value: CONFIG_IPV6=y
+
+Value of CONFIG_TMPFS_POSIX_ACL is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: # CONFIG_TMPFS_POSIX_ACL is not set
+New value: CONFIG_TMPFS_POSIX_ACL=y
+
+Value of CONFIG_TMPFS_XATTR is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: # CONFIG_TMPFS_XATTR is not set
+New value: CONFIG_TMPFS_XATTR=y
+
+Value of CONFIG_CRYPTO_HMAC is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: CONFIG_CRYPTO_HMAC=y
+New value: CONFIG_CRYPTO_HMAC=m
+
+Value of CONFIG_CRYPTO_USER_API_HASH is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/3.config:
+Previous value: CONFIG_CRYPTO_USER_API_HASH=y
+New value: CONFIG_CRYPTO_USER_API_HASH=m
+
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/4.config
+Value of CONFIG_SCSI_VIRTIO is redefined by fragment /home/tuxbuild/.cache/tuxmake/builds/1/tmp/4.config:
+Previous value: # CONFIG_SCSI_VIRTIO is not set
+New value: CONFIG_SCSI_VIRTIO=y
+
+Merging /home/tuxbuild/.cache/tuxmake/builds/1/tmp/5.config
+#
+# merged configuration written to /home/tuxbuild/.cache/tuxmake/builds/1/tmp/.config (needs make)
+#
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' olddefconfig
+.config:8651:warning: override: TRANSPARENT_HUGEPAGE_MADVISE changes choice state
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc'
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #address-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #size-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #address-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #size-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #address-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/broadcom/stingray/stingray-usb.dtsi:7.3-14: Warning (dma_ranges_format): /usb:dma-ranges: empty "dma-ranges" property but its #size-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/qcom/ipq6018.dtsi:185.3-14: Warning (dma_ranges_format): /soc:dma-ranges: empty "dma-ranges" property but its #address-cells (1) differs from / (2)
+/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/arch/arm64/boot/dts/qcom/ipq6018.dtsi:185.3-14: Warning (dma_ranges_format): /soc:dma-ranges: empty "dma-ranges" property but its #size-cells (1) differs from / (2)
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' Image.gz
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+grep -q CONFIG_MODULES=y /home/tuxbuild/.cache/tuxmake/builds/1/tmp/.config
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' modules
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' modules_install INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=/home/tuxbuild/.cache/tuxmake/builds/1/tmp/modinstall
+tar caf /home/tuxbuild/.cache/tuxmake/builds/1/tmp/modules.tar.xz -C /home/tuxbuild/.cache/tuxmake/builds/1/tmp/modinstall lib
+test -d arch/arm64/boot/dts
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' dtbs
+mkdir -p /home/tuxbuild/.cache/tuxmake/builds/1/tmp/dtbsinstall/dtbs
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' dtbs_install INSTALL_DTBS_PATH=/home/tuxbuild/.cache/tuxmake/builds/1/tmp/dtbsinstall/dtbs
+make[3]: *** No rule to make target '/home/tuxbuild/.cache/tuxmake/builds/1/tmp/dtbsinstall/dtbs/freescale/imx8mm-kontron-n801x-s.dts', needed by '__dtbs_install'.
+make[3]: Target '__dtbs_install' not remade because of errors.
+make[2]: *** [/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/scripts/Makefile.dtbinst:34: arch/arm64/boot/dts/freescale] Error 2
+make[2]: Target '__dtbs_install' not remade because of errors.
+make[1]: *** [/builds/cf7cd542d1b538f6e9e83490bc090dd773f4266d/Makefile:1344: dtbs_install] Error 2
+make: *** [Makefile:185: __sub-make] Error 2
+make: Target 'dtbs_install' not remade because of errors.
+make --silent --keep-going --jobs=16 O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc' 'HOSTCC=sccache gcc' vmlinux
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+aarch64-linux-gnu-ld: warning: -z norelro ignored
+xz -T0 --keep /home/tuxbuild/.cache/tuxmake/builds/1/tmp/vmli

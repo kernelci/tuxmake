@@ -5,6 +5,7 @@ ERRORS = (
     "no configuration exists",
     "not found",
     "no such file or directory",
+    "no rule to make target",
 )
 
 

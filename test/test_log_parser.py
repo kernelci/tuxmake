@@ -15,6 +15,7 @@ class TestLogParser:
             ("simple.log", 1, 1),
             ("case.log", 3, 3),
             ("no-such-file-or-directory.log", 1, 5),
+            ("no-rule-to-make-target.log", 1, 10),
         ),
     )
     def test_log(self, log, errors, warnings):
