@@ -90,7 +90,7 @@ class Image:
 
         test_args = " ".join(self.test_args)
         stream.write(f"test-{self.name}: {self.name}\n")
-        stream.write(f"\tdocker run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name} /test {test_args}\n\n")
+        stream.write(f"\tdocker run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args}\n\n")
 
 
 class BaseImage(Image):
