@@ -173,7 +173,7 @@ docker-images-amd64:
   variables:
     TAG: "-amd64"
   script:
-    - "make $(echo ${DOCKER_IMAGES} | sed -e 's/\\</publish-/g')"
+    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-${img}; done)"
 
 docker-images-arm64:
   stage: build
@@ -183,7 +183,7 @@ docker-images-arm64:
   variables:
     TAG: "-arm64"
   script:
-    - "make $(echo ${DOCKER_IMAGES} | sed -e 's/\\</publish-/g')"
+    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-${img}; done)"
 
 docker-images-multiarch:
   stage: publish
@@ -195,4 +195,4 @@ docker-images-multiarch:
     DOCKER_CLI_EXPERIMENTAL: "enabled"
     ARCH_TAGS: "-amd64 -arm64"
   script:
-    - "make $(echo ${DOCKER_IMAGES} | sed -e 's/\\</publish-multiarch-/g')"
+    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-multiarch-${img}; done)"
