@@ -19,7 +19,7 @@ typecheck:
 codespell:
 	codespell \
 		--check-filenames \
-		--skip '.git,public,dist,*.sw*,*.pyc,tags,*.json,.coverage'
+		--skip '.git,public,dist,*.sw*,*.pyc,tags,*.json,.coverage,htmlcov'
 
 integration-tests:
 	run-parts --verbose test/integration
