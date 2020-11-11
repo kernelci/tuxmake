@@ -37,6 +37,9 @@ class Runtime(ConfigurableObject):
     def __init_config__(self):
         self.toolchains = Toolchain.supported()
 
+    def get_image(self, build):
+        return None
+
     def is_supported(self, arch, toolchain):
         return True
 
@@ -89,6 +92,7 @@ class Image:
 class DockerRuntime(Runtime):
     name = "docker"
     command = "docker"
+    extra_opts_env_variable = "TUXMAKE_DOCKER_RUN"
     prepare_failed_msg = "failed to pull remote image {image}"
 
     def __init_config__(self):
@@ -121,7 +125,7 @@ class DockerRuntime(Runtime):
         }
 
     def is_supported(self, arch, toolchain):
-        image_name = toolchain.get_docker_image(arch)
+        image_name = toolchain.get_image(arch)
         image = self.toolchain_images_map.get(image_name)
         if image:
             return host_arch.name in image.hosts or any(
@@ -131,8 +135,10 @@ class DockerRuntime(Runtime):
             return False
 
     def get_image(self, build):
-        return os.getenv("TUXMAKE_DOCKER_IMAGE") or build.toolchain.get_docker_image(
-            build.target_arch
+        return (
+            os.getenv("TUXMAKE_IMAGE")
+            or os.getenv("TUXMAKE_DOCKER_IMAGE")
+            or build.toolchain.get_image(build.target_arch)
         )
 
     def prepare(self, build):
@@ -195,13 +201,14 @@ class DockerRuntime(Runtime):
         return [f"--user={uid}:{gid}"]
 
     def __get_extra_opts__(self):
-        opts = os.getenv("TUXMAKE_DOCKER_RUN", "")
+        opts = os.getenv(self.extra_opts_env_variable, "")
         return shlex.split(opts)
 
 
 class PodmanRuntime(DockerRuntime):
     name = "podman"
     command = "podman"
+    extra_opts_env_variable = "TUXMAKE_PODMAN_RUN"
 
     def get_user_opts(self):
         return []

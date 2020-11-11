@@ -23,7 +23,7 @@ installed locally, the build will just fail.
 ## docker
 
 The docker runtime. Runs builds in docker containers, using images provided by
-the tuxmake maintainers (or the image informed via **-i/--docker-image**). Will
+the tuxmake maintainers (or the image informed via **-i/--image**). Will
 hit the network every time, looking for updated images.
 
 If you want more details on the contents of the images provided by the TuxMake

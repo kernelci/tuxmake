@@ -1,10 +1,8 @@
 from contextlib import contextmanager
 from collections import OrderedDict
 from pathlib import Path
-import multiprocessing
 import json
 import os
-import shlex
 import shutil
 import subprocess
 import sys
@@ -13,26 +11,15 @@ from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper, NoWrapper
 from tuxmake.output import get_new_output_dir
-from tuxmake.target import create_target, supported_targets
-from tuxmake.runtime import get_runtime, Runtime
+from tuxmake.target import create_target
+from tuxmake.runtime import get_runtime
 from tuxmake.metadata import MetadataExtractor
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 from tuxmake.log import LogParser
-
-
-class supported:
-    architectures = Architecture.supported()
-    targets = supported_targets()
-    toolchains = Toolchain.supported()
-    runtimes = Runtime.supported()
-    wrappers = Wrapper.supported()
-
-
-class defaults:
-    kconfig = "defconfig"
-    targets = ["config", "kernel", "modules", "dtbs", "debugkernel"]
-    jobs = multiprocessing.cpu_count() * 2
+from tuxmake.cmdline import CommandLine
+from tuxmake.utils import defaults
+from tuxmake.utils import quote_command_line
 
 
 class BuildInfo:
@@ -204,6 +191,7 @@ class Build:
         self.__status__ = {}
         self.__durations__ = {}
         self.metadata = OrderedDict()
+        self.cmdline = CommandLine()
 
     @property
     def status(self):
@@ -232,8 +220,8 @@ class Build:
 
     def prepare(self):
         self.log(
-            "# command line: "
-            + " ".join(["tuxmake"] + [shlex.quote(a) for a in sys.argv[1:]])
+            "# to reproduce this build locally: "
+            + quote_command_line(self.cmdline.reproduce(self))
         )
         self.wrapper.prepare(self)
         self.runtime.prepare(self)
@@ -266,7 +254,7 @@ class Build:
             stdin = subprocess.DEVNULL
             stderr = logger
             if not stdout:
-                self.log(" ".join([shlex.quote(c) for c in cmd]))
+                self.log(quote_command_line(cmd))
                 stdout = logger
 
         self.log_debug(f"Command: {final_cmd}")
@@ -422,6 +410,7 @@ class Build:
             "jobs": self.jobs,
             "runtime": self.runtime.name,
             "verbose": self.verbose,
+            "reproducer_cmdline": self.cmdline.reproduce(self),
         }
         errors, warnings = self.parse_log()
         self.metadata["results"] = {

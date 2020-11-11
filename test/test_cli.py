@@ -99,7 +99,7 @@ class TestRuntime:
         assert args(builder).runtime == "docker"
 
 
-class TestDockerImage:
+class TestImage:
     @pytest.fixture(autouse=True)
     def environment(self, monkeypatch):
         env = {}
@@ -107,16 +107,24 @@ class TestDockerImage:
         return env
 
     def test_implies_runtime_docker(self, builder):
-        tuxmake("--docker-image=foobar")
+        tuxmake("--image=foobar")
         assert args(builder).runtime == "docker"
 
-    def test_not_passed_to_builder_class(self, builder):
-        tuxmake("--docker-image=foobar")
-        assert "docker_image" not in builder.call_args[1].keys()
+    def test_does_not_override_explicit_runtime(self, builder):
+        tuxmake("--image=foobar", "--runtime=podman")
+        assert args(builder).runtime == "podman"
 
-    def test_sets_TUXMAKE_DOCKER_IMAGE(self, environment):
+    def test_not_passed_to_builder_class(self, builder):
+        tuxmake("--image=foobar")
+        assert "image" not in builder.call_args[1].keys()
+
+    def test_sets_TUXMAKE_IMAGE(self, environment):
+        tuxmake("--image=foobar")
+        assert environment["TUXMAKE_IMAGE"] == "foobar"
+
+    def test_backwards_compat_with_docker_image(self, environment):
         tuxmake("--docker-image=foobar")
-        assert environment["TUXMAKE_DOCKER_IMAGE"] == "foobar"
+        assert environment["TUXMAKE_IMAGE"] == "foobar"
 
 
 class TestVerbosity:

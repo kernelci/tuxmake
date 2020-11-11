@@ -527,6 +527,9 @@ class TestMetadata:
         assert metadata["results"]["targets"]["kernel"]["status"] == "PASS"
         assert metadata["results"]["targets"]["kernel"]["duration"] > 0.0
 
+    def test_command_line(self, metadata):
+        assert type(metadata["build"]["reproducer_cmdline"]) is list
+
 
 LOG = (Path(__file__).parent / "logs/simple.log").read_text()
 

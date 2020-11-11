@@ -18,7 +18,7 @@ class Toolchain(ConfigurableObject):
 
     def __init_config__(self):
         self.makevars = self.config["makevars"]
-        self.docker_image = self.config["docker"]["image"]
+        self.image = self.config["docker"]["image"]
         self.__compiler__ = self.config["metadata"]["compiler"]
 
     def expand_makevars(self, arch):
@@ -28,8 +28,8 @@ class Toolchain(ConfigurableObject):
             for k, v in self.makevars.items()
         }
 
-    def get_docker_image(self, arch):
-        return self.docker_image.format(
+    def get_image(self, arch):
+        return self.image.format(
             toolchain=self.name, arch=arch.name, version_suffix=self.version_suffix
         )
 

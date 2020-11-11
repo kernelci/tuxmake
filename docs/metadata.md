@@ -24,6 +24,7 @@ available.
     - **kconfig**: name of the kernel config (string).
     - **kconfig_add**: extra kernel config file or fragments (list of strings).
     - **jobs**: number of concurrent jobs (integer).
+    - **reproducer_cmdline**: command line that can be used to reproduce the build with tuxmake (list of strings).
     - **runtime**: name of the runtime used for the build (string).
     - **verbose**: whether this was a verbose build (boolean).
 - **ccache**: ccache statistics. Requires `ccache` 3.7 and later versions.

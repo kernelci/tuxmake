@@ -15,7 +15,8 @@ class ConfigurableObject:
         conffile = Path(__file__).parent / self.basedir / f"{name}.ini"
         if not conffile.exists():
             raise self.exception(name)
-        conffile = conffile.resolve()
+        if conffile.name not in self.not_aliases:
+            conffile = conffile.resolve()
         name = conffile.stem
         self.name = name
         self.config = ConfigParser()

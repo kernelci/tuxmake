@@ -17,8 +17,8 @@ def arm64():
 
 
 class TestGcc:
-    def test_docker_image(self, gcc, arm64):
-        assert gcc.get_docker_image(arm64) == "tuxmake/arm64_gcc"
+    def test_image(self, gcc, arm64):
+        assert gcc.get_image(arm64) == "tuxmake/arm64_gcc"
 
 
 @pytest.fixture
@@ -27,8 +27,8 @@ def clang():
 
 
 class TestClang:
-    def test_docker_image(self, clang, arm64):
-        assert clang.get_docker_image(arm64) == "tuxmake/arm64_clang"
+    def test_image(self, clang, arm64):
+        assert clang.get_image(arm64) == "tuxmake/arm64_clang"
 
 
 def test_compiler_name(gcc, arm64):
@@ -40,13 +40,13 @@ def test_compiler_name(gcc, arm64):
 
 
 class TestLLVM:
-    def test_docker_image_unversioned(self, arm64):
+    def test_image_unversioned(self, arm64):
         llvm = Toolchain("llvm")
-        assert llvm.get_docker_image(arm64) == "tuxmake/arm64_clang"
+        assert llvm.get_image(arm64) == "tuxmake/arm64_clang"
 
-    def test_docker_image_versioned(self, arm64):
+    def test_image_versioned(self, arm64):
         llvm = Toolchain("llvm-10")
-        assert llvm.get_docker_image(arm64) == "tuxmake/arm64_clang-10"
+        assert llvm.get_image(arm64) == "tuxmake/arm64_clang-10"
 
     def test_compiler_unversioned(self, arm64):
         assert Toolchain("llvm").compiler(arm64) == "clang"
