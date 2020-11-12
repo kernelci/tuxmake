@@ -27,11 +27,21 @@ class TestGetRuntime:
     def test_docker_runtime(self):
         assert isinstance(get_runtime("docker"), DockerRuntime)
 
+    def test_docker_local_runtime(self):
+        assert isinstance(get_runtime("docker-local"), DockerLocalRuntime)
+
     def test_invalid_runtime(self):
         with pytest.raises(InvalidRuntimeError):
             get_runtime("invalid")
         with pytest.raises(InvalidRuntimeError):
             get_runtime("xyz")
+
+
+class TestRuntime:
+    def test_invalid_runtime(self, monkeypatch):
+        monkeypatch.setattr(Runtime, "name", "invalid")
+        with pytest.raises(InvalidRuntimeError):
+            Runtime()
 
 
 class TestNullRuntime:
@@ -44,6 +54,10 @@ class TestNullRuntime:
         runtime = NullRuntime()
         runtime.prepare(build)
         log.assert_called()
+
+    def test_toolchains(self):
+        runtime = NullRuntime()
+        assert "gcc" in runtime.toolchains
 
 
 @pytest.fixture

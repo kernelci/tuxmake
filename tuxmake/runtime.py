@@ -28,6 +28,7 @@ def get_runtime(runtime):
 
 class Runtime(ConfigurableObject):
     basedir = "runtime"
+    name = "runtime"
     exception = InvalidRuntimeError
     not_aliases = ["docker-local.ini", "podman.ini", "podman-local.ini"]
 
