@@ -48,6 +48,10 @@ class TestNullRuntime:
         runtime.prepare(build)
         log.assert_called()
 
+    def test_toolchains(self):
+        runtime = NullRuntime()
+        assert "gcc" in runtime.toolchains
+
 
 @pytest.fixture
 def get_image(mocker):
