@@ -72,6 +72,17 @@ def test_build_with_build_dir(linux, tmp_path):
     assert (tmp_path / ".config").exists
 
 
+def test_no_directory_created_unecessarily(linux, home):
+    Build(tree=linux)
+    assert len(list(home.glob("*"))) == 0
+
+
+def test_no_directory_created_unecessarily_with_explicit_paths(linux, tmp_path):
+    Build(tree=linux, output_dir=tmp_path / "output", build_dir=tmp_path / "build")
+    assert not (tmp_path / "output").exists()
+    assert not (tmp_path / "build").exists()
+
+
 def test_unsupported_target(linux):
     with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
         build(tree=linux, targets=["unknown-target"])
