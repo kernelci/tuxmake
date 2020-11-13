@@ -3,6 +3,7 @@ import re
 import shlex
 import subprocess
 import sys
+from functools import lru_cache
 
 
 from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
@@ -15,6 +16,7 @@ from tuxmake.arch import host_arch
 DEFAULT_RUNTIME = "null"
 
 
+@lru_cache(None)
 def get_runtime(runtime):
     runtime = runtime or DEFAULT_RUNTIME
     name = "".join([w.title() for w in re.split(r"[_-]", runtime)]) + "Runtime"
@@ -125,6 +127,7 @@ class DockerRuntime(Runtime):
             f"tuxmake/{image.name}": image for image in self.toolchain_images
         }
 
+    @lru_cache(None)
     def is_supported(self, arch, toolchain):
         image_name = toolchain.get_image(arch)
         image = self.toolchain_images_map.get(image_name)

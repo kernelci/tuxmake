@@ -1,5 +1,6 @@
 import re
 import shlex
+from functools import lru_cache
 from typing import Optional, Type, List
 from configparser import ConfigParser
 from pathlib import Path
@@ -11,19 +12,24 @@ class ConfigurableObject:
     not_aliases: List[str] = []
 
     def __init__(self, name):
-        commonconf = Path(__file__).parent / self.basedir / "common.ini"
-        conffile = Path(__file__).parent / self.basedir / f"{name}.ini"
+        self.name, self.config = self.read_config(name)
+        self.__init_config__()
+
+    @classmethod
+    @lru_cache(None)
+    def read_config(cls, name):
+        commonconf = Path(__file__).parent / cls.basedir / "common.ini"
+        conffile = Path(__file__).parent / cls.basedir / f"{name}.ini"
         if not conffile.exists():
-            raise self.exception(name)
-        if conffile.name not in self.not_aliases:
+            raise cls.exception(name)
+        if conffile.name not in cls.not_aliases:
             conffile = conffile.resolve()
         name = conffile.stem
-        self.name = name
-        self.config = ConfigParser()
-        self.config.optionxform = str
-        self.config.read(commonconf)
-        self.config.read(conffile)
-        self.__init_config__()
+        config = ConfigParser()
+        config.optionxform = str
+        config.read(commonconf)
+        config.read(conffile)
+        return name, config
 
     def __init_config__(self):
         raise NotImplementedError
@@ -33,6 +39,9 @@ class ConfigurableObject:
 
     def __eq__(self, other):
         return str(self) == str(other)
+
+    def __hash__(self):
+        return hash(self.name)
 
     @classmethod
     def supported(cls):

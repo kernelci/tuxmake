@@ -143,19 +143,13 @@ class Build:
     ):
         self.source_tree = tree
 
-        if output_dir is None:
-            self.output_dir = get_new_output_dir()
-        else:
-            self.output_dir = Path(output_dir)
-            self.output_dir.mkdir(exist_ok=True)
-
-        if build_dir:
-            self.build_dir = Path(build_dir)
-            self.build_dir.mkdir(exist_ok=True)
+        self.__output_dir__ = None
+        self.__output_dir_input__ = output_dir
+        self.__build_dir__ = None
+        self.__build_dir_input__ = build_dir
+        if self.__build_dir_input__:
             self.auto_cleanup = False
         else:
-            self.build_dir = self.output_dir / "tmp"
-            self.build_dir.mkdir()
             self.auto_cleanup = auto_cleanup
 
         self.target_arch = target_arch and Architecture(target_arch) or host_arch
@@ -225,6 +219,31 @@ class Build:
         )
         self.wrapper.prepare(self)
         self.runtime.prepare(self)
+
+    @property
+    def output_dir(self):
+        if self.__output_dir__:
+            return self.__output_dir__
+
+        if self.__output_dir_input__ is None:
+            self.__output_dir__ = get_new_output_dir()
+        else:
+            self.__output_dir__ = Path(self.__output_dir_input__)
+            self.__output_dir__.mkdir(exist_ok=True)
+        return self.__output_dir__
+
+    @property
+    def build_dir(self):
+        if self.__build_dir__:
+            return self.__build_dir__
+
+        if self.__build_dir_input__:
+            self.__build_dir__ = Path(self.__build_dir_input__)
+            self.__build_dir__.mkdir(exist_ok=True)
+        else:
+            self.__build_dir__ = self.output_dir / "tmp"
+            self.__build_dir__.mkdir()
+        return self.__build_dir__
 
     def get_silent(self):
         if self.verbose:
