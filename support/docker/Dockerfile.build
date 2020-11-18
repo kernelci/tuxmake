@@ -28,4 +28,14 @@ RUN for bin in $(ls -1 /usr/bin/*-[0-9]* | xargs -n 1 basename); do \
 # For clang images, symlink all the binaries in $PATH
 RUN if [ -d /usr/lib/llvm-*/bin ]; then ln -sfv /usr/lib/llvm-*/bin/* /usr/local/bin/; fi
 
+# The GCC plugins have no default package name, so we must discover the installed
+# GCC version in order to install them. :(
+RUN apt-get install \
+        --assume-yes \
+        --no-install-recommends \
+        --option=debug::pkgProblemResolver=yes \
+        $(dpkg -l 'gcc-*' | grep ^.i | awk '{print $2}' | \
+          grep -E '^gcc-[0-9]*-(.*)-base(:.*)*$' | grep -v -- -cross-base | \
+          sed -e 's/^gcc-\([0-9]*\)-/gcc-\1-plugin-dev-/; s/-base//;')
+
 # vim: ft=dockerfile
