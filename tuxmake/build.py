@@ -380,9 +380,19 @@ class Build:
 
         target.prepare()
 
+        fail = False
         for cmd in target.commands:
             if not self.run_cmd(cmd):
-                return BuildInfo("FAIL")
+                fail = True
+                break
+        if fail and target.alt_commands:
+            fail = False
+            for cmd in target.alt_commands:
+                if not self.run_cmd(cmd):
+                    fail = True
+                    break
+        if fail:
+            return BuildInfo("FAIL")
 
         return BuildInfo("PASS")
 

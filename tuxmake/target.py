@@ -32,6 +32,7 @@ class Target(ConfigurableObject):
         self.dependencies = self.config["target"].get("dependencies", "").split()
         self.preconditions = self.__split_cmds__("target", "preconditions")
         self.commands = self.__split_cmds__("target", "commands")
+        self.alt_commands = self.__split_cmds__("target", "alt_commands")
         try:
             self.artifacts = self.config["artifacts"]
         except KeyError:

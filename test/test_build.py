@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 import pytest
 import re
+import subprocess
+import shutil
 import urllib
 from tuxmake.arch import Architecture, Native
 from tuxmake.toolchain import Toolchain
@@ -411,6 +413,29 @@ class TestDtbs:
         result = build(tree=linux, targets=["dtbs"], target_arch="x86_64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" not in artifacts
+
+    @pytest.fixture
+    def oldlinux(self, linux, tmp_path):
+        old = tmp_path / "oldlinux"
+        shutil.copytree(linux, old)
+        subprocess.check_call(
+            ["sed", "-i", "-e", "s/dtbs_install/XXXX/g", str(old / "Makefile")]
+        )
+        return old
+
+    def test_collect_dtbs_manually_without_dtbs_install(self, oldlinux):
+        result = build(tree=oldlinux, targets=["dtbs"], target_arch="arm64")
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "dtbs.tar.xz" in artifacts
+
+    def test_collect_dtbs_manually_without_dtbs_install_and_fails(
+        self, oldlinux, monkeypatch
+    ):
+        build = Build(tree=oldlinux, targets=["dtbs"], target_arch="arm64")
+        dtbs = [t for t in build.targets if t.name == "dtbs"][0]
+        monkeypatch.setattr(dtbs, "alt_commands", [["false"]])
+        build.run()
+        assert build.failed
 
 
 class TestTargetDependencies:
