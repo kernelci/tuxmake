@@ -122,9 +122,10 @@ class TestImage:
         tuxmake("--image=foobar")
         assert environment["TUXMAKE_IMAGE"] == "foobar"
 
-    def test_backwards_compat_with_docker_image(self, environment):
+    def test_backwards_compat_with_docker_image(self, environment, builder):
         tuxmake("--docker-image=foobar")
         assert environment["TUXMAKE_IMAGE"] == "foobar"
+        assert "docker_image" not in builder.call_args[1].keys()
 
 
 class TestVerbosity:

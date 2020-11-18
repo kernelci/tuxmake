@@ -92,7 +92,7 @@ def main(*argv):
     build_args = {
         k: v
         for k, v in options.__dict__.items()
-        if v and k not in ["color", "image", "shell"]
+        if v and k not in ["color", "docker_image", "image", "shell"]
     }
     try:
         result = build(**build_args, auto_cleanup=(not options.shell))
