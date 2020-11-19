@@ -301,10 +301,6 @@ class TestArchitecture:
         result = build(tree=linux, target_arch="arm")
         assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
-    def test_hppa(self, linux):
-        result = build(tree=linux, target_arch="parisc")
-        assert "bzImage" in [str(f.name) for f in result.output_dir.glob("*")]
-
     def test_i386(self, linux):
         result = build(tree=linux, target_arch="i386")
         assert "bzImage" in [str(f.name) for f in result.output_dir.glob("*")]
@@ -312,6 +308,10 @@ class TestArchitecture:
     def test_mips(self, linux):
         result = build(tree=linux, target_arch="mips")
         assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
+
+    def test_parisc(self, linux):
+        result = build(tree=linux, target_arch="parisc")
+        assert "bzImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_powerpc(self, linux):
         result = build(tree=linux, target_arch="powerpc")
