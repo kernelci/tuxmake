@@ -128,6 +128,10 @@ kvm_guest.config: config
 	$(call maybefail,kvm_guest.config)
 	echo CONFIG_KVM_GUEST=y >> $(O)/.config
 
+qemu-gdb.config: config
+	$(call maybefail,qemu-gdb.config)
+	echo CONFIG_DEBUG_INFO=y >> $(O)/.config
+
 
 ########################################################################
 # cleaning

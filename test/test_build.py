@@ -212,11 +212,12 @@ def test_kconfig_add_in_tree(linux, output_dir):
     build(
         tree=linux,
         targets=["config"],
-        kconfig_add=["kvm_guest.config"],
+        kconfig_add=["kvm_guest.config", "qemu-gdb.config"],
         output_dir=output_dir,
     )
     config = output_dir / "config"
-    assert "CONFIG_KVM_GUEST=y" in config.read_text()
+    assert ("CONFIG_KVM_GUEST=y") in config.read_text()
+    assert ("CONFIG_DEBUG_INFO=y") in config.read_text()
 
 
 def test_kconfig_add_invalid(linux):

@@ -136,7 +136,7 @@ class Config(Target):
             return False
 
     def handle_in_tree_config(self, t):
-        if re.match(r"^\w+\.config$", t):
+        if re.match(r"^[\w\-]+.config$", t):
             self.commands.append(["{make}", t])
             return True
         else:
