@@ -390,6 +390,20 @@ class TestDebugKernel:
         assert "System.map" in artifacts
 
 
+class TestRunCmd:
+    def test_pass(self, linux):
+        build = Build(tree=linux)
+        assert build.run_cmd(["true"])
+
+    def test_fail(self, linux):
+        build = Build(tree=linux)
+        assert not build.run_cmd(["false"])
+
+    def test_negate(self, linux):
+        build = Build(tree=linux)
+        assert build.run_cmd(["!", "false"])
+
+
 class TestModules:
     def test_modules(self, linux):
         result = build(tree=linux, targets=["config", "kernel", "modules"])
