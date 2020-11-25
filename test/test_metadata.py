@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import pathlib
 import pytest
+from tuxmake import __version__
 from tuxmake.build import Build
 from tuxmake.exceptions import UnsupportedMetadataType
 from tuxmake.metadata import Metadata
@@ -131,3 +132,8 @@ class TestVmlinux:
 class TestSystemMap:
     def test_text_offset(self, build):
         assert build.metadata["system_map"]["text_offset"] == "0xc1000000"
+
+
+class TestTuxmake:
+    def test_tuxmake_versino(self, build):
+        assert build.metadata["tuxmake"]["version"] == __version__

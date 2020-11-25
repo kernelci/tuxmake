@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import time
+from tuxmake import __version__
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper, NoWrapper
@@ -462,6 +463,7 @@ class Build:
             "warnings": warnings,
             "duration": self.__durations__,
         }
+        self.metadata["tuxmake"] = {"version": __version__}
 
         extractor = MetadataExtractor(self)
         self.metadata.update(extractor.extract())
