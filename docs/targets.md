@@ -57,6 +57,13 @@ mips | uImage.gz
 riscv | Image.gz
 x86_64 | bzImage
 
+## xipkernel
+
+Builds the XIP Kernel image, named `xipImage`, which is then copied into the
+output directory. This requires setting `CONFIG_XIP_KERNEL=y` in kconfig, and
+is only supported by a few architectures. It will be skipped in most cases.
+When this target is built, the `kernel` target is not.
+
 ## modules
 
 This target builds the Kernel modules. The modules are compressed in a tarball,

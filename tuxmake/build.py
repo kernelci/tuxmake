@@ -262,6 +262,12 @@ class Build:
         for c in origcmd:
             cmd += self.expand_cmd_part(c)
 
+        if cmd[0] == "!":
+            expect_failure = True
+            cmd.pop(0)
+        else:
+            expect_failure = False
+
         final_cmd = self.runtime.get_command_line(self, cmd, interactive)
         extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C.UTF-8")
         env = dict(os.environ, **extra_env)
@@ -290,7 +296,10 @@ class Build:
                     stderr=stderr,
                 )
             process.communicate()
-            return process.returncode == 0
+            if expect_failure:
+                return process.returncode != 0
+            else:
+                return process.returncode == 0
         except KeyboardInterrupt:
             process.terminate()
             sys.exit(1)

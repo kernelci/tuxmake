@@ -390,6 +390,29 @@ class TestDebugKernel:
         assert "System.map" in artifacts
 
 
+class TestRunCmd:
+    def test_pass(self, linux):
+        build = Build(tree=linux)
+        assert build.run_cmd(["true"])
+
+    def test_fail(self, linux):
+        build = Build(tree=linux)
+        assert not build.run_cmd(["false"])
+
+    def test_negate(self, linux):
+        build = Build(tree=linux)
+        assert build.run_cmd(["!", "false"])
+
+
+class TestXIPKernel:
+    def test_xip_kernel(self, linux):
+        result = build(tree=linux, kconfig_add=["CONFIG_XIP_KERNEL=y"])
+        assert result.passed
+        artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert "xipImage" in artifacts
+        assert "modules.tar.xz" in artifacts
+
+
 class TestModules:
     def test_modules(self, linux):
         result = build(tree=linux, targets=["config", "kernel", "modules"])
@@ -454,7 +477,7 @@ class TestTargetDependencies:
     def test_recursive_dependencies(self, linux):
         result = build(tree=linux, targets=["modules"])
         assert result.status["config"].passed
-        assert result.status["kernel"].passed
+        assert result.status["debugkernel"].passed
         assert result.status["modules"].passed
 
 

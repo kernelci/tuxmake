@@ -67,6 +67,18 @@ $(O)/vmlinux.o: vmlinux.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 ########################################################################
+# XIP kernel image
+########################################################################
+
+CLEAN += $(O)/arch/$(ARCHDIRNAME)/boot/xipImage
+xipImage: $(O)/arch/$(ARCHDIRNAME)/boot/xipImage
+$(O)/arch/$(ARCHDIRNAME)/boot/xipImage: $(O)/vmlinux
+	$(call maybefail,xipImage)
+	@grep -q CONFIG_XIP_KERNEL=y $(O)/.config || (echo "Error: CONFIG_XIP_KERNEL not set"; false)
+	cp $(O)/vmlinux $@
+
+
+########################################################################
 # modules
 #########################################################################
 modules: $(O)/modules
