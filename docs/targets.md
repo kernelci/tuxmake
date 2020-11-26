@@ -74,3 +74,16 @@ When this target is built, the `kernel` target is not.
 
 This target builds the Kernel modules. The modules are compressed in a tarball,
 which is copied into the output directory as `modules.tar.gz`.
+
+## kselftest
+
+Build the kernsel selftests. The resulting, installed tests are compressed in a
+tarball which is copied into the output directory as `kselftest.tar.xz`.
+
+## kselftest-merge
+
+This target merges some configuration required by `kselftest` in the kernel
+configuration. It will run after the `config` target. Note that `kselftest`
+does not require this, so if you want `kselftest-merge` to be built, it needs
+to be specified explicitly. If built, it will always be built before
+`kselftest` itself.
