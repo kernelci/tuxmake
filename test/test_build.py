@@ -657,4 +657,4 @@ class TestPrepare:
         )
         build = Build(wrapper="ccache")
         build.prepare()
-        assert order == ["runtime", "wrapper"]
+        assert order[0] == ["runtime"]
