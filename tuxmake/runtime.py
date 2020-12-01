@@ -191,8 +191,8 @@ class DockerRuntime(Runtime):
             "--env=KBUILD_BUILD_USER=tuxmake",
             *env,
             *user_opts,
-            f"--volume={source_tree}:{source_tree}",
-            f"--volume={build_dir}:{build_dir}",
+            self.volume(source_tree, source_tree),
+            self.volume(build_dir, build_dir),
             f"--workdir={source_tree}",
             *extra_opts,
             self.get_image(build),
@@ -202,6 +202,9 @@ class DockerRuntime(Runtime):
         uid = os.getuid()
         gid = os.getgid()
         return [f"--user={uid}:{gid}"]
+
+    def volume(self, source, target):
+        return f"--volume={source}:{target}"
 
     def __get_extra_opts__(self):
         opts = os.getenv(self.extra_opts_env_variable, "")
@@ -215,6 +218,9 @@ class PodmanRuntime(DockerRuntime):
 
     def get_user_opts(self):
         return []
+
+    def volume(self, source, target):
+        return super().volume(source, target) + ":z"
 
 
 class LocalMixin:

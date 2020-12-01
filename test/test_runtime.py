@@ -205,6 +205,11 @@ class TestPodmanRuntime:
         assert "--hostname=foobar" in cmd
         assert "--env=FOO=bar baz" in cmd
 
+    def test_selinux_label(self, build):
+        cmd = PodmanRuntime().get_command_line(build, ["bash"], False)
+        volumes = [o for o in cmd if o.startswith("--volume=")]
+        assert all([v.endswith(":z") for v in volumes])
+
 
 class TestPodmanLocalRuntime:
     def test_prepare_checks_local_image(self, build, get_image, mocker):
