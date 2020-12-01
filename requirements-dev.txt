@@ -8,4 +8,6 @@ mypy
 codespell
 docutils
 mkdocs
-# you also need these non-Python packages: make shunit2 git ccache gcc
+# you also need these non-Python packages:
+# Debian and derivatives: make shunit2 git ccache gcc perl findutils xz-utils bzip2
+# Fedora and derivatives: make shunit2 git ccache gcc perl findutils xz bzip2 perl-JSON-PP
