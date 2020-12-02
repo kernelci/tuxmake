@@ -17,6 +17,7 @@ from tuxmake.runtime import get_runtime
 from tuxmake.metadata import MetadataExtractor
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
+from tuxmake.exceptions import UnsupportedMakeVariable
 from tuxmake.log import LogParser
 from tuxmake.cmdline import CommandLine
 from tuxmake.utils import defaults
@@ -108,6 +109,11 @@ class Build:
       `defconfig`.
     - **kconfig_add**: additional kconfig fragments/options to use. List of
       `str`, defaulting to an empty list.
+    - **make_variables**: KEY=VALUE arguments to pass to `make`. `dict` with
+      strings as values and strings as keys. Some `KEY`s are now allowed, as
+      they would interfere with the tuxmake normal operation(e.g. `ARCH`, `CC`,
+      `CROSS_COMPILE`, `HOSTCC`, INSTALL_MOD_PATH`, `INSTALL_DTBS_PATH`, `O`,
+      etc).
     - **targets**: targets to build, list of `str`.
     - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
       defaults to twice the number of available CPU cores.
@@ -123,6 +129,16 @@ class Build:
       case the build directory *will not be removed*.
     """
 
+    MAKE_VARIABLES_REJECTLIST = [
+        "ARCH",
+        "CC",
+        "CROSS_COMPILE",
+        "HOSTCC",
+        "INSTALL_DTBS_PATH",
+        "INSTALL_MOD_PATH",
+        "O",
+    ]
+
     def __init__(
         self,
         tree=".",
@@ -134,6 +150,7 @@ class Build:
         environment={},
         kconfig=defaults.kconfig,
         kconfig_add=[],
+        make_variables={},
         targets=defaults.targets,
         jobs=None,
         runtime=None,
@@ -161,6 +178,11 @@ class Build:
 
         self.kconfig = kconfig
         self.kconfig_add = kconfig_add
+
+        for k in make_variables.keys():
+            if k in self.MAKE_VARIABLES_REJECTLIST:
+                raise UnsupportedMakeVariable(k)
+        self.make_variables = make_variables
 
         self.targets = []
         for t in targets:
@@ -365,6 +387,7 @@ class Build:
     @property
     def makevars(self):
         mvars = {}
+        mvars.update(self.make_variables)
         mvars.update(self.target_arch.makevars)
         mvars.update(self.toolchain.expand_makevars(self.target_arch))
         mvars.update(self.wrapper.wrap(mvars))

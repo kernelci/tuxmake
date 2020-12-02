@@ -70,6 +70,10 @@ class UnsupportedArchitectureToolchainCombination(TuxMakeUserError):
     msg = "Unsupported architecture/toolchain combination: {name}"
 
 
+class UnsupportedMakeVariable(TuxMakeUserError):
+    msg = "Can't set make variable {name}= as it would break normal tuxmake operation"
+
+
 class RuntimePreparationFailed(TuxMakeInfrastructureError):
     msg = "Runtime preparation failed: {name}"
 

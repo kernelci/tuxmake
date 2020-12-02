@@ -509,6 +509,17 @@ class TestEnvironment:
         assert kwargs(Popen)["env"]["KCONFIG_ALLCONFIG"] == "foo.config"
 
 
+class TestMakeVariables:
+    def test_basics(self, linux, Popen):
+        b = Build(tree=linux, make_variables={"LLVM": "1"}, targets=["config"])
+        b.build(b.targets[0])
+        assert "LLVM=1" in args(Popen)
+
+    def test_reject_make_variables_set_by_us(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedMakeVariable):
+            Build(make_variables={"O": "/path/to/build"})
+
+
 class TestCompilerWrappers:
     def test_ccache(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], wrapper="ccache")
