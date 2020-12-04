@@ -33,11 +33,17 @@ $(publish_releases): publish-%: %
 	@echo $(patsubst %, $(PROJECT)/%:latest$(TAG), $(shell ./list-images $*)) | \
 		$(xargs) -n 1 $(docker) push
 
+TIMESTAMP = $(shell date +%Y%m%d)
+
 $(publish_multiarch_releases): publish-multiarch-%: noop-%
 	@for image in $(shell ./list-images $*); do \
+		echo $(PROJECT)/$${image}:$(TIMESTAMP) $$(./get-arch-images $${image}) | \
+			$(xargs) $(docker) manifest create; \
 		echo $(PROJECT)/$${image}:latest $$(./get-arch-images $${image}) | \
 			$(xargs) $(docker) manifest create; \
 	done
+	@echo $(patsubst %, $(PROJECT)/%:$(TIMESTAMP), $(shell ./list-images $*)) | \
+		$(xargs) -n 1 $(docker) manifest push
 	@echo $(patsubst %, $(PROJECT)/%:latest, $(shell ./list-images $*)) | \
 		$(xargs) -n 1 $(docker) manifest push
 
