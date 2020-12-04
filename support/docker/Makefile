@@ -1,7 +1,6 @@
 export PYTHONPATH := $(shell readlink -f $(CURDIR)/../..)
 PROJECT := tuxmake
 
-docker_build := docker build
 docker := docker
 
 default: checkconfig all

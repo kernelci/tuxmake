@@ -81,7 +81,7 @@ class Image:
             stream.write(f"{self.name}: {self.dependency} log\n")
         else:
             stream.write(f"{self.name}: log\n")
-        stream.write("\t$(docker_build) \\\n")
+        stream.write("\t$(docker) build \\\n")
         for k, v in self.args:
             stream.write(f"\t\t--build-arg={k}={v} \\\n")
         stream.write(f"\t\t--file=Dockerfile.{self.kind} \\\n")
