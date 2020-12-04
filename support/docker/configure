@@ -75,7 +75,7 @@ class Image:
 
     def generate(self, stream):
         self.emit()
-        for l in self.lists:
+        for l in sorted(set(self.lists)):
             stream.write(f"{l}_images += {self.name}\n")
         if self.dependency:
             stream.write(f"{self.name}: {self.dependency} log\n")
