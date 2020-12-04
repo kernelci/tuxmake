@@ -54,7 +54,7 @@ test:
 test-images: $(patsubst %, test-%, $(all_images))
 
 show:
-	@$(docker) images $(PROJECT)/\* | sort
+	@$(docker) images $(PROJECT)/\* | sed -e 1d | sort
 
 clean:
 	$(RM) configure.mk
