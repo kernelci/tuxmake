@@ -77,7 +77,7 @@ class Image:
         self.emit()
         for l in sorted(set(self.lists)):
             stream.write(f"{l}_images += {self.name}\n")
-        if self.dependency:
+        if self.dependency and not self.dependency.startswith("base"):
             stream.write(f"# dot: \"{self.name}\" -> \"{self.dependency}\";\n")
             stream.write(f"{self.name}: {self.dependency} log\n")
         else:
