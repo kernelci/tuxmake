@@ -42,13 +42,14 @@ class Image:
 
     @property
     def lists(self):
-        return self.extra_lists + ["all", self.when]
+        return self.extra_lists + ["all", self.group, self.when]
 
-    def __init__(self, name, base, when, packages):
+    def __init__(self, name, base, when, packages, group):
         self.name = name
         self.base = base
         self.when = when
         self.packages = packages
+        self.group = group
         self.args = []
         self.test_args = [name]
 
@@ -75,9 +76,10 @@ class Image:
 
     def generate(self, stream):
         self.emit()
-        for l in self.lists:
+        for l in sorted(set(self.lists)):
             stream.write(f"{l}_images += {self.name}\n")
-        if self.dependency:
+        if self.dependency and not self.dependency.startswith("base"):
+            stream.write(f"# dot: \"{self.name}\" -> \"{self.dependency}\";\n")
             stream.write(f"{self.name}: {self.dependency} log\n")
         else:
             stream.write(f"{self.name}: log\n")
@@ -90,7 +92,7 @@ class Image:
 
         test_args = " ".join(self.test_args)
         stream.write(f"test-{self.name}: {self.name}\n")
-        stream.write(f"\tdocker run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args}\n\n")
+        stream.write(f"\t$(docker) run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args}\n\n")
 
 
 class BaseImage(Image):
@@ -118,8 +120,8 @@ class BuildImage(Image):
     kind = "build"
     extra_lists = ["build"]
 
-    def __init__(self, name, base, when, packages):
-        super().__init__(name, base, when, packages)
+    def __init__(self, name, base, when, packages, group):
+        super().__init__(name, base, when, packages, group)
         self.pkgname = self.name
 
     def emit(self):
@@ -172,8 +174,8 @@ class CrossBuildMixin:
 class CrossGccBuildImage(CrossBuildMixin, BuildImage):
     extra_lists = ["crossbuild", "gcc_all"]
 
-    def __init__(self, name, base, when, packages):
-        super().__init__(name, base, when, packages)
+    def __init__(self, name, base, when, packages, group):
+        super().__init__(name, base, when, packages, group)
         self.pkgname = re.sub(r".*_(gcc.*)$", "\g<1>", name)
 
     def get_packages(self):
@@ -217,11 +219,11 @@ class ArcImage(Image):
             self.arg(k, v)
 
 
-def generate(name, kind, base, when, hosts, packages):
+def generate(name, kind, base, when, hosts, packages, group):
     # transforms foo-bar into FooBarImage
     clsname = "".join([w.title() for w in re.split(r"[-_]", kind)]) + "Image"
     cls = globals()[clsname]
-    image = cls(name, base, when, packages)
+    image = cls(name, base, when, packages, group)
     image.register()
 
     if TAG:
@@ -239,7 +241,7 @@ else:
 
 runtime = DockerRuntime()
 for image in runtime.images:
-    generate(image.name, image.kind, image.base, image.rebuild, image.hosts, image.packages)
+    generate(image.name, image.kind, image.base, image.rebuild, image.hosts, image.packages, re.sub(r"-", "_", image.group))
 
 ImageList.dump(output)
 

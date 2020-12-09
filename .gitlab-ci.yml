@@ -1,3 +1,5 @@
+include: '/support/docker/gitlab-ci.yml'
+
 image:
   name: tuxmake/ci-python3.7
 
@@ -18,6 +20,8 @@ stages:
   - unit-tests
   - code-checks
   - integration-tests
+  - build-base
+  - publish-base
   - build
   - publish
 
@@ -152,47 +156,3 @@ pages:
       - public
   only:
     - master
-
-.docker:
-  image: docker:19.03.11-dind
-  services:
-    - name: docker:19.03.11-dind
-  only:
-    - schedules
-  variables:
-    DOCKER_DRIVER: overlay2
-  before_script:
-    - apk add make python3
-    - cd support/docker/
-    - ./configure
-    - 'docker login --username="${DOCKER_USERNAME}" --password-stdin < "${DOCKER_PASSWORD_FILE}"'
-
-docker-images-amd64:
-  stage: build
-  extends: .docker
-  variables:
-    TAG: "-amd64"
-  script:
-    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-${img}; done)"
-
-docker-images-arm64:
-  stage: build
-  extends: .docker
-  tags:
-    - arm64-dind
-  variables:
-    TAG: "-arm64"
-  script:
-    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-${img}; done)"
-
-docker-images-multiarch:
-  stage: publish
-  needs:
-    - docker-images-amd64
-    - docker-images-arm64
-  extends: .docker
-  variables:
-    DOCKER_CLI_EXPERIMENTAL: "enabled"
-    ARCH_TAGS: "-amd64 -arm64"
-  script:
-    - "make $(for img in ${DOCKER_IMAGES}; do echo publish-multiarch-${img}; done)"

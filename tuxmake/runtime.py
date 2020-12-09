@@ -73,6 +73,7 @@ class Image:
         base,
         hosts,
         rebuild,
+        group=None,
         targets="",
         target_bases="",
         target_kinds="",
@@ -83,6 +84,7 @@ class Image:
         self.kind = kind
         self.base = base
         self.hosts = split(hosts)
+        self.group = group
         self.targets = split(targets)
         self.target_bases = splitmap(target_bases)
         self.target_kinds = splitmap(target_kinds)
@@ -110,7 +112,13 @@ class DockerRuntime(Runtime):
             for entry in split(config):
                 if entry not in self.config:
                     continue
-                image = Image(name=entry, **self.config[entry])
+                if entry.startswith("base"):
+                    group = "base"
+                elif entry.startswith("ci-"):
+                    group = "ci"
+                else:
+                    group = entry
+                image = Image(name=entry, group=group, **self.config[entry])
                 image_list.append(image)
                 for target in image.targets:
                     cross_config = dict(self.config[entry])
@@ -119,7 +127,9 @@ class DockerRuntime(Runtime):
                         target, "cross-" + image.kind
                     )
                     cross_config["hosts"] = image.target_hosts.get(target, image.hosts)
-                    cross_image = Image(name=f"{target}_{image.name}", **cross_config)
+                    cross_image = Image(
+                        name=f"{target}_{image.name}", group=group, **cross_config
+                    )
                     image_list.append(cross_image)
         self.images = self.base_images + self.ci_images + self.toolchain_images
         self.toolchain_images_map = {
