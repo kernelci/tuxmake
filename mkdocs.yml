@@ -8,12 +8,14 @@ site_author: Tuxmake Team
 site_dir: public
 repo_url: https://gitlab.com/Linaro/tuxmake/
 theme:
-  name: readthedocs
+  name: material
+  logo: tuxmake.svg
+  favicon: tuxmake_icon.svg
 markdown_extensions:
   - mkautodoc
 extra_css:
-  - tuxmake.css
   - mkautodoc.css
+  - extra.css
 extra_javascript:
   - fix.js # workaround for https://github.com/mkdocs/mkdocs/issues/2028
 
