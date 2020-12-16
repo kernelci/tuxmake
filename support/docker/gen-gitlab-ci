@@ -17,6 +17,12 @@ HEADER = """
 # script. Rerun the script to update this file, and commit it to version
 # control.
 
+stages:
+    - build-base
+    - publish-base
+    - build
+    - publish
+
 .docker:
     image: docker:19.03.11-dind
     services:
