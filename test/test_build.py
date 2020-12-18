@@ -276,6 +276,11 @@ def test_verbose(linux, mocker, Popen):
     assert "--silent" not in args(Popen)
 
 
+def test_default_targets(linux):
+    b = Build(tree=linux, targets=[])
+    assert set(t.name for t in b.targets) == set(defaults.targets)
+
+
 def test_quiet(linux, capfd):
     build(tree=linux, quiet=True)
     out, err = capfd.readouterr()

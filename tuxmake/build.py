@@ -114,7 +114,8 @@ class Build:
       they would interfere with the tuxmake normal operation(e.g. `ARCH`, `CC`,
       `CROSS_COMPILE`, `HOSTCC`, INSTALL_MOD_PATH`, `INSTALL_DTBS_PATH`, `O`,
       etc).
-    - **targets**: targets to build, list of `str`.
+    - **targets**: targets to build, list of `str`. If `None` or an empty list
+      is passed, the default list of targets will be built.
     - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
       defaults to twice the number of available CPU cores.
     - **runtime:** name of the runtime to use (`str`).
@@ -183,6 +184,9 @@ class Build:
             if k in self.MAKE_VARIABLES_REJECTLIST:
                 raise UnsupportedMakeVariable(k)
         self.make_variables = make_variables
+
+        if not targets:
+            targets = defaults.targets
 
         self.targets = []
         for t in targets:
