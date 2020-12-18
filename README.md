@@ -106,11 +106,11 @@ The behavior of the build can be modified with command-line arguments. Run
 
 Build from current directory:
 
-$ tuxmake
+    $ tuxmake
 
 Build from specific directory:
 
-$ tuxmake --directory /path/to/linux
+    $ tuxmake --directory /path/to/linux
 
 Build an arm64 kernel:
 
