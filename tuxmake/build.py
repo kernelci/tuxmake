@@ -505,7 +505,7 @@ class Build:
         self.logger.terminate()
 
     def cleanup(self):
-        shutil.rmtree(self.build_dir)
+        shutil.rmtree(self.build_dir, ignore_errors=True)
 
     def run(self):
         """
