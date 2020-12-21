@@ -694,3 +694,5 @@ class TestMissingArtifacts:
         build = Build(tree=linux)
         build.run()
         assert build.failed
+        errors, _ = build.parse_log()
+        assert errors == 0

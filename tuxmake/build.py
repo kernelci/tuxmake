@@ -442,7 +442,7 @@ class Build:
         for _, f in target.artifacts.items():
             artifact = self.build_dir / f
             if not artifact.exists():
-                self.log(f"ERROR: expected artifact {f} not found!")
+                self.log(f"E: expected artifact {f} does not exist!")
                 ret = False
         return ret
 
