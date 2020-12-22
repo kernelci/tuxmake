@@ -28,13 +28,18 @@ RUN apt-get update \
         libelf-dev \
         lzop \
         make \
+        python3 \
         rsync \
         tar \
         u-boot-tools \
         wget \
+        zstd \
         xz-utils
 
 # Lightweight: base container customizations
-RUN useradd --create-home tuxmake
+RUN true \
+    && useradd --create-home tuxmake \
+    && ln -s /usr/bin/python3 /usr/local/bin/python \
+    && true
 
 # vim: ft=dockerfile
