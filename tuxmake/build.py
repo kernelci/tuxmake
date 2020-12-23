@@ -355,6 +355,7 @@ class Build:
 
     def format_cmd_part(self, part):
         return part.format(
+            source_tree=self.source_tree,
             build_dir=self.build_dir,
             target_arch=self.target_arch.name,
             toolchain=self.toolchain.name,
@@ -422,12 +423,6 @@ class Build:
             if not self.run_cmd(cmd):
                 fail = True
                 break
-        if fail and target.alt_commands:
-            fail = False
-            for cmd in target.alt_commands:
-                if not self.run_cmd(cmd):
-                    fail = True
-                    break
 
         if not self.check_artifacts(target):
             fail = True

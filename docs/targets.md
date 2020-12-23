@@ -40,6 +40,12 @@ The file structure inside the tarball is not fixed, and depends on the build
 (target architecture, etc). When postprocessing it, make sure to look foo all
 files inside, regardless of directory depth.
 
+## dtbs-legacy
+
+This target builds all DTB files, like `dtbs`, but does not rely on the
+`dtbs_install` target. It's main goal is supporting DTBs in old kernels where
+`dtbs_install` didn't exist. It will be skipped on recent kernels.
+
 ## kernel
 
 Builds the Kernel image, which is copied into the output directory. The
