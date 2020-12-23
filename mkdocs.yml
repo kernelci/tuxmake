@@ -28,6 +28,7 @@ nav:
   - Runtimes: runtimes.md
   - Metadata: metadata.md
   - Reproducible Builds: reproducible_builds.md
+  - Curated Containers: curated_containers.md
 - Reference:
   - Command Line Reference: cli.md
   - Python API Reference: python.md
