@@ -19,6 +19,7 @@ targets.
 Building Linux is easy, right? You just run "make defconfig; make"!
 
 It gets complicated when you want to support the following combinations:
+
 - Architectures (arc, arm, arm64, i386, mips, parisc, powerpc, riscv, s390, sh,
   sparc, x86_64, etc)
 - Toolchains (gcc-8, gcc-9, gcc-10, clang-10, clang-11, clang-nightly, etc)
