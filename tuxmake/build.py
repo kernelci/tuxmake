@@ -355,6 +355,7 @@ class Build:
 
     def format_cmd_part(self, part):
         return part.format(
+            source_tree=self.source_tree,
             build_dir=self.build_dir,
             target_arch=self.target_arch.name,
             toolchain=self.toolchain.name,
@@ -407,12 +408,14 @@ class Build:
     def build(self, target):
         for dep in target.dependencies:
             if not self.status[dep].passed:
-                self.log(f"# Skipping {target.name} because dependency {dep} failed")
+                self.log_debug(
+                    f"Skipping {target.name} because dependency {dep} failed"
+                )
                 return BuildInfo("SKIP")
 
         for precondition in target.preconditions:
-            if not self.run_cmd(precondition):
-                self.log(f"# Skipping {target.name} because precondition failed")
+            if not self.run_cmd(precondition, stdout=subprocess.DEVNULL):
+                self.log_debug(f"Skipping {target.name} because precondition failed")
                 return BuildInfo("SKIP")
 
         target.prepare()
@@ -422,12 +425,6 @@ class Build:
             if not self.run_cmd(cmd):
                 fail = True
                 break
-        if fail and target.alt_commands:
-            fail = False
-            for cmd in target.alt_commands:
-                if not self.run_cmd(cmd):
-                    fail = True
-                    break
 
         if not self.check_artifacts(target):
             fail = True

@@ -447,6 +447,8 @@ class TestDtbs:
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" not in artifacts
 
+
+class TestDtbsLegacy:
     @pytest.fixture
     def oldlinux(self, linux, tmp_path):
         old = tmp_path / "oldlinux"
@@ -457,16 +459,18 @@ class TestDtbs:
         return old
 
     def test_collect_dtbs_manually_without_dtbs_install(self, oldlinux):
-        result = build(tree=oldlinux, targets=["dtbs"], target_arch="arm64")
+        result = build(tree=oldlinux, target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" in artifacts
+        errors, _ = result.parse_log()
+        assert errors == 0
 
     def test_collect_dtbs_manually_without_dtbs_install_and_fails(
         self, oldlinux, monkeypatch
     ):
-        build = Build(tree=oldlinux, targets=["dtbs"], target_arch="arm64")
-        dtbs = [t for t in build.targets if t.name == "dtbs"][0]
-        monkeypatch.setattr(dtbs, "alt_commands", [["false"]])
+        build = Build(tree=oldlinux, target_arch="arm64")
+        dtbs_legacy = [t for t in build.targets if t.name == "dtbs-legacy"][0]
+        monkeypatch.setattr(dtbs_legacy, "commands", [["false"]])
         build.run()
         assert build.failed
 
