@@ -46,7 +46,7 @@ failures is trivial by sharing TuxMake command lines with others.
 
 TuxMake requires Python version 3, and is available using pip.
 
-To install tuxmake on your system globally:
+To install TuxMake on your system globally:
 
 ```
 sudo pip3 install -U tuxmake
@@ -58,12 +58,12 @@ To install tuxbuild to your home directory at ~/.local/bin:
 pip3 install -U --user tuxmake
 ```
 
-To upgrade tuxmake to the latest version, run the same command you ran to
+To upgrade TuxMake to the latest version, run the same command you ran to
 install it.
 
-## Running tuxmake from source
+## Running TuxMake From Source
 
-If you don't want to or can't install tuxmake, you can run it directly from the
+If you don't want to or can't install TuxMake, you can run it directly from the
 source directory. After getting the sources via git or something else, there is
 a `run` script that will do the right think for you: you can either use that
 script, or symlink it to a directory in your `PATH`.
@@ -73,9 +73,9 @@ script, or symlink it to a directory in your `PATH`.
 sudo ln -s /path/to/tuxmake/run /usr/local/bin/tuxmake && tuxmake --help
 ```
 
-# Using tuxmake
+# Using TuxMake
 
-To use tuxmake, navigate to a Linux source tree (where you might usually run
+To use TuxMake, navigate to a Linux source tree (where you might usually run
 `make`), and run `tuxmake`. By default, it will perform a defconfig build on
 your native architecture, using a default compiler (`gcc`).
 
@@ -147,9 +147,9 @@ Display all options:
 
     $ tuxmake --help
 
-# Contributing to tuxmake
+# Contributing to TuxMake
 
-See the [contribution guidelines](docs/contributing.md) document for details in how
-to contribute to tuxmake. Contributors are expected to follow the
-[tuxmake code of conduct](docs/code-of-conduct.md) (the same adopted in the Linux
-kernel community).
+See the [Contribution Guidelines](docs/contributing.md) document for details in
+how to contribute to TuxMake. Contributors are expected to follow the [TuxMake
+Code of Conduct](docs/code-of-conduct.md) (the same adopted in the Linux kernel
+community).
