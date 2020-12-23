@@ -408,12 +408,14 @@ class Build:
     def build(self, target):
         for dep in target.dependencies:
             if not self.status[dep].passed:
-                self.log(f"# Skipping {target.name} because dependency {dep} failed")
+                self.log_debug(
+                    f"Skipping {target.name} because dependency {dep} failed"
+                )
                 return BuildInfo("SKIP")
 
         for precondition in target.preconditions:
-            if not self.run_cmd(precondition):
-                self.log(f"# Skipping {target.name} because precondition failed")
+            if not self.run_cmd(precondition, stdout=subprocess.DEVNULL):
+                self.log_debug(f"Skipping {target.name} because precondition failed")
                 return BuildInfo("SKIP")
 
         target.prepare()
