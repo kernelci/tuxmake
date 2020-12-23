@@ -1,0 +1,22 @@
+Source: tuxmake
+Maintainer: Antonio Terceiro <terceiro@debian.org>
+Section: python
+Priority: optional
+Build-Depends: debhelper-compat (= 12),
+               dh-python,
+               flit,
+               git,
+               python3-all,
+               python3-pytest,
+               python3-pytest-cov,
+               python3-pytest-mock
+Standards-Version: 3.9.6
+Homepage: https://tuxmake.org/
+
+Package: tuxmake
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, ${python3:Depends}
+Description: Thin wrapper to build Linux kernels
+ TuxMake is a command line tool and Python library that provides portable and
+ repeatable Linux kernel builds across a variety of architectures, toolchains,
+ kernel configurations, and make targets.
