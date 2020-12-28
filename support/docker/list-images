@@ -3,4 +3,4 @@
 set -eu
 list="$1"
 
-make --silent list | awk "{if (\$1 == \"${list}_images\") {\$1=\$2=\"\"; print(\$0)}}"
+make --silent list | awk "{if (\$1 == \"${list}_images\") {\$1=\$2=\"\"; print(\$0)}}" | sed -e 's/^\s*//'
