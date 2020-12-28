@@ -590,7 +590,10 @@ class TestMetadata:
         return json.loads((build.output_dir / "metadata.json").read_text())
 
     def test_kernelversion(self, metadata):
-        assert re.match(r"^[0-9]+\.[0-9]+", metadata["source"]["kernelversion"])
+        assert (
+            re.match(r"^[0-9]+\.[0-9]+", metadata["source"]["kernelversion"])
+            is not None
+        )
 
     def test_metadata_file(self, metadata):
         assert type(metadata) is dict
