@@ -30,9 +30,12 @@ xargs = xargs -r -t
 endif
 
 $(publish_releases): publish-%: %
-	$(MAKE) $(patsubst %, test-%, $(shell ./list-images $*))
-	@echo $(patsubst %, $(PROJECT)/%:latest$(TAG), $(shell ./list-images $*)) | \
-		$(xargs) -n 1 $(docker) push
+	images=$$(./list-images $*); \
+	if [ "x$$images" != x ]; then \
+	  $(MAKE) $(patsubst %, test-%, $(shell ./list-images $*)); \
+	  echo $(patsubst %, $(PROJECT)/%:latest$(TAG), $(shell ./list-images $*)) | \
+	    $(xargs) -n 1 $(docker) push; \
+	fi
 
 TIMESTAMP = $(shell date +%Y%m%d)
 
