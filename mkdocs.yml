@@ -1,5 +1,5 @@
 strict: true
-site_name: tuxmake documentation
+site_name: TuxMake Documentation
 site_description: |
   Documentation for TuxMake, a command line tool and Python library utility
   that provides portable and repeatable Linux kernel builds across a variety of
@@ -18,20 +18,22 @@ extra_css:
   - extra.css
 
 nav:
-- Introduction:
-  - Getting Started: index.md
-  - Command line reference: cli.md
-  - Python API: python.md
-- Reference Documentation:
-  - Targets: targets.md
-  - Target architectures: architectures.md
+- Getting Started: index.md
+- Features:
+  - Make Targets: targets.md
+  - Target Architectures: architectures.md
   - Toolchains: toolchains.md
   - Kernel Configuration: kconfig.md
-  - Compiler wrappers: wrappers.md
+  - Compiler Wrappers: wrappers.md
   - Runtimes: runtimes.md
   - Metadata: metadata.md
-- TuxMake community:
+  - Reproducible Builds: reproducible_builds.md
+  - Curated Containers: curated_containers.md
+- Reference:
+  - Command Line Reference: cli.md
+  - Python API Reference: python.md
+- Community:
   - Code of Conduct: code-of-conduct.md
   - Contributing: contributing.md
-  - Downstream packaging: packaging.md
+  - Downstream Packaging: packaging.md
   - License: license.md
