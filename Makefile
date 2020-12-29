@@ -1,7 +1,7 @@
 OS := $(shell sh -c 'eval "$$(grep ^ID= /etc/os-release)"; echo $$ID')
 -include scripts/config/$(OS).mk
 
-.PHONY: test
+.PHONY: test tags rpm rpmsrc deb debsrc dist
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
@@ -35,25 +35,8 @@ integration-tests-docker:
 docker-build-tests:
 	$(MAKE) -C support/docker test
 
-version = $(shell python3 -c "import tuxmake; print(tuxmake.__version__)")
-relnotes = $(CURDIR)/.git/relnotes-$(version).txt
-
 release:
-	@if [ -n "$$(git tag --list v$(version))" ]; then echo "Version $(version) already released. Bump the version in tuxmake/__init__.py to make a new release"; false; fi
-	@if ! git diff-index --exit-code --quiet HEAD; then git status; echo "Commit all changes before releasing"; false; fi
-	@if [ ! -f $(relnotes) ]; then \
-		printf "$(version) release\n\n" > $(relnotes); \
-		git log --no-merges --reverse --oneline $$(git tag | sort -V | tail -1).. >> $(relnotes); \
-	fi
-	@$${EDITOR} $(relnotes)
-	@echo "Release notes: "
-	@sed -e 's/^/| /' $(relnotes)
-	@read -p "Press ENTER to release version $(version) with the release notes above, or ctrl-c to abort" input
-	git push
-	git tag --sign --file=$(relnotes) v$(version)
-	flit publish
-	git push --tags
-	$(RM) $(relnotes)
+	./scripts/release $(V)
 
 man: tuxmake.1
 
@@ -73,5 +56,43 @@ doc: docs/cli.md docs/index.md
 	python3 -m pytest scripts/test_doc.py
 	PYTHONPATH=. mkdocs build
 
+tags:
+	ctags --exclude=public --exclude=tmp -R
+
 clean:
-	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md public/
+	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md public/ tags dist/
+
+version = $(shell sed -e '/^__version__/ !d; s/"\s*$$//; s/.*"//' tuxmake/__init__.py)
+
+rpm: dist/tuxmake-0.12.0-0tuxmake.noarch.rpm
+
+dist/tuxmake-$(version)-0tuxmake.noarch.rpm: dist/tuxmake-$(version).tar.gz dist/tuxmake.spec
+	cd dist && \
+	rpmbuild -ta --define "dist tuxmake" --define "_rpmdir $$(pwd)" tuxmake-$(version).tar.gz
+	mv $(patsubst dist/%, dist/noarch/%, $@) $@
+	rmdir dist/noarch
+
+rpmsrc: dist dist/tuxmake.spec
+
+dist/tuxmake.spec: tuxmake.spec
+	cp tuxmake.spec dist/
+
+dist: dist/tuxmake-$(version).tar.gz
+
+dist/tuxmake-$(version).tar.gz:
+	flit build
+
+deb: debsrc dist/tuxmake_$(version)-1_all.deb
+
+dist/tuxmake_$(version)-1_all.deb: dist/tuxmake_$(version)-1.dsc
+	cd dist/tuxmake-$(version) && dpkg-buildpackage -b -us -uc
+
+debsrc: dist dist/tuxmake_$(version)-1.dsc dist/tuxmake_$(version).orig.tar.gz
+
+dist/tuxmake_$(version).orig.tar.gz: dist/tuxmake-$(version).tar.gz
+	ln -f $< $@
+
+dist/tuxmake_$(version)-1.dsc: dist/tuxmake_$(version).orig.tar.gz $(wildcard debian/*)
+	cd dist && tar xaf tuxmake_$(version).orig.tar.gz
+	cp -r debian/ dist/tuxmake-$(version)
+	cd dist/tuxmake-$(version)/ && dpkg-buildpackage -S -d -us -uc

@@ -156,3 +156,27 @@ pages:
       - public
   only:
     - master
+
+rpm:
+  extends: .tuxmake
+  stage: integration-tests
+  image: fedora:rawhide
+  script:
+    - dnf install -y dnf-plugins-core rpm-build crontabs shunit2 gcc-x86_64-linux-gnu gcc-aarch64-linux-gnu ccache clang
+    - dnf builddep -y tuxmake.spec
+    - make rpm
+    - rpm --install dist/tuxmake*.rpm
+    - make integration-tests
+
+deb:
+  extends: .tuxmake
+  stage: integration-tests
+  image: debian:testing
+  script:
+    - apt-get update
+    - apt-get install -qy auto-apt-proxy
+    - apt-get install -qy shunit2 gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu ccache clang
+    - apt-get build-dep -qy .
+    - make deb
+    - apt-get install -qy ./dist/tuxmake*.deb
+    - make integration-tests
