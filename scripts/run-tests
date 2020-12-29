@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -eu
+
+rc=0
+run_test() {
+    echo "$@"
+    echo
+    "$@" || rc=1
+    echo
+}
+
+if [ $# -lt 1 ]; then
+    echo "usage: $0 [DIRECTORY|PROGRAM] ... "
+    exit 2
+fi
+
+for entry in $@; do
+    if [ -d "${entry}" ]; then
+        for script in "${entry}"/*; do
+            if [ -f "${script}" ] && [ -x "${script}" ]; then
+                run_test "${script}"
+            fi
+        done
+    elif [ -x "${entry}" ]; then
+        run_test "${entry}"
+    fi
+done
+
+exit $rc

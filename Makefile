@@ -1,6 +1,3 @@
-OS := $(shell sh -c 'eval "$$(grep ^ID= /etc/os-release)"; echo $$ID')
--include scripts/config/$(OS).mk
-
 .PHONY: test tags rpm rpmsrc deb debsrc dist
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
@@ -24,13 +21,13 @@ codespell:
 		--check-filenames \
 		--skip '.git,public,dist,*.sw*,*.pyc,tags,*.json,.coverage,htmlcov'
 
-RUN_PARTS ?= run-parts --verbose
+RUN_TESTS = scripts/run-tests
 
 integration-tests:
-	$(RUN_PARTS) test/integration
+	$(RUN_TESTS) test/integration
 
 integration-tests-docker:
-	$(RUN_PARTS) --regex=docker test/integration-slow
+	$(RUN_TESTS) test/integration-slow/docker*
 
 docker-build-tests:
 	$(MAKE) -C support/docker test
