@@ -27,4 +27,4 @@ TuxMake has both unit and integration tests, in `test/test_*.py` and
 version of TuxMake (as opposed to from the TuxMake sources).
 
 The unit test can be executed with `pytest`, and the integration tests can be
-run by just calling `run-parts test/integration`.
+run by just calling `scripts/run-tests test/integration`.
