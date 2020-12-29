@@ -1,7 +1,7 @@
 OS := $(shell sh -c 'eval "$$(grep ^ID= /etc/os-release)"; echo $$ID')
 -include scripts/config/$(OS).mk
 
-.PHONY: test tags
+.PHONY: test tags rpm rpmsrc deb debsrc dist
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
@@ -60,4 +60,39 @@ tags:
 	ctags --exclude=public --exclude=tmp -R
 
 clean:
-	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md public/ tags
+	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md public/ tags dist/
+
+version = $(shell sed -e '/^__version__/ !d; s/"\s*$$//; s/.*"//' tuxmake/__init__.py)
+
+rpm: dist/tuxmake-0.12.0-0tuxmake.noarch.rpm
+
+dist/tuxmake-$(version)-0tuxmake.noarch.rpm: dist/tuxmake-$(version).tar.gz dist/tuxmake.spec
+	cd dist && \
+	rpmbuild -ta --define "dist tuxmake" --define "_rpmdir $$(pwd)" tuxmake-$(version).tar.gz
+	mv $(patsubst dist/%, dist/noarch/%, $@) $@
+	rmdir dist/noarch
+
+rpmsrc: dist dist/tuxmake.spec
+
+dist/tuxmake.spec: tuxmake.spec
+	cp tuxmake.spec dist/
+
+dist: dist/tuxmake-$(version).tar.gz
+
+dist/tuxmake-$(version).tar.gz:
+	flit build
+
+deb: debsrc dist/tuxmake_$(version)-1_all.deb
+
+dist/tuxmake_$(version)-1_all.deb: dist/tuxmake_$(version)-1.dsc
+	cd dist/tuxmake-$(version) && dpkg-buildpackage -b -us -uc
+
+debsrc: dist dist/tuxmake_$(version)-1.dsc dist/tuxmake_$(version).orig.tar.gz
+
+dist/tuxmake_$(version).orig.tar.gz: dist/tuxmake-$(version).tar.gz
+	ln -f $< $@
+
+dist/tuxmake_$(version)-1.dsc: dist/tuxmake_$(version).orig.tar.gz $(wildcard debian/*)
+	cd dist && tar xaf tuxmake_$(version).orig.tar.gz
+	cp -r debian/ dist/tuxmake-$(version)
+	cd dist/tuxmake-$(version)/ && dpkg-buildpackage -S -d -us -uc
