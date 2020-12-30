@@ -46,5 +46,3 @@ $git tag --sign --file=${relnotes} v${version}
 $flit publish
 $git push --tags
 rm -f ${relnotes}
-
-./scripts/build-src-pkgs >/dev/null
