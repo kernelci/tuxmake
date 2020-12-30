@@ -1,5 +1,5 @@
 Source: tuxmake
-Maintainer: Antonio Terceiro <terceiro@debian.org>
+Maintainer: Antonio Terceiro <antonio.terceiro@linaro.org>
 Section: python
 Priority: optional
 Build-Depends: debhelper-compat (= 12),
