@@ -61,7 +61,7 @@ clean:
 
 version = $(shell sed -e '/^__version__/ !d; s/"\s*$$//; s/.*"//' tuxmake/__init__.py)
 
-rpm: dist/tuxmake-0.12.0-0tuxmake.noarch.rpm
+rpm: dist/tuxmake-$(version)-0tuxmake.noarch.rpm
 
 dist/tuxmake-$(version)-0tuxmake.noarch.rpm: dist/tuxmake-$(version).tar.gz dist/tuxmake.spec
 	cd dist && \
