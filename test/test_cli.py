@@ -25,28 +25,26 @@ def args(called):
     return argparse.Namespace(**called.call_args[1])
 
 
-def test_basic_build(builder, monkeypatch):
-    monkeypatch.setattr(sys, "argv", ["tuxmake"])
-    tuxmake()
-    assert args(builder).tree == "."
+class TestTree:
+    def test_basic_build(self, builder, monkeypatch):
+        monkeypatch.setattr(sys, "argv", ["tuxmake"])
+        tuxmake()
+        assert args(builder).tree == "."
 
+    def test_basic_build_with_directory(self, linux, builder):
+        tree = str(linux)
+        tuxmake("--directory", tree)
+        assert args(builder).tree == tree
 
-def test_basic_build_with_directory(linux, builder):
-    tree = str(linux)
-    tuxmake("--directory", tree)
-    assert args(builder).tree == tree
+    def test_build_from_sys_argv(self, monkeypatch, builder):
+        monkeypatch.setattr(sys, "argv", ["tuxmake", "--directory=/path/to/linux"])
+        tuxmake()
+        assert args(builder).tree == "/path/to/linux"
 
-
-def test_build_from_sys_argv(monkeypatch, builder):
-    monkeypatch.setattr(sys, "argv", ["tuxmake", "--directory=/path/to/linux"])
-    tuxmake()
-    assert args(builder).tree == "/path/to/linux"
-
-
-def test_build_from_sys_argv_default_tree_is_cwd(monkeypatch, builder):
-    monkeypatch.setattr(sys, "argv", ["tuxmake"])
-    tuxmake()
-    assert args(builder).tree == "."
+    def test_build_from_sys_argv_default_tree_is_cwd(self, monkeypatch, builder):
+        monkeypatch.setattr(sys, "argv", ["tuxmake"])
+        tuxmake()
+        assert args(builder).tree == "."
 
 
 class TestTargets:
