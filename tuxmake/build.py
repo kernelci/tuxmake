@@ -160,7 +160,7 @@ class Build:
         debug=False,
         auto_cleanup=True,
     ):
-        self.source_tree = tree
+        self.source_tree = Path(tree).absolute()
 
         self.__output_dir__ = None
         self.__output_dir_input__ = output_dir
