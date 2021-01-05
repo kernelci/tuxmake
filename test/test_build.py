@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import os
 import pytest
 import re
 import subprocess
@@ -436,14 +437,36 @@ class TestModules:
         assert "modules.tar.xz" not in artifacts
 
 
+def tarball_contents(tarball):
+    return subprocess.check_output(["tar", "taf", tarball]).decode("utf-8").splitlines()
+
+
 class TestDtbs:
     def test_dtbs(self, linux):
-        result = build(tree=linux, targets=["dtbs"], target_arch="arm64")
+        result = build(tree=linux, target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+        assert result.status["dtbs"].status == "PASS"
+        assert "dtbs/hisilicon/hi6220-hikey.dtb" in tarball_contents(
+            result.output_dir / "dtbs.tar.xz"
+        )
         assert "dtbs.tar.xz" in artifacts
 
+    def test_relative_path_to_source_tree(self, linux):
+        cwd = Path.cwd()
+        try:
+            os.chdir(Path(linux).parent)
+            result = build(tree="linux", target_arch="arm64")
+            assert result.status["dtbs"].status == "PASS"
+            assert "dtbs/hisilicon/hi6220-hikey.dtb" in tarball_contents(
+                result.output_dir / "dtbs.tar.xz"
+            )
+            artifacts = [str(f.name) for f in result.output_dir.glob("*")]
+            assert "dtbs.tar.xz" in artifacts
+        finally:
+            os.chdir(cwd)
+
     def test_skip_on_arch_with_no_dtbs(self, linux):
-        result = build(tree=linux, targets=["dtbs"], target_arch="x86_64")
+        result = build(tree=linux, target_arch="x86_64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" not in artifacts
 
@@ -462,6 +485,7 @@ class TestDtbsLegacy:
         result = build(tree=oldlinux, target_arch="arm64")
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" in artifacts
+        assert result.status["dtbs-legacy"].status == "PASS"
         errors, _ = result.parse_log()
         assert errors == 0
 
