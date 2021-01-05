@@ -488,6 +488,9 @@ class TestDtbsLegacy:
         assert result.status["dtbs-legacy"].status == "PASS"
         errors, _ = result.parse_log()
         assert errors == 0
+        assert "dtbs/hisilicon/hi6220-hikey.dtb" in tarball_contents(
+            result.output_dir / "dtbs.tar.xz"
+        )
 
     def test_collect_dtbs_manually_without_dtbs_install_and_fails(
         self, oldlinux, monkeypatch
