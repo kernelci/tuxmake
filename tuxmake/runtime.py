@@ -14,6 +14,7 @@ from tuxmake.arch import host_arch
 
 
 DEFAULT_RUNTIME = "null"
+DEFAULT_CONTAINER_REGISTRY = "docker.io"
 
 
 @lru_cache(None)
@@ -153,7 +154,7 @@ class DockerRuntime(Runtime):
             or os.getenv("TUXMAKE_DOCKER_IMAGE")
             or build.toolchain.get_image(build.target_arch)
         )
-        registry = os.getenv("TUXMAKE_IMAGE_REGISTRY")
+        registry = os.getenv("TUXMAKE_IMAGE_REGISTRY", DEFAULT_CONTAINER_REGISTRY)
         if registry:
             image = registry + "/" + image
         tag = os.getenv("TUXMAKE_IMAGE_TAG")
