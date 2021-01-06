@@ -15,7 +15,7 @@ class LogParser:
         self.warnings = 0
 
     def parse(self, filepath: Path):
-        for orig_line in filepath.open("r"):
+        for orig_line in filepath.open("r", errors="ignore"):
             line = orig_line.lower()
             if "error:" in line or any([s in line for s in ERRORS]):
                 self.errors += 1

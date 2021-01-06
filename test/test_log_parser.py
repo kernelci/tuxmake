@@ -16,6 +16,8 @@ class TestLogParser:
             ("case.log", 3, 3),
             ("no-such-file-or-directory.log", 1, 5),
             ("no-rule-to-make-target.log", 1, 10),
+            ("non-utf8.log", 2, 0),
+            ("garbage.log", 0, 2),
         ),
     )
     def test_log(self, log, errors, warnings):
