@@ -1,0 +1,5 @@
+include/linux/cpumask.h:401:42: warning: conversion to ‘unsigned int’ from ‘int’ may change the sign of the result [-Wsign-conversion]
+  401 |  return test_and_clear_bit(cpumask_check(cpu), cpumask_bits(cpumask));
+      |                                          ^~~
+include/linux/cpumask.h:401:28: warning: conversion to �   ^~~~~~~~~~~~~
+include/linux/bvec.h:65:2: note: in expansion of macro ‘min’
