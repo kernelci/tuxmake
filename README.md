@@ -9,7 +9,8 @@
 TuxMake, by [Linaro](https://www.linaro.org/), is a command line tool and
 Python library that provides portable and repeatable Linux kernel builds across
 a variety of architectures, toolchains, kernel configurations, and make
-targets.
+targets. TuxMake is a part of [TuxSuite](https://tuxsuite.com), a suite of
+tools and services to help with Linux kernel development.
 
 [[_TOC_]]
 
