@@ -266,7 +266,7 @@ class Build:
 
         if self.__build_dir_input__:
             self.__build_dir__ = Path(self.__build_dir_input__)
-            self.__build_dir__.mkdir(exist_ok=True)
+            self.__build_dir__.mkdir(parents=True, exist_ok=True)
         else:
             self.__build_dir__ = self.output_dir / "tmp"
             self.__build_dir__.mkdir()
