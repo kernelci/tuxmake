@@ -20,9 +20,8 @@ s/^  \(\S.*\)/### \1/
 ' "${tmpfile}"
 
 sed -e '
-/^ENVIRONMENT VARIABLES/,/^\.\./ !d
-s/^[A-Z]/## &/
-s/ENVIRONMENT VARIABLES/Environment variables/
+/BEGIN-EXPORT/,/END-EXPORT/!d
+s/^\([A-Z]\)\([A-Z].*\)/## \1\L\2/
 /^==/d
 /^\.\./d' tuxmake.rst >> "${tmpfile}"
 

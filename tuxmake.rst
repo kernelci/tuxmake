@@ -38,6 +38,8 @@ OPTIONS
     Include the options from --help
 .. include:: cli_options.rst
 
+.. BEGIN-EXPORT
+
 CONFIGURATION FILES
 ===================
 
@@ -96,14 +98,13 @@ ENVIRONMENT VARIABLES
   that was informed with `$TUXMAKE_IMAGE`, `--image`, or determined
   automatically by tuxmake.
 
-..
-    END OF ENVIRONMENT VARIABLES
-
 FILES
 =====
 
 * `${XDG_CONFIG_HOME}/tuxmake/default` (`~/.config/tuxmake/default`): default
   configuration file.
+
+.. END-EXPORT
 
 SEE ALSO
 ========
