@@ -507,7 +507,7 @@ class Build:
 
     def save_metadata(self):
         with (self.output_dir / "metadata.json").open("w") as f:
-            f.write(json.dumps(self.metadata, indent=4))
+            f.write(json.dumps(self.metadata, indent=4, sort_keys=True))
             f.write("\n")
 
     def parse_log(self):
