@@ -517,7 +517,6 @@ class TestTargetDependencies:
     def test_recursive_dependencies(self, linux):
         result = build(tree=linux, targets=["modules"])
         assert result.status["config"].passed
-        assert result.status["debugkernel"].passed
         assert result.status["modules"].passed
 
 
