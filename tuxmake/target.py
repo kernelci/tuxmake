@@ -13,11 +13,6 @@ def supported_targets():
     return Target.supported()
 
 
-def create_target(name, build):
-    cls = (name == "config") and Config or Target
-    return cls(name, build)
-
-
 class Target(ConfigurableObject):
     basedir = "target"
     exception = UnsupportedTarget
@@ -159,3 +154,18 @@ class Config(Target):
             f.write(frag)
             f.write("\n")
         return True
+
+
+class Kernel(Target):
+    def __init_config__(self):
+        super().__init_config__()
+        if "vmlinux" in self.artifacts:
+            self.artifacts["vmlinux"] = "vmlinux"
+
+
+__special_targets__ = {"config": Config, "kernel": Kernel}
+
+
+def create_target(name, build):
+    cls = __special_targets__.get(name, Target)
+    return cls(name, build)

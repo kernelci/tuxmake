@@ -743,3 +743,11 @@ class TestKernel:
         build.run()
         assert build.passed
         assert "Image.bz2" in build.artifacts["kernel"]
+
+    def test_vmlinux(self, linux):
+        build = Build(
+            tree=linux, target_arch="arm64", targets=["kernel"], kernel_image="vmlinux"
+        )
+        build.run()
+        assert build.passed
+        assert "vmlinux" in build.artifacts["kernel"]
