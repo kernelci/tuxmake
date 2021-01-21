@@ -9,6 +9,7 @@ from tuxmake.target import Target, Config
 def build(mocker):
     b = mocker.MagicMock()
     b.target_arch = Native()
+    b.target_overrides = {"kernel": b.target_arch.artifacts["kernel"]}
     b.kconfig = ["defconfig"]
     return b
 

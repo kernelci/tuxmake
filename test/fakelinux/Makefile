@@ -50,6 +50,19 @@ $(O)/arch/$(ARCHDIRNAME)/boot/$(IMAGE): $(O)/vmlinux
 
 
 ########################################################################
+# alternative image
+########################################################################
+ifneq (,$(ALT_IMAGE))
+$(ALT_IMAGE): $(O)/arch/$(ARCHDIRNAME)/boot/$(ALT_IMAGE)
+CLEAN += $(O)/arch/$(ARCHDIRNAME)/boot/$(ALT_IMAGE)
+$(O)/arch/$(ARCHDIRNAME)/boot/$(ALT_IMAGE): $(O)/vmlinux
+	$(call maybefail,kernel)
+	mkdir -p $$(dirname $@)
+	$(ALT_COMPRESS) < $< > $@ || ($(RM) $@; false)
+endif
+
+
+########################################################################
 # debug kernel image
 #########################################################################
 vmlinux: $(O)/vmlinux

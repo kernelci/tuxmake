@@ -1,3 +1,5 @@
 IMAGE = Image.gz
 COMPRESS = gzip
+ALT_IMAGE = Image.bz2
+ALT_COMPRESS = bzip2
 ARCHDIRNAME = arm64

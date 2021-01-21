@@ -730,3 +730,16 @@ class TestMissingArtifacts:
         assert build.failed
         errors, _ = build.parse_log()
         assert errors == 0
+
+
+class TestKernel:
+    def test_custom_kernel_image(self, linux):
+        build = Build(
+            tree=linux,
+            target_arch="arm64",
+            targets=["kernel"],
+            kernel_image="Image.bz2",
+        )
+        build.run()
+        assert build.passed
+        assert "Image.bz2" in build.artifacts["kernel"]
