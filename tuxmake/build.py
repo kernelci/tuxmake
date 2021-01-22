@@ -116,6 +116,8 @@ class Build:
       etc).
     - **targets**: targets to build, list of `str`. If `None` or an empty list
       is passed, the default list of targets will be built.
+    - **kernel_image**: which kernel image to build, overriding the default
+      kernel image name defined for the target architecture.
     - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
       defaults to twice the number of available CPU cores.
     - **runtime:** name of the runtime to use (`str`).
@@ -153,6 +155,7 @@ class Build:
         kconfig_add=[],
         make_variables={},
         targets=defaults.targets,
+        kernel_image=None,
         jobs=None,
         runtime=None,
         verbose=False,
@@ -187,6 +190,11 @@ class Build:
 
         if not targets:
             targets = defaults.targets
+
+        if kernel_image:
+            self.target_overrides = {"kernel": kernel_image}
+        else:
+            self.target_overrides = self.target_arch.targets
 
         self.targets = []
         for t in targets:
@@ -361,7 +369,7 @@ class Build:
             toolchain=self.toolchain.name,
             wrapper=self.wrapper.name,
             kconfig=self.kconfig,
-            **self.target_arch.targets,
+            **self.target_overrides,
         )
 
     @property

@@ -374,3 +374,9 @@ class TestConfigurationFiles:
         monkeypatch.setenv("XDG_CONFIG_HOME", str(custom_config_dir))
         tuxmake("@myconfig")
         assert args(builder).environment["CONFIG"] == "custom"
+
+
+class TestKernel:
+    def test_kernel(self, builder):
+        tuxmake("--kernel-image=Image.bz2")
+        assert args(builder).kernel_image == "Image.bz2"

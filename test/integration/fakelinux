@@ -173,6 +173,12 @@ test_missing_artifact() {
   assertTrue "grep '^I: kernel: FAIL' stderr"
 }
 
+test_custom_kernel_image() {
+  run tuxmake --target-arch=arm64 --kernel-image=Image.bz2
+  assertEquals 0 "$rc"
+  assertTrue "test -f ${XDG_CACHE_HOME}/tuxmake/builds/1/Image.bz2"
+}
+
 
 if [ $# -gt 0 ]; then
   export TESTCASES="$(echo "$@")"

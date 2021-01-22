@@ -78,6 +78,12 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         action="append",
         help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. In tree configuration fragment (e.g. `kvm_guest.config`), path to local file, URL, `CONFIG_*=[y|m|n]`, or `# CONFIG_* is not set`. Can be specified multiple times, and will be merged in the order given.",
     )
+    target.add_argument(
+        "-I",
+        "--kernel-image",
+        type=str,
+        help="Kernel image to build, overriding the default image name for the target architecture.",
+    )
 
     buildenv = parser.add_argument_group("Build environment options")
     buildenv.add_argument(
