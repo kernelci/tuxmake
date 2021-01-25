@@ -26,6 +26,7 @@ RUN apt-get update \
         kmod \
         libssl-dev \
         libelf-dev \
+        lz4 \
         lzop \
         make \
         python3 \
