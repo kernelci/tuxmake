@@ -76,13 +76,13 @@ test_x86_64_gcc() {
 
 test_clang() {
     get_build_args clang
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-10 llvm-10 lld-10"'
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang llvm lld"'
 }
 
 test_arm64_clang() {
     get_build_args arm64_clang
     assertArg 'BASE=$(REGISTRY)$(PROJECT)/clang' 'HOSTARCH=aarch64' \
-        'PACKAGES="clang-10 llvm-10 lld-10 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"'
+        'PACKAGES="clang llvm lld gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"'
 }
 
 test_clang10() {
