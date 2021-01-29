@@ -1,6 +1,13 @@
 from tuxmake.wrapper import Wrapper
 
 
+class TestNone:
+    def test_basics(self):
+        none = Wrapper("none")
+        assert none.environment == {}
+        assert none.wrap({}) == {}
+
+
 class Test_ccache:
     def test_environment(self, monkeypatch, home):
         monkeypatch.delenv("CCACHE_DIR", raising=False)

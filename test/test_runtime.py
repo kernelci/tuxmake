@@ -100,6 +100,11 @@ class TestDockerRuntime:
         runtime = DockerRuntime()
         assert runtime.get_image(build) == "foobar.com/myimage:20201201"
 
+    def test_override_full_image_name_with_registry(self, build, monkeypatch):
+        monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo/bar")
+        runtime = DockerRuntime()
+        assert runtime.get_image(build) == "docker.io/foo/bar"
+
     def test_prepare(self, build, get_image, mocker):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")

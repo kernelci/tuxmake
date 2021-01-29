@@ -27,7 +27,8 @@ class Wrapper(ConfigurableObject):
         self.environment = {
             k: expand(k, v) for k, v in self.config["environment"].items()
         }
-        self.prepare_cmds = split_commands(self.config["commands"]["prepare"])
+        self.prepare_cmds = split_commands(self.config["commands"].get("prepare", ""))
+        self.command = self.config["commands"].get("wrapper")
 
     def prepare(self, build):
         for k, v in self.environment.items():
@@ -37,21 +38,13 @@ class Wrapper(ConfigurableObject):
             build.run_cmd(cmd, stdout=subprocess.DEVNULL)
 
     def wrap(self, makevars):
+        if not self.command:
+            return makevars
         cross = makevars.get("CROSS_COMPILE", "")
         if makevars.get("LLVM") == "1":
-            return {"CC": f"{self.name} clang", "HOSTCC": f"{self.name} clang"}
+            return {"CC": f"{self.command} clang", "HOSTCC": f"{self.command} clang"}
         return {
-            k: f"{self.name} {v}" for k, v in makevars.items() if k in ("CC", "HOSTCC")
-        } or {"CC": f"{self.name} {cross}gcc", "HOSTCC": f"{self.name} gcc"}
-
-
-class NoWrapper(Wrapper):
-    def __init__(self):
-        self.environment = {}
-        self.name = "none"
-
-    def prepare(self, build):
-        pass
-
-    def wrap(self, makevars):
-        return {}
+            k: f"{self.command} {v}"
+            for k, v in makevars.items()
+            if k in ("CC", "HOSTCC")
+        } or {"CC": f"{self.command} {cross}gcc", "HOSTCC": f"{self.command} gcc"}

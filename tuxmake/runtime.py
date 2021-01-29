@@ -156,7 +156,10 @@ class DockerRuntime(Runtime):
         )
         registry = os.getenv("TUXMAKE_IMAGE_REGISTRY", DEFAULT_CONTAINER_REGISTRY)
         if registry:
-            image = registry + "/" + image
+            if len(image.split("/")) < 3:
+                # only prepend registry if the image name is not already a full
+                # image name.
+                image = registry + "/" + image
         tag = os.getenv("TUXMAKE_IMAGE_TAG")
         if tag:
             image = image + ":" + tag

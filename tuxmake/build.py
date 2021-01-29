@@ -10,7 +10,7 @@ import time
 from tuxmake import __version__
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
-from tuxmake.wrapper import Wrapper, NoWrapper
+from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_new_output_dir
 from tuxmake.target import create_target
 from tuxmake.runtime import get_runtime
@@ -176,7 +176,7 @@ class Build:
 
         self.target_arch = target_arch and Architecture(target_arch) or host_arch
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
-        self.wrapper = wrapper and Wrapper(wrapper) or NoWrapper()
+        self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
         self.environment = environment
 
