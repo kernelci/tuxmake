@@ -25,6 +25,7 @@ class Target(ConfigurableObject):
     def __init_config__(self):
         self.description = self.config["target"].get("description")
         self.dependencies = self.config["target"].get("dependencies", "").split()
+        self.runs_after = self.config["target"].get("runs_after", "").split()
         self.preconditions = self.__split_cmds__("target", "preconditions")
         self.commands = self.__split_cmds__("target", "commands")
         try:

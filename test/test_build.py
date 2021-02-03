@@ -758,3 +758,20 @@ class TestKernel:
         build.run()
         assert build.passed
         assert "vmlinux" in build.artifacts["kernel"]
+
+
+class TestKselftest:
+    def test_kselftest_merge_before_kselftest(self, linux):
+        build = Build(tree=linux, targets=["kselftest", "kselftest-merge"])
+        names = [t.name for t in build.targets][-2:]
+        assert names == ["kselftest-merge", "kselftest"]
+
+    def test_kselftest_merge_before_kselftest_with_input_already_ordered(self, linux):
+        build = Build(tree=linux, targets=["kselftest-merge", "kselftest"])
+        names = [t.name for t in build.targets][-2:]
+        assert names == ["kselftest-merge", "kselftest"]
+
+    def test_kselftest_without_kselftest_merge(self, linux):
+        build = Build(tree=linux, targets=["kselftest"])
+        names = [t.name for t in build.targets]
+        assert names == ["config", "kselftest"]

@@ -197,8 +197,10 @@ class Build:
             self.target_overrides = self.target_arch.targets
 
         self.targets = []
+        self.__ordering_only_targets__ = {}
         for t in targets:
             self.add_target(t)
+        self.cleanup_targets()
 
         if jobs:
             self.jobs = jobs
@@ -233,12 +235,26 @@ class Build:
         """
         return self.__status__
 
-    def add_target(self, target_name):
+    def add_target(self, target_name, ordering_only=False):
         target = create_target(target_name, self)
+
+        if ordering_only:
+            if target_name not in self.__ordering_only_targets__:
+                self.__ordering_only_targets__[target_name] = True
+        else:
+            self.__ordering_only_targets__[target_name] = False
+
         for d in target.dependencies:
-            self.add_target(d)
+            self.add_target(d, ordering_only=ordering_only)
+        for a in target.runs_after:
+            self.add_target(a, ordering_only=True)
         if target not in self.targets:
             self.targets.append(target)
+
+    def cleanup_targets(self):
+        self.targets = [
+            t for t in self.targets if not self.__ordering_only_targets__[t.name]
+        ]
 
     def validate(self):
         source = Path(self.source_tree)
