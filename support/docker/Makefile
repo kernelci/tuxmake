@@ -11,6 +11,7 @@ checkconfig:
 	@if [ ! -f configure.mk ]; then echo "configure.mk not found; run ./configure first"; false; fi
 
 -include configure.mk
+-include configure.local.mk
 
 noop_releases = $(patsubst %, noop-%, $(releases))
 publish_releases = $(patsubst %, publish-%, $(releases))

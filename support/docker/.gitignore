@@ -1,2 +1,3 @@
 configure.mk
+configure.local.mk
 /log
