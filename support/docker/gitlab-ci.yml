@@ -178,6 +178,45 @@ docker-images-clang_11-multiarch:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && $TUXMAKE_DOCKER_IMAGES == "monthly"'
 
 
+docker-images-clang_12-amd64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-amd64"
+    script:
+        - "make publish-clang_12"
+    tags: []
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $TUXMAKE_DOCKER_IMAGES == "monthly"'
+
+
+docker-images-clang_12-arm64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-arm64"
+    script:
+        - "make publish-clang_12"
+    tags: [arm64-dind]
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $TUXMAKE_DOCKER_IMAGES == "monthly"'
+
+
+docker-images-clang_12-multiarch:
+    stage: publish
+    extends: .docker
+    variables:
+        DOCKER_CLI_EXPERIMENTAL: "enabled"
+        ARCH_TAGS: "-amd64 -arm64"
+    script:
+        - "make publish-multiarch-clang_12"
+    needs: ['docker-images-clang_12-amd64', 'docker-images-clang_12-arm64']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $TUXMAKE_DOCKER_IMAGES == "monthly"'
+
+
 docker-images-clang_nightly-amd64:
     stage: build
     extends: .docker

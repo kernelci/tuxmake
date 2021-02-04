@@ -55,6 +55,7 @@ $(publish_multiarch_releases): publish-multiarch-%: noop-%
 
 test:
 	sh test/test_configure.sh
+	sh test/test_gitlab_ci.sh
 
 test-images: $(patsubst %, test-%, $(all_images))
 
@@ -74,5 +75,5 @@ dot:
 
 .PHONY: $(all_images) $(releases) $(publish_releases) $(publish_multiarch_releases) test show list clean purge dot
 
-gitlab-ci.yml: gen-gitlab-ci
+gitlab-ci.yml: gen-gitlab-ci ../../tuxmake/runtime/docker.ini
 	+./gen-gitlab-ci > $@ || ($(RM) $@; false)
