@@ -77,6 +77,8 @@ groups = sorted(
 )
 hosts = set()
 for img in runtime.images:
+    if img.skip_build:
+        continue
     for host in img.hosts:
         hosts.add(host)
 hosts = sorted(hosts)

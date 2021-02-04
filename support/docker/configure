@@ -241,6 +241,8 @@ else:
 
 runtime = DockerRuntime()
 for image in runtime.images:
+    if image.skip_build:
+        continue
     generate(image.name, image.kind, image.base, image.rebuild, image.hosts, image.packages, re.sub(r"-", "_", image.group))
 
 ImageList.dump(output)

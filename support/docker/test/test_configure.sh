@@ -85,9 +85,9 @@ test_arm64_clang() {
         'PACKAGES="clang llvm lld gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"'
 }
 
-test_clang10() {
-    get_build_args clang-10
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-10 llvm-10 lld-10"'
+test_clang_11() {
+    get_build_args clang-11
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-11 llvm-11 lld-11"'
 }
 
 . /usr/share/shunit2/shunit2

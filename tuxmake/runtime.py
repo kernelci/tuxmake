@@ -76,6 +76,7 @@ class Image:
         rebuild,
         group=None,
         targets="",
+        skip_build=False,
         target_bases="",
         target_kinds="",
         target_hosts="",
@@ -87,6 +88,7 @@ class Image:
         self.hosts = split(hosts)
         self.group = group
         self.targets = split(targets)
+        self.skip_build = skip_build
         self.target_bases = splitmap(target_bases)
         self.target_kinds = splitmap(target_kinds)
         self.target_hosts = splitlistmap(target_hosts)
