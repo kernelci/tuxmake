@@ -29,6 +29,7 @@ RUN apt-get update \
         lz4 \
         lzop \
         make \
+        pkg-config \
         python3 \
         rsync \
         tar \
