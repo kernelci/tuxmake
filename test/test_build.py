@@ -26,12 +26,12 @@ def output_dir(tmp_path):
 
 
 @pytest.fixture
-def check_artfifacts(mocker):
+def check_artifacts(mocker):
     return mocker.patch("tuxmake.build.Build.check_artifacts", return_value=True)
 
 
 @pytest.fixture()
-def Popen(mocker, check_artfifacts):
+def Popen(mocker, check_artifacts):
     _Popen = mocker.patch("subprocess.Popen")
     _Popen.return_value.communicate.return_value = (
         mocker.MagicMock(),
@@ -729,6 +729,14 @@ class TestMissingArtifacts:
         assert build.failed
         errors, _ = build.parse_log()
         assert errors == 0
+
+    def test_dont_bother_checking_artifacts_if_build_fails(
+        self, linux, check_artifacts, monkeypatch
+    ):
+        monkeypatch.setenv("FAIL", "defconfig")
+        build = Build(tree=linux, targets=["config"])
+        build.run()
+        check_artifacts.assert_not_called()
 
 
 class TestKernel:

@@ -434,7 +434,7 @@ class Build:
                 fail = True
                 break
 
-        if not self.check_artifacts(target):
+        if not fail and not self.check_artifacts(target):
             fail = True
 
         if fail:
