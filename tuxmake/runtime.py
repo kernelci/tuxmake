@@ -120,7 +120,7 @@ class DockerRuntime(Runtime):
                 elif entry.startswith("ci-"):
                     group = "ci"
                 else:
-                    group = entry
+                    group = f"{entry}_all"
                 image = Image(name=entry, group=group, **self.config[entry])
                 image_list.append(image)
                 for target in image.targets:
