@@ -19,6 +19,7 @@ RUN apt-get update \
         bzip2 \
         ccache \
         cpio \
+        dpkg-dev \
         flex \
         git \
         gzip \
