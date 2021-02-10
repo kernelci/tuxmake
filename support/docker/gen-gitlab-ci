@@ -71,7 +71,7 @@ groups = sorted(
         [
             (re.sub(r"-", "_", i.group), i.rebuild)
             for i in runtime.images
-            if i.group != "ci"
+            if i.group != "ci" and not i.skip_build
         ]
     )
 )

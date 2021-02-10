@@ -20,7 +20,7 @@ RUN apt-get update && \
         gcc \
     && wget --progress=dot:giga $DOWNLOAD_SITE/download/$RELEASE/$TARBALL \
     && sha256sum -c arc-gcc-$GCC_VERSION.sha256sum \
-    && tar -C /usr/local --strip-components=1 -xaf $TARBALL \
+    && tar -C /usr/local --strip-components=1 --no-same-owner -xaf $TARBALL \
     && ln -sf arc-elf32-gcc-$GCC_VERSION_FULL /usr/local/bin/arc-elf32-gcc-$GCC_VERSION \
     && rm -f $TARBALL arc.sha256sum
 
