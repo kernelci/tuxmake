@@ -2,6 +2,7 @@ from pathlib import Path
 import re
 import urllib.request
 
+from tuxmake import __version__
 from tuxmake.config import ConfigurableObject, split_commands
 from tuxmake.exceptions import InvalidKConfig
 from tuxmake.exceptions import UnsupportedTarget
@@ -107,8 +108,10 @@ class Config(Target):
         if not url.startswith("http://") and not url.startswith("https://"):
             return False
 
+        header = {"User-Agent": "tuxmake/{}".format(__version__)}
         try:
-            download = urllib.request.urlopen(url)
+            req = urllib.request.Request(url, headers=header)
+            download = urllib.request.urlopen(req)
         except urllib.error.URLError as error:
             raise InvalidKConfig(f"{url} - {error}")
         with config.open("w") as f:
