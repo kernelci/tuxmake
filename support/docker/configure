@@ -172,7 +172,7 @@ class CrossBuildMixin:
 
 
 class CrossGccBuildImage(CrossBuildMixin, BuildImage):
-    extra_lists = ["crossbuild", "gcc_all"]
+    extra_lists = ["crossbuild"]
 
     def __init__(self, name, base, when, packages, group):
         super().__init__(name, base, when, packages, group)
@@ -184,7 +184,7 @@ class CrossGccBuildImage(CrossBuildMixin, BuildImage):
 
 
 class CrossClangBuildImage(CrossBuildMixin, ClangBuildImage):
-    extra_lists = ["crossbuild", "clang_all"]
+    extra_lists = ["crossbuild"]
 
     def get_packages(self):
         cross = self.cross_package_suffix
