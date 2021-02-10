@@ -73,7 +73,7 @@ When this target is built, the `kernel` target is not.
 ## modules
 
 This target builds the Kernel modules. The modules are compressed in a tarball,
-which is copied into the output directory as `modules.tar.gz`.
+which is copied into the output directory as `modules.tar.xz`.
 
 
 ## headers
