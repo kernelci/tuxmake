@@ -5,7 +5,7 @@ import sys
 from tuxmake import xdg
 from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
-from tuxmake.build import build
+from tuxmake.build import Build
 from tuxmake.cmdline import build_parser
 from tuxmake.exceptions import TuxMakeException
 from tuxmake.runtime import get_runtime
@@ -129,15 +129,16 @@ def main(*origargv):
         if v and k not in ["color", "docker_image", "image", "shell"]
     }
     try:
-        result = build(**build_args, auto_cleanup=(not options.shell))
+        build = Build(**build_args, auto_cleanup=(not options.shell))
+        build.run()
         if options.shell:
-            result.run_cmd(["bash"], interactive=True)
-            result.cleanup()
-        for target, info in result.status.items():
+            build.run_cmd(["bash"], interactive=True)
+            build.cleanup()
+        for target, info in build.status.items():
             duration = timedelta(seconds=info.duration)
             print(f"I: {target}: {info.status} in {duration}", file=err)
-        print(f"I: build output in {result.output_dir}", file=err)
-        if result.failed:
+        print(f"I: build output in {build.output_dir}", file=err)
+        if build.failed:
             sys.exit(2)
     except TuxMakeException as e:
         sys.stderr.write("E: " + str(e) + "\n")

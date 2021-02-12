@@ -15,14 +15,26 @@ def builds(home):
 
 @pytest.fixture(autouse=True)
 def builder(mocker):
-    b = mocker.patch("tuxmake.cli.build")
+    b = mocker.patch("tuxmake.cli.Build")
     b.return_value.passed = True
     b.return_value.failed = False
     return b
 
 
+@pytest.fixture
+def build(builder):
+    return builder.return_value
+
+
 def args(called):
     return argparse.Namespace(**called.call_args[1])
+
+
+class TestBuildRun:
+    def test_basic_build(self, build, monkeypatch):
+        monkeypatch.setattr(sys, "argv", ["tuxmake"])
+        tuxmake()
+        build.run.assert_called()
 
 
 class TestTree:
