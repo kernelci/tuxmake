@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+echo "digraph targets {"
+for target in tuxmake/target/*.ini; do
+    name=$(basename $target .ini)
+    for dep in $(sed -e '/^dependencies\s*=/!d; s/.*=\s*//' ${target}); do
+        echo "  \"${name}\" -> \"${dep}\";"
+    done
+done
+echo "}"
