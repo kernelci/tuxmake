@@ -39,7 +39,7 @@ export FLIT_NO_NETWORK=1
 make man
 
 %check
-python3 -m pytest
+python3 -m pytest test/
 
 %install
 %pyproject_install

@@ -2,6 +2,7 @@
 
 export PYBUILD_NAME = tuxmake
 export PYBUILD_TEST_PYTEST = 1
+export PYBUILD_TEST_ARGS = test/
 export LC_ALL = C.UTF-8
 
 # Support non-flit builds - requires setup.py to be present (which is the case
