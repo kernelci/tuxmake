@@ -54,7 +54,8 @@ class TestConfig:
 class TestDebugKernel:
     def test_commands(self, build):
         debugkernel = Target("debugkernel", build)
-        assert ["{make}", "vmlinux"] in debugkernel.commands
+        assert debugkernel.commands[0][0] == "xz"
+        assert debugkernel.commands[0][-1] == "{build_dir}/vmlinux"
 
 
 class TestKernel:
@@ -62,9 +63,9 @@ class TestKernel:
         kernel = Target("kernel", build)
         assert kernel.artifacts
 
-    def test_depends_on_config(self, build):
+    def test_depends_on_default(self, build):
         kernel = Target("kernel", build)
-        assert kernel.dependencies == ["config"]
+        assert kernel.dependencies == ["default"]
 
 
 class TestModules:
@@ -73,14 +74,13 @@ class TestModules:
         return Target("modules", build)
 
     def test_install_modules(self, modules):
-        assert modules.commands[0][0:1] == ["{make}"]
-        assert modules.commands[1][0:2] == ["{make}", "modules_install"]
+        assert modules.commands[0][0:2] == ["{make}", "modules_install"]
 
     def test_strip_modules(self, modules):
-        assert "INSTALL_MOD_STRIP=1" in modules.commands[1]
+        assert "INSTALL_MOD_STRIP=1" in modules.commands[0]
 
-    def test_depends_on_config(self, modules):
-        assert modules.dependencies == ["config"]
+    def test_depends_on_default(self, modules):
+        assert modules.dependencies == ["default"]
 
 
 class TestDtbs:
@@ -97,3 +97,13 @@ class TestDtbs:
     def test_artifacts(self, build):
         dtbs = Target("dtbs", build)
         assert dtbs.artifacts["dtbs.tar.xz"] == "dtbs.tar.xz"
+
+
+class TestDefault:
+    def test_command(self, build):
+        default = Target("default", build)
+        assert default.commands == [["{make}"]]
+
+    def test_depends_on_config(self, build):
+        default = Target("default", build)
+        assert default.dependencies == ["config"]

@@ -91,7 +91,7 @@ test_fail() {
   run tuxmake --env=FAIL=kernel
   assertEquals 2 "$rc"
   assertTrue 'grep "config: PASS" stderr'
-  assertTrue 'grep "kernel: FAIL" stderr'
+  assertTrue 'grep "default: FAIL" stderr'
 }
 
 test_skip_kernel_if_config_fails() {

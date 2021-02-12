@@ -26,6 +26,13 @@ contains a `.config`, this target is skipped.
 
 The final configuration is copied into the output directory as `config`.
 
+## default
+
+This target runs `make`. It's an internal target, and is brought in by the
+others via dependencies. You usually should not need to build it explicitly,
+and if you do you won't get any artifacts out. The artifacts are tied to the
+other, specific targets such as `kernel`, `modules`, etc.
+
 ## debugkernel
 
 This target builds the debug Kernel image, i.e. `vmlinux`. A compressed copy of

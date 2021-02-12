@@ -279,7 +279,7 @@ def test_verbose(linux, mocker, Popen):
 
 def test_default_targets(linux):
     b = Build(tree=linux, targets=[])
-    assert set(t.name for t in b.targets) == set(defaults.targets)
+    assert set(t.name for t in b.targets) == set(defaults.targets) | set(["default"])
 
 
 def test_quiet(linux, capfd):
