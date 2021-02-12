@@ -46,10 +46,10 @@ bash_completion/tuxmake: tuxmake/cmdline.py
 	mkdir -p $$(dirname $@)
 	python3 -m tuxmake.cmdline bash_completion > $@ || ($(RM) $@; false)
 
-cli_options.rst: tuxmake/cli.py scripts/cli2rst.sh
+cli_options.rst: tuxmake/cli.py scripts/cli2rst.sh tuxmake/cmdline.py
 	scripts/cli2rst.sh $@
 
-docs/cli.md: tuxmake.rst tuxmake/cli.py scripts/cli2md.sh
+docs/cli.md: tuxmake.rst tuxmake/cli.py scripts/cli2md.sh scripts/cli2md.py
 	scripts/cli2md.sh $@
 
 docs/index.md: README.md scripts/readme2index.sh
