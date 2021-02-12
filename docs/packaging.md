@@ -19,6 +19,8 @@ though, two targets that might be of interest for packagers:
   packages (`tuxmake.1` in the root directory).
 - `make doc` will build the documentation. The output will be in a directory
   called `public` in the root directly.
+- `make bash_completion` will generate a bash completion file in
+  `bash_completion/tuxmake`, that you can include in your package.
 
 ## Tests
 
