@@ -36,7 +36,10 @@ class MetadataExtractor:
     def read_json(self, metadata_json):
         if not metadata_json:
             return {}
-        metadata = json.loads(metadata_json)
+        try:
+            metadata = json.loads(metadata_json)
+        except json.JSONDecodeError:
+            return {"invalid_metadata": metadata_json}
         if not metadata:
             return {}
 
