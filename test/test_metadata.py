@@ -47,7 +47,7 @@ class TestExtractor:
     def extractor(self, build):
         return MetadataExtractor(build)
 
-    @pytest.mark.parametrize("data", [None, "", "{}"])
+    @pytest.mark.parametrize("data", [None, "", "{}", '{"invalid":'])
     def test_dont_crash_on_corner_cases(self, extractor, data):
         extractor.read_json(data)
 
