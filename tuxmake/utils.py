@@ -26,6 +26,7 @@ class defaults:
         "dtbs",
         "dtbs-legacy",
         "debugkernel",
+        "headers",
     ]
     jobs = multiprocessing.cpu_count()
 
