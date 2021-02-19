@@ -56,7 +56,7 @@ This target builds all DTB files, like `dtbs`, but does not rely on the
 ## kernel
 
 Builds the Kernel image, which is copied into the output directory. The
-filename is architecture-dependent:
+default kernel image that will be built is architecture-dependent:
 
 Architecture | Kernel image filename
 -------------|-----------------------
@@ -69,6 +69,9 @@ i386 | bzImage
 mips | uImage.gz
 riscv | Image.gz
 x86_64 | bzImage
+
+This can be overridden using the `--kernel-image` option in the [CLI](cli.md)
+and the `kernel_image` parameter in the [Python API](python.md).
 
 ## xipkernel
 
