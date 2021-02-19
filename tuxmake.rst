@@ -109,4 +109,4 @@ FILES
 SEE ALSO
 ========
 
-The full tuxmake documentation: <https://docs.tuxmake.org/>
+The full tuxmake documentation: <https://tuxmake.org/>

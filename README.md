@@ -4,7 +4,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI - License](https://img.shields.io/pypi/l/tuxmake)](https://gitlab.com/Linaro/tuxmake/blob/master/LICENSE)
 
-[Documentation](https://docs.tuxmake.org/) - [Repository](https://gitlab.com/Linaro/tuxmake) - [Issues](https://gitlab.com/Linaro/tuxmake/-/issues)
+[Documentation](https://tuxmake.org/) - [Repository](https://gitlab.com/Linaro/tuxmake) - [Issues](https://gitlab.com/Linaro/tuxmake/-/issues)
 
 TuxMake, by [Linaro](https://www.linaro.org/), is a command line tool and
 Python library that provides portable and repeatable Linux kernel builds across

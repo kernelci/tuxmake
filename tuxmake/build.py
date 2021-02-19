@@ -119,7 +119,7 @@ class Build:
     - **kernel_image**: which kernel image to build, overriding the default
       kernel image name defined for the target architecture.
     - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
-      defaults to twice the number of available CPU cores.
+      defaults to the number of available CPU cores.
     - **runtime:** name of the runtime to use (`str`).
     - **verbose**: do a verbose build. The default is to do a silent build
       (i.e.  `make -s`).
