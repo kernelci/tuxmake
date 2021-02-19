@@ -3,7 +3,7 @@ Maintainer: Antonio Terceiro <antonio.terceiro@linaro.org>
 Section: python
 Priority: optional
 Build-Depends: bash-completion,
-               debhelper-compat (= 12),
+               debhelper-compat (= 13),
                dh-python,
                flit,
                git,
