@@ -775,3 +775,10 @@ class TestKselftest:
         build = Build(tree=linux, targets=["kselftest"])
         names = [t.name for t in build.targets]
         assert names == ["config", "kselftest"]
+
+
+class TestHeaders:
+    def test_basics(self, linux):
+        build = Build(tree=linux, targets=["headers"])
+        build.run()
+        assert "headers.tar.xz" in build.artifacts["headers"]
