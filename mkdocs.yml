@@ -1,5 +1,5 @@
 strict: true
-site_name: TuxMake Documentation
+site_name: TuxMake
 site_description: |
   Documentation for TuxMake, a command line tool and Python library utility
   that provides portable and repeatable Linux kernel builds across a variety of
