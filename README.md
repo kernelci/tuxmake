@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/tuxmake_full.svg" alt="TuxMake Logo" width="50%" />
+</div>
+
 [![Pipeline Status](https://gitlab.com/Linaro/tuxmake/badges/master/pipeline.svg)](https://gitlab.com/Linaro/tuxmake/pipelines)
 [![coverage report](https://gitlab.com/Linaro/tuxmake/badges/master/coverage.svg)](https://gitlab.com/Linaro/tuxmake/commits/master)
 [![PyPI version](https://badge.fury.io/py/tuxmake.svg)](https://pypi.org/project/tuxmake/)
