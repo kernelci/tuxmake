@@ -1,7 +1,7 @@
 include: '/support/docker/gitlab-ci.yml'
 
 image:
-  name: tuxmake/ci-python3.7
+  name: tuxmake/ci-python3.8
 
 variables:
   LANG: C.UTF-8

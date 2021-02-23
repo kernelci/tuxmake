@@ -2,7 +2,7 @@ from tuxmake import xdg
 
 
 def get_default_output_basedir():
-    return xdg.cache_home() / "tuxmake" / "builds"
+    return xdg.cache_dir() / "builds"
 
 
 def get_new_output_dir():

@@ -10,9 +10,9 @@ def _resolve(var, default):
         return Path.home() / default
 
 
-def cache_home():
-    return _resolve("XDG_CACHE_HOME", ".cache")
+def cache_dir():
+    return _resolve("XDG_CACHE_HOME", ".cache") / "tuxmake"
 
 
-def config_home():
-    return _resolve("XDG_CONFIG_HOME", ".config")
+def config_dir():
+    return _resolve("XDG_CONFIG_HOME", ".config") / "tuxmake"

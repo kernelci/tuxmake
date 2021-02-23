@@ -14,7 +14,7 @@ from tuxmake.utils import supported
 
 
 def read_config(filename, missing_ok=False):
-    configdir = xdg.config_home() / "tuxmake"
+    configdir = xdg.config_dir()
     path = configdir / filename
     if not path.exists():
         if missing_ok:

@@ -111,6 +111,29 @@ class TestDockerRuntime:
         DockerRuntime().prepare(build)
         check_call.assert_called_with(["docker", "pull", q("myimage")])
 
+    def test_prepare_pull_only_once_a_day(self, build, get_image, mocker):
+        get_image.return_value = "myimage"
+        check_call = mocker.patch("subprocess.check_call")
+        now = 1614000983
+        mocker.patch("time.time", return_value=now)
+        two_hours_ago = now - (2 * 60 * 60)
+        two_days_ago = now - (2 * 24 * 60 * 60)
+        mocker.patch(
+            "tuxmake.cache.get", side_effect=(None, two_hours_ago, two_days_ago)
+        )
+
+        # first call
+        PodmanRuntime().prepare(build)
+        assert len(check_call.call_args_list) == 1
+
+        # after 2 hours, no need to pull
+        PodmanRuntime().prepare(build)
+        assert len(check_call.call_args_list) == 1
+
+        # after 2 days, pull again
+        PodmanRuntime().prepare(build)
+        assert len(check_call.call_args_list) == 2
+
     def test_get_command_line(self, build):
         cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert cmd[0:2] == ["docker", "run"]

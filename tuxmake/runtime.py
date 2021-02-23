@@ -3,9 +3,11 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 from functools import lru_cache
 
 
+from tuxmake import cache
 from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import InvalidRuntimeError
@@ -177,7 +179,15 @@ class DockerRuntime(Runtime):
             )
 
     def do_prepare(self, build):
-        subprocess.check_call([self.command, "pull", self.get_image(build)])
+        pull = [self.command, "pull", self.get_image(build)]
+        last_pull = cache.get(pull)
+        now = time.time()
+        if last_pull:
+            a_day_ago = now - (24 * 60 * 60)
+            if last_pull > a_day_ago:
+                return
+        subprocess.check_call(pull)
+        cache.set(pull, time.time())
 
     def get_command_line(self, build, cmd, interactive):
         source_tree = os.path.abspath(build.source_tree)
