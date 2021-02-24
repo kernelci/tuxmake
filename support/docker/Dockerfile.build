@@ -52,6 +52,7 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         libmnl-dev:${arch} \
         libmount-dev:${arch} \
         libnuma-dev:${arch} \
+        libpci-dev:${arch} \
         libpopt-dev:${arch} \
         libreadline-dev:${arch} \
         libssl-dev:${arch} \

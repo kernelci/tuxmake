@@ -103,3 +103,8 @@ configuration. It will run after the `config` target. Note that `kselftest`
 does not require this, so if you want `kselftest-merge` to be built, it needs
 to be specified explicitly. If built, it will always be built before
 `kselftest` itself.
+
+## cpupower
+
+This target builds the cpupower program and libraries, from
+`tools/power/cpupower`.

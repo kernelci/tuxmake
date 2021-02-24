@@ -21,6 +21,7 @@ RUN apt-get update \
         cpio \
         dpkg-dev \
         flex \
+        gettext \
         git \
         gzip \
         jq \
