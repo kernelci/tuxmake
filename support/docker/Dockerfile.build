@@ -18,7 +18,6 @@ RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
     fi
 
 # Install development libraries for kselftest
-# libhugetlbfs-dev is not cross-installable on Debian <= 10; skip it in that case
 # Only official Debian architectures are supported, as those are the only ones
 # where we can ensure that the foreign userspace libraries needed to cross
 # compile are available and in good shape enough to be installable and usable.
@@ -47,7 +46,7 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         libdrm-dev:${arch} \
         libelf-dev:${arch} \
         libfuse-dev:${arch} \
-        $(eval $(grep VERSION_ID /etc/os-release); if [ -z "${VERSION_ID}" -o "0${VERSION_ID}" -gt 10 ]; then echo libhugetlbfs-dev:${arch}; fi) \
+        libhugetlbfs-dev:${arch} \
         libkeyutils-dev:${arch} \
         libmnl-dev:${arch} \
         libmount-dev:${arch} \
