@@ -38,24 +38,39 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
+        libbinutils:${arch} \
+        libbabeltrace-dev:${arch} \
         libssl-dev:${arch} \
         libelf-dev:${arch} \
         libc6-dev:${arch} \
         libcap-dev:${arch} \
         libcap-ng-dev:${arch} \
         libdrm-dev:${arch} \
+        libdw-dev:${arch} \
         libelf-dev:${arch} \
         libfuse-dev:${arch} \
         libhugetlbfs-dev:${arch} \
         libkeyutils-dev:${arch} \
+        libiberty-dev:${arch} \
         libmnl-dev:${arch} \
         libmount-dev:${arch} \
         libnuma-dev:${arch} \
         libpci-dev:${arch} \
         libpopt-dev:${arch} \
         libreadline-dev:${arch} \
+        libslang2-dev:${arch} \
         libssl-dev:${arch} \
-        libc-dev-bin
+        libunwind-dev:${arch} \
+        libzstd-dev:${arch} \
+        systemtap-sdt-dev:${arch} \
+        libc-dev-bin \
+        && \
+    # This is a horrible hack, but a foreign binutils-dev is not installable \
+    # See https://bugs.debian.org/983540 \
+    apt-get download binutils-dev:${arch} && \
+    dpkg -x binutils-dev*.deb /tmp/binutils-dev && \
+    rsync -avp /tmp/binutils-dev/ / && \
+    rm -rf binutils-dev*.deb /tmp/binutils-dev
 
 # For gcc images, symlink all binaries with unversioned names into $PATH
 RUN for bin in $(ls -1 /usr/bin/*-[0-9]* | xargs -n 1 basename); do \
