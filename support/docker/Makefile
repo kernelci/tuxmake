@@ -1,7 +1,23 @@
 export PYTHONPATH := $(shell readlink -f $(CURDIR)/../..)
 REGISTRY := docker.io/
 PROJECT := tuxmake
-LOG = > log/$@.log 2>&1 || (cat log/$@.log; false)
+
+ANN := echo
+ifneq ($(findstring s,$(filter-out --%,$(MAKEFLAGS))),)
+  ANN := true
+endif
+
+ifeq ($(V), 1)
+Q         :=
+LOG       :=
+ANN       := true
+else
+Q         := @
+LOG       := > log/$@.log 2>&1 || (cat log/$@.log; false)
+endif
+
+ANN_BUILD := @$(ANN) " BUILD"
+ANN_TEST  := @$(ANN) "  TEST"
 
 docker := docker
 

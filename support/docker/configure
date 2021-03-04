@@ -83,7 +83,8 @@ class Image:
             stream.write(f"{self.name}: {self.dependency} log\n")
         else:
             stream.write(f"{self.name}: log\n")
-        stream.write("\t$(docker) build \\\n")
+        stream.write(f"\t$(ANN_BUILD) {self.name}\n")
+        stream.write("\t$(Q)$(docker) build \\\n")
         for k, v in self.args:
             stream.write(f"\t\t--build-arg={k}={v} \\\n")
         stream.write(f"\t\t--file=Dockerfile.{self.kind} \\\n")
@@ -92,7 +93,8 @@ class Image:
 
         test_args = " ".join(self.test_args)
         stream.write(f"test-{self.name}: {self.name}\n")
-        stream.write(f"\t$(docker) run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args}\n\n")
+        stream.write(f"\t$(ANN_TEST) {self.name}\n")
+        stream.write(f"\t$(Q)$(docker) run --rm --volume=$(CURDIR)/test-image:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args} $(LOG)\n\n")
 
 
 class BaseImage(Image):
