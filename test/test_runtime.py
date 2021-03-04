@@ -172,7 +172,11 @@ class TestDockerRuntime:
         assert "--tty" in cmd
 
     def test_bases(self):
-        assert "base-debian" in [t.name for t in DockerRuntime().base_images]
+        assert [
+            t.name
+            for t in DockerRuntime().base_images
+            if not t.name.startswith("base-debian")
+        ] == []
 
     def test_ci_images(self):
         assert "ci-python3.8" in [t.name for t in DockerRuntime().ci_images]

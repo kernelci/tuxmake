@@ -37,11 +37,6 @@ assertArg() {
     fi
 }
 
-test_base() {
-    get_build_args base-debian
-    assertArg 'BASE=docker.io/library/debian:stable-slim'
-}
-
 test_gcc() {
     get_build_args gcc
     assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="gcc g++"'
