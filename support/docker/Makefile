@@ -74,6 +74,11 @@ test:
 
 test-images: $(patsubst %, test-%, $(all_images))
 
+SMOKE_ARCH = x86_64 arm64
+SMOKE_TOOLCHAINS = gcc gcc-8 gcc-9 gcc-10 clang-11 clang-12
+SMOKE_IMAGES = $(foreach toolchain,$(SMOKE_TOOLCHAINS),test-$(toolchain) $(foreach arch,$(SMOKE_ARCH),test-$(arch)_$(toolchain)))
+smoke-test: test-base-debian10 test-base-debian11 test-base-debiantesting $(SMOKE_IMAGES)
+
 show:
 	@$(docker) images $(PROJECT)/\* | sed -e 1d | sort
 
