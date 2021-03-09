@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # This list of packages was seeded from kernelci's base image
 # https://github.com/kernelci/kernelci-core/blob/master/jenkins/dockerfiles/build-base/Dockerfile
 RUN apt-get update \
-    && apt-get install auto-apt-proxy --assume-yes --no-install-recommends \
+    && apt-get install auto-apt-proxy --assume-yes \
     && apt-get install --assume-yes --no-install-recommends --option=debug::pkgProblemResolver=yes \
         procps \
         apt-transport-https \
