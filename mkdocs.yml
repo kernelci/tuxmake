@@ -38,6 +38,7 @@ nav:
   - Command Line Reference: cli.md
   - Python API Reference: python.md
 - Community:
+  - Chat: chat.md
   - Code of Conduct: code-of-conduct.md
   - Contributing: contributing.md
   - Downstream Packaging: packaging.md
