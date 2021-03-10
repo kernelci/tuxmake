@@ -24,5 +24,5 @@ deb [signed-by=/usr/share/keyrings/tuxmake.asc] https://tuxmake.org/packages/ ./
 # apt install tuxmake
 ```
 
-Upgrading tuxmake will work just like it would for any other package (`apt-get
-update` and `apt-get upgrade`).
+Upgrading tuxmake will work just like it would for any other package (`apt
+update`, `apt upgrade`).

@@ -94,7 +94,7 @@ ENVIRONMENT VARIABLES
   prepended to the image name, regardless of it being provided via
   `$TUXMAKE_IMAGE`, `--image`, or determined automatically by tuxmake.
 * `TUXMAKE_IMAGE_TAG`: defines an container image tag to use.  If
-  used, a colon character (":") and this string get appended to the image name
+  used, a colon character (":") and this string gets appended to the image name
   that was informed with `$TUXMAKE_IMAGE`, `--image`, or determined
   automatically by tuxmake.
 

@@ -42,9 +42,9 @@ tuxmake has no runtime dependencies other than the Python core.
 
 ## Running the tests
 
-To run the tests, just run `make`: it will run all the included tests, include unit
-tests, integration tests, coding style checks, etc. Please make sure all the
-tests pass before submitting patches.
+To run the tests, just run `make`: it will run all the included tests,
+including unit tests, integration tests, coding style checks, etc. Please make
+sure all the tests pass before submitting patches.
 
 ## Sending your contributions.
 
