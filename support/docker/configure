@@ -65,7 +65,10 @@ class Image:
         self.args.append((k, v))
 
     def emit(self):
-        self.args.append(("BASE", self.base_image))
+        base = self.base_image
+        if "tuxmake/" in base:
+            base += ":latest$(TAG)"
+        self.args.append(("BASE", base))
 
     def register(self):
         for l in self.lists:
