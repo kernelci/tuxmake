@@ -26,6 +26,10 @@ fi
 
 if [ ! -f ${relnotes} ]; then
     printf "${version} release\n\n" > ${relnotes}
+    printf "New features:\n\n" >> ${relnotes}
+    printf "Bug fixes:\n\n" >> ${relnotes}
+    printf "Documentation updates:\n\n" >> ${relnotes}
+    printf "Container images:\n\n" >> ${relnotes}
     git log --no-merges --reverse --oneline $(git tag | sort -V | tail -1).. >> ${relnotes}
 fi
 
