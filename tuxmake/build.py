@@ -543,7 +543,6 @@ class Build:
         self.logger.terminate()
 
     def cleanup(self):
-        self.runtime.cleanup()
         shutil.rmtree(self.build_dir, ignore_errors=True)
 
     def run(self):
@@ -570,6 +569,7 @@ class Build:
 
         with self.measure_duration("Cleanup", metadata="cleanup"):
             self.terminate()
+            self.runtime.cleanup()
             if self.auto_cleanup:
                 self.cleanup()
 
