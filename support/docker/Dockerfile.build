@@ -4,6 +4,7 @@ FROM ${BASE}
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG PACKAGES
+ARG INSTALL_OPTIONS
 # arch for which we are building for (i.e. the cross arch)
 ARG HOSTARCH
 
@@ -14,6 +15,7 @@ RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
+        ${INSTALL_OPTIONS} \
         $PACKAGES; \
     fi
 
@@ -38,6 +40,7 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
+        ${INSTALL_OPTIONS} \
         libbinutils:${arch} \
         libbabeltrace-dev:${arch} \
         libssl-dev:${arch} \

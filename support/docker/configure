@@ -44,11 +44,12 @@ class Image:
     def lists(self):
         return self.extra_lists + ["all", self.group, self.when]
 
-    def __init__(self, name, base, when, packages, group):
+    def __init__(self, name, base, when, packages, install_options, group):
         self.name = name
         self.base = base
         self.when = when
         self.packages = packages
+        self.install_options = install_options
         self.group = group
         self.args = []
         self.test_args = [name]
@@ -125,13 +126,15 @@ class BuildImage(Image):
     kind = "build"
     extra_lists = ["build"]
 
-    def __init__(self, name, base, when, packages, group):
-        super().__init__(name, base, when, packages, group)
+    def __init__(self, name, base, when, packages, install_options, group):
+        super().__init__(name, base, when, packages, install_options, group)
         self.pkgname = self.name
 
     def emit(self):
         super().emit()
         packages = " ".join(self.get_packages())
+        if self.install_options:
+            self.arg("INSTALL_OPTIONS", f'"{self.install_options}"')
         self.arg("PACKAGES", f'"{packages}"')
 
 
@@ -179,8 +182,8 @@ class CrossBuildMixin:
 class CrossGccBuildImage(CrossBuildMixin, BuildImage):
     extra_lists = ["crossbuild"]
 
-    def __init__(self, name, base, when, packages, group):
-        super().__init__(name, base, when, packages, group)
+    def __init__(self, name, base, when, packages, install_options, group):
+        super().__init__(name, base, when, packages, install_options, group)
         self.pkgname = re.sub(r".*_(gcc.*)$", "\g<1>", name)
 
     def get_packages(self):
@@ -224,11 +227,11 @@ class ArcImage(Image):
             self.arg(k, v)
 
 
-def generate(name, kind, base, when, hosts, packages, group):
+def generate(name, kind, base, when, hosts, packages, install_options, group):
     # transforms foo-bar into FooBarImage
     clsname = "".join([w.title() for w in re.split(r"[-_]", kind)]) + "Image"
     cls = globals()[clsname]
-    image = cls(name, base, when, packages, group)
+    image = cls(name, base, when, packages, install_options, group)
     image.register()
 
     if TAG:
@@ -248,7 +251,7 @@ runtime = DockerRuntime()
 for image in runtime.images:
     if image.skip_build:
         continue
-    generate(image.name, image.kind, image.base, image.rebuild, image.hosts, image.packages, re.sub(r"-", "_", image.group))
+    generate(image.name, image.kind, image.base, image.rebuild, image.hosts, image.packages, image.install_options, re.sub(r"-", "_", image.group))
 
 ImageList.dump(output)
 
