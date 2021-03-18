@@ -52,6 +52,5 @@ RUN true \
         sed -e  '/^deb .* \(testing\|sid\|unstable\) main/ !d; s/\(testing\|sid\|unstable\)/experimental/' /etc/apt/sources.list \
         > /etc/apt/sources.list.d/experimental.list; fi \
     && true
-COPY testing-pins /etc/apt/preferences.d/
 
 # vim: ft=dockerfile
