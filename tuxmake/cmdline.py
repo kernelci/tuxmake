@@ -5,7 +5,6 @@ import sys
 
 from tuxmake.runtime import get_runtime
 from tuxmake.utils import supported, defaults
-from tuxmake import xdg
 from tuxmake import __version__
 
 
@@ -336,11 +335,6 @@ class BashCompletion:
                 options.append(option.opt)
         for target in supported.targets:
             options.append(target)
-
-        config_files = [f.name for f in xdg.config_dir().glob("*")]
-        for f in config_files:
-            if f != "default":
-                options.append(f"@{f}")
 
         all_toolchains = get_runtime("podman").toolchains
 
