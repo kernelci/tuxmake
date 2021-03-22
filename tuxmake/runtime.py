@@ -86,6 +86,7 @@ class Image:
         target_kinds="",
         target_hosts="",
         packages="",
+        install_options="",
     ):
         self.name = name
         self.kind = kind
@@ -98,6 +99,7 @@ class Image:
         self.target_kinds = splitmap(target_kinds)
         self.target_hosts = splitlistmap(target_hosts)
         self.packages = split(packages)
+        self.install_options = install_options
         self.rebuild = rebuild
 
 

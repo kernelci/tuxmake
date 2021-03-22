@@ -1,7 +1,0 @@
-Package: src:gcc*:*
-Pin: release a=unstable
-Pin-Priority: 1001
-
-Package: src:gcc*:*
-Pin: release a=experimental
-Pin-Priority: 1000

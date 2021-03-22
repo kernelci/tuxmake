@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 
+my $LATEST_CLANG_NIGHTLY = "13";
+
 my $image = shift;
 my $cross_compile = shift;
 
@@ -54,6 +56,9 @@ sub check_toolchain_image() {
   if ($compiler =~ /^(.*)-(nightly|\d+)$/) {
     $compiler = $1;
     $version = $2;
+    if ($compiler eq "clang" && $version eq "nightly") {
+      $version = $LATEST_CLANG_NIGHTLY;
+    }
   }
 
   $arch ||= `arch`; chomp $arch;
