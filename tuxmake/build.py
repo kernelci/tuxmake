@@ -170,9 +170,10 @@ class Build:
         self.__build_dir__ = None
         self.__build_dir_input__ = build_dir
         if self.__build_dir_input__:
-            self.auto_cleanup = False
+            self.clean_build_tree = False
         else:
-            self.auto_cleanup = auto_cleanup
+            self.clean_build_tree = True
+        self.auto_cleanup = auto_cleanup
 
         self.target_arch = target_arch and Architecture(target_arch) or host_arch
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
@@ -544,7 +545,9 @@ class Build:
         self.logger.terminate()
 
     def cleanup(self):
-        shutil.rmtree(self.build_dir, ignore_errors=True)
+        self.runtime.cleanup()
+        if self.clean_build_tree:
+            shutil.rmtree(self.build_dir, ignore_errors=True)
 
     def run(self):
         """
@@ -570,7 +573,6 @@ class Build:
 
         with self.measure_duration("Cleanup", metadata="cleanup"):
             self.terminate()
-            self.runtime.cleanup()
             if self.auto_cleanup:
                 self.cleanup()
 
