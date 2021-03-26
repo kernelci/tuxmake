@@ -65,7 +65,7 @@ serve-public: public
 	mkdocs serve --livereload --strict
 
 tags:
-	ctags --exclude=public --exclude=tmp -R
+	ctags --exclude=public --exclude=.mypy_cache --exclude=tmp -R
 
 clean:
 	$(RM) -r tuxmake.1 cli_options.rst docs/cli.md docs/index.md public/ tags dist/ bash_completion/
