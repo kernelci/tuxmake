@@ -534,7 +534,9 @@ class TestRuntime:
         runtime.get_command_line.return_value = ["true"]
         build = Build(tree=linux, runtime="docker")
         build.run_cmd(["true"], interactive=True)
-        runtime.get_command_line.assert_called_with(build, ["true"], True)
+        runtime.get_command_line.assert_called_with(
+            build, ["true"], True, offline=build.offline
+        )
 
 
 class TestEnvironment:

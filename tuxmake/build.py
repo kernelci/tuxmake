@@ -219,6 +219,8 @@ class Build:
         self.quiet = quiet
         self.debug = debug
 
+        self.offline = False
+
         self.artifacts = {"log": ["build.log"]}
         self.__logger__ = None
         self.__status__ = {}
@@ -309,6 +311,14 @@ class Build:
         else:
             return ["--silent"]
 
+    @contextmanager
+    def go_offline(self):
+        self.offline = True
+        try:
+            yield
+        finally:
+            self.offline = False
+
     def run_cmd(self, origcmd, stdout=None, interactive=False):
         """
         Performs the build.
@@ -326,7 +336,9 @@ class Build:
         else:
             expect_failure = False
 
-        final_cmd = self.runtime.get_command_line(self, cmd, interactive)
+        final_cmd = self.runtime.get_command_line(
+            self, cmd, interactive, offline=self.offline
+        )
         extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C.UTF-8")
         env = dict(os.environ, **extra_env)
 
@@ -566,22 +578,23 @@ class Build:
         with self.measure_duration("Preparation", metadata="prepare"):
             self.prepare()
 
-        with self.measure_duration("Build", metadata="build"):
-            self.build_all_targets()
+        with self.go_offline():
+            with self.measure_duration("Build", metadata="build"):
+                self.build_all_targets()
 
-        with self.measure_duration("Copying Artifacts", metadata="copy"):
-            for target in self.targets:
-                self.copy_artifacts(target)
+            with self.measure_duration("Copying Artifacts", metadata="copy"):
+                for target in self.targets:
+                    self.copy_artifacts(target)
 
-        with self.measure_duration("Metadata Extraction", metadata="metadata"):
-            self.extract_metadata()
+            with self.measure_duration("Metadata Extraction", metadata="metadata"):
+                self.extract_metadata()
 
-        with self.measure_duration("Cleanup", metadata="cleanup"):
-            self.terminate()
-            if self.auto_cleanup:
-                self.cleanup()
+            with self.measure_duration("Cleanup", metadata="cleanup"):
+                self.terminate()
+                if self.auto_cleanup:
+                    self.cleanup()
 
-        self.save_metadata()
+            self.save_metadata()
 
 
 def build(**kwargs):

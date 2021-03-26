@@ -47,7 +47,9 @@ class TestRuntime:
 
 class TestNullRuntime:
     def test_get_command_line(self, build):
-        assert NullRuntime().get_command_line(build, ["date"], False) == ["date"]
+        assert NullRuntime().get_command_line(
+            build, ["date"], interactive=False, offline=False
+        ) == ["date"]
 
     def test_prepare_warns_about_versioned_toolchain(self, build, mocker):
         build.toolchain.version_suffix = "-10"
@@ -80,6 +82,12 @@ class TestContainerRuntime:
     def spawn_container(self, mocker, container_id):
         return mocker.patch(
             "tuxmake.runtime.DockerRuntime.spawn_container", return_value=container_id
+        )
+
+    @pytest.fixture(autouse=True)
+    def offline_available(self, mocker):
+        return mocker.patch(
+            "tuxmake.runtime.Runtime.offline_available", return_value=False
         )
 
 
@@ -240,6 +248,29 @@ class TestDockerRuntimeSpawnContainer:
         cmd = check_output.call_args[0][0]
         assert cmd[0:2] == ["docker", "run"]
         assert runtime.container_id == container_id
+
+
+class TestDockerRuntimeOfflineAvailable:
+    @pytest.fixture
+    def runtime(self, build, container_id, mocker):
+        mocker.patch(
+            "tuxmake.runtime.DockerRuntime.spawn_container", return_value=container_id
+        )
+        mocker.patch("tuxmake.runtime.DockerRuntime.prepare_image")
+        r = DockerRuntime()
+        r.prepare(build)
+        return r
+
+    def test_offline_available(self, runtime, mocker):
+        mocker.patch("subprocess.check_call")
+        assert runtime.offline_available
+
+    def test_offline_not_available(self, runtime, mocker):
+        mocker.patch(
+            "subprocess.check_call",
+            side_effect=subprocess.CalledProcessError(1, ["true"]),
+        )
+        assert not runtime.offline_available
 
 
 class TestDockerLocalRuntime(TestContainerRuntime):

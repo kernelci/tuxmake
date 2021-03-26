@@ -1,0 +1,55 @@
+#!/bin/sh
+
+set -eu
+
+if [ -z "${TUXMAKE_OFFLINE_BUILD:-}" ]; then
+    # initial call: here we still have network access
+
+    if [ -n "${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT:-}" ]; then
+        # determine socket location
+        uid="$(id -u)"
+        export TUXMAKE_OFFLINE_BUILD_SOCKET="/run/user/${uid}/tuxmake-${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT}.sock"
+
+        # start TCP -> UNIX socket tunnel
+        socat \
+            "unix-listen:${TUXMAKE_OFFLINE_BUILD_SOCKET},reuseaddr,fork" \
+            "tcp-connect:localhost:${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT}" \
+            &
+        export TUXMAKE_OFFLINE_BUILD_FORWARDER1_PID="$!"
+    fi
+
+    # run itself under a new and empty network namespace
+    export TUXMAKE_OFFLINE_BUILD=1
+    exec unshare --net --map-root-user "${0}" "$@"
+else
+    # inner call: here we have no network access
+
+    # set up loopback interface
+    ip link set lo up
+
+    if [ -n "${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT:-}" ]; then
+        # start TCP -> UNIX socket
+        socat \
+            "tcp-listen:${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT},reuseaddr,fork" \
+            "unix-connect:${TUXMAKE_OFFLINE_BUILD_SOCKET}" \
+            &
+        export TUXMAKE_OFFLINE_BUILD_FORWARDER2_PID="$!"
+    fi
+
+    # run the original command
+    rc=0
+    "$@" || rc="$?"
+
+    # cleanup
+    if [ -n "${TUXMAKE_OFFLINE_BUILD_FORWARDER1_PID:-}" ]; then
+        kill -9 "${TUXMAKE_OFFLINE_BUILD_FORWARDER1_PID}"
+    fi
+    if [ -n "${TUXMAKE_OFFLINE_BUILD_FORWARDER2_PID:-}" ]; then
+        kill -9 "${TUXMAKE_OFFLINE_BUILD_FORWARDER2_PID}"
+    fi
+    if [ -n "${TUXMAKE_OFFLINE_BUILD_SOCKET:-}" ]; then
+        rm -f "${TUXMAKE_OFFLINE_BUILD_SOCKET}"
+    fi
+
+    exit "$rc"
+fi

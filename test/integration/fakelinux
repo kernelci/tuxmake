@@ -179,6 +179,24 @@ test_custom_kernel_image() {
   assertTrue "test -f ${XDG_CACHE_HOME}/tuxmake/builds/1/Image.bz2"
 }
 
+test_no_network_access() {
+  case "${TUXMAKE:-}" in
+    *--runtime=docker*)
+      echo "I: test skipped, not supported when using the docker runtime"
+      return
+      ;;
+  esac
+  if [ -f /.dockerenv ]; then
+    echo "I: test skipped, not supported when running inside docker"
+    return
+  fi
+  sed -i -e 's#\S*call maybefail,debugkernel.*#wget http://tuxmake.org/#' Makefile
+  run tuxmake
+  assertFalse 'wget needs to be installed in the build environment' 'grep "wget: Command not found" stdout'
+  assertFalse 'wget needs to be installed in the build environment' 'grep "wget: No such file or directory" stdout'
+  assertTrue 'network access attempt should fail the build' 'grep wget stdout && [ $rc -ne 0 ]'
+}
+
 
 if [ $# -gt 0 ]; then
   export TESTCASES="$(echo "$@")"

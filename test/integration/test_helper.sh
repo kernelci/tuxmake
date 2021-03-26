@@ -1,5 +1,6 @@
 set -u
 export testdir=$(readlink -f $(dirname $0)/..)
+export LANG=C.UTF-8 LC_ALL=C.UTF-8 LANGUAGE=C.UTF-8
 
 if ! command -v tuxmake >/dev/null; then
   base=$(readlink -f $(dirname $0)/../..)

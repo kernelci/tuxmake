@@ -5,6 +5,7 @@ import subprocess
 import sys
 import time
 from functools import lru_cache
+from pathlib import Path
 
 
 from tuxmake import cache
@@ -38,6 +39,7 @@ class Runtime(ConfigurableObject):
 
     def __init__(self):
         super().__init__(self.name)
+        self.__offline_available__ = None
 
     def __init_config__(self):
         self.toolchains = Toolchain.supported()
@@ -48,14 +50,37 @@ class Runtime(ConfigurableObject):
     def is_supported(self, arch, toolchain):
         return True
 
-    def get_command_line(self, build, cmd, interactive):
-        return cmd
+    @property
+    def offline_available(self):
+        if self.__offline_available__ is None:
+            prefix = self.get_command_prefix(False)
+            go_offline = str(self.get_go_offline_command())
+            try:
+                subprocess.check_call([*prefix, go_offline, "true"])
+                self.__offline_available__ = True
+            except subprocess.CalledProcessError:
+                self.__offline_available__ = False
+        return self.__offline_available__
+
+    def get_command_line(self, build, cmd, interactive, offline=True):
+        prefix = self.get_command_prefix(interactive)
+        if offline and self.offline_available:
+            go_offline = [str(self.get_go_offline_command())]
+        else:
+            go_offline = []
+        return [*prefix, *go_offline, *cmd]
+
+    def get_command_prefix(self, interactive):
+        return []
 
     def prepare(self, build):
         pass
 
     def cleanup(self):
         pass
+
+    def get_go_offline_command(self):
+        return Path(__file__).parent / self.basedir / "tuxmake-offline-build"
 
 
 class NullRuntime(Runtime):
@@ -213,6 +238,10 @@ class DockerRuntime(Runtime):
                 v = path
             wrapper_opts.append(f"--env={k}={v}")
 
+        orig_go_offline = super().get_go_offline_command()
+        go_offline = self.get_go_offline_command()
+        go_offline_volume = self.volume(orig_go_offline, f"/usr/local/bin/{go_offline}")
+
         env = (f"--env={k}={v}" for k, v in build.environment.items())
         user_opts = self.get_user_opts()
         extra_opts = self.__get_extra_opts__()
@@ -228,6 +257,7 @@ class DockerRuntime(Runtime):
             *user_opts,
             self.volume(source_tree, source_tree),
             self.volume(build_dir, build_dir),
+            go_offline_volume,
             f"--workdir={source_tree}",
             *self.get_logging_opts(),
             *extra_opts,
@@ -242,12 +272,15 @@ class DockerRuntime(Runtime):
     def spawn_container(self, cmd):
         return subprocess.check_output(cmd, text=True).strip()
 
-    def get_command_line(self, build, cmd, interactive):
+    def get_command_prefix(self, interactive):
         if interactive:
             interactive_opts = ["--interactive", "--tty"]
         else:
             interactive_opts = []
-        return [self.command, "exec", *interactive_opts, self.container_id] + cmd
+        return [self.command, "exec", *interactive_opts, self.container_id]
+
+    def get_go_offline_command(self):
+        return super().get_go_offline_command().name
 
     def cleanup(self):
         subprocess.check_call(

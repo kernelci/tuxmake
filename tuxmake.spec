@@ -18,6 +18,7 @@ BuildRequires: python3-pytest
 BuildRequires: python3-pytest-cov
 BuildRequires: python3-pytest-mock
 BuildRequires: pyproject-rpm-macros
+BuildRequires: wget
 
 BuildArch: noarch
 
