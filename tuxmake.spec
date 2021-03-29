@@ -21,6 +21,7 @@ BuildRequires: pyproject-rpm-macros
 
 BuildArch: noarch
 
+Requires: python3 >= 3.6
 Requires: perl-JSON-PP
 
 %global debug_package %{nil}

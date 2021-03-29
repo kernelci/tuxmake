@@ -16,7 +16,7 @@ Homepage: https://tuxmake.org/
 
 Package: tuxmake
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends}, ${python3:Depends}
+Depends: ${misc:Depends}, ${perl:Depends}, python3 (>= 3.6), ${python3:Depends}
 Description: Thin wrapper to build Linux kernels
  TuxMake is a command line tool and Python library that provides portable and
  repeatable Linux kernel builds across a variety of architectures, toolchains,

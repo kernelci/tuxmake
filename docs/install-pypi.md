@@ -1,5 +1,7 @@
 # Installing from PyPI
 
+**Note:** TuxMake requires Python 3.6 or newer.
+
 To install TuxMake on your system globally:
 
 ```

@@ -1,5 +1,7 @@
 # Installing TuxMake via RPM packages
 
+**Note:** TuxMake requires Python 3.6 or newer.
+
 TuxMake provides RPM packages that have minimal dependencies, and should work
 on any RPM-based (Ubuntu, etc) system. The instructions below were tested on
 Fedora 33, you may need to adapt them to your system.

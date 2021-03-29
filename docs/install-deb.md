@@ -1,5 +1,7 @@
 # Installing TuxMake via Debian packages
 
+**Note:** TuxMake requires Python 3.6 or newer.
+
 TuxMake provides Debian packages that have minimal dependencies, and should
 work on any Debian or Debian-based (Ubuntu, etc) system.
 
