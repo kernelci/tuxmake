@@ -15,6 +15,7 @@ gpg="gpg --local-user ${TUXMAKE_RELEASE_KEYID} --batch --yes"
 
 # export signing key
 $gpg --armor --export --export-options export-minimal --output signing-key.asc ${TUXMAKE_RELEASE_KEYID}
+$gpg         --export --export-options export-minimal --output signing-key.gpg ${TUXMAKE_RELEASE_KEYID}
 
 # rpm
 rpmsign --define "__gpg /usr/bin/gpg" --define "_gpg_name ${TUXMAKE_RELEASE_KEYID}" --addsign *.rpm
