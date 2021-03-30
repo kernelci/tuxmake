@@ -13,6 +13,7 @@ RUN apt-get update \
         flake8 \
         gcc \
         git \
+        iproute2 \
         make \
         mkdocs \
         mypy \
@@ -23,6 +24,8 @@ RUN apt-get update \
         python3-pytest-cov \
         python3-pytest-mock \
         shunit2 \
+        socat \
+        wget \
     && for a in x86-64 aarch64; do \
         if [ "$a" != "$(uname -m | tr _ -)" ]; then \
             apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
