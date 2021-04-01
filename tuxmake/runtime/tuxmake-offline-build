@@ -5,6 +5,11 @@ set -eu
 if [ -z "${TUXMAKE_OFFLINE_BUILD:-}" ]; then
     # initial call: here we still have network access
 
+    if ! command -v socat >/dev/null; then
+        echo "socat not found" >&2
+        exit 1
+    fi
+
     if [ -n "${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT:-}" ]; then
         # determine socket location
         uid="$(id -u)"

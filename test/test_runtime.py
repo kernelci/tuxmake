@@ -1,3 +1,4 @@
+import re
 import subprocess
 import pytest
 
@@ -262,15 +263,19 @@ class TestDockerRuntimeOfflineAvailable:
         return r
 
     def test_offline_available(self, runtime, mocker):
-        mocker.patch("subprocess.check_call")
+        mocker.patch("subprocess.check_output")
         assert runtime.offline_available
 
-    def test_offline_not_available(self, runtime, mocker):
+    def test_offline_not_available(self, runtime, mocker, capsys):
         mocker.patch(
-            "subprocess.check_call",
-            side_effect=subprocess.CalledProcessError(1, ["true"]),
+            "subprocess.check_output",
+            side_effect=subprocess.CalledProcessError(
+                1, ["true"], output=b"some error"
+            ),
         )
         assert not runtime.offline_available
+        _, stderr = capsys.readouterr()
+        assert re.match("W:.*(some error)", stderr)
 
 
 class TestDockerLocalRuntime(TestContainerRuntime):

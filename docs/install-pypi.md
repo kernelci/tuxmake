@@ -1,6 +1,9 @@
 # Installing from PyPI
 
-**Note:** TuxMake requires Python 3.6 or newer.
+**Notes:**
+
+- TuxMake requires Python 3.6 or newer.
+- The offline builds feature requires `socat`, consider installing it.
 
 To install TuxMake on your system globally:
 

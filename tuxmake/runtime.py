@@ -56,9 +56,13 @@ class Runtime(ConfigurableObject):
             prefix = self.get_command_prefix(False)
             go_offline = str(self.get_go_offline_command())
             try:
-                subprocess.check_call([*prefix, go_offline, "true"])
+                subprocess.check_output(
+                    [*prefix, go_offline, "true"], stderr=subprocess.STDOUT
+                )
                 self.__offline_available__ = True
-            except subprocess.CalledProcessError:
+            except subprocess.CalledProcessError as exc:
+                error = exc.output.decode("utf-8").strip()
+                print(f"W: offline builds not available ({error})", file=sys.stderr)
                 self.__offline_available__ = False
         return self.__offline_available__
 
