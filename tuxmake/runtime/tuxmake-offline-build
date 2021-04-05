@@ -11,14 +11,27 @@ if [ -z "${TUXMAKE_OFFLINE_BUILD:-}" ]; then
     fi
 
     if [ -n "${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT:-}" ]; then
+        port="${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT}"
+
+        # wait for server to be online
+        waited=0
+        while ! socat GOPEN:/dev/null tcp-connect:localhost:${port} 2>/dev/null; do
+            waited=$((waited + 1))
+            if [ "$waited" -ge 50 ]; then
+                echo "$(basename $0): can't reach service at localhost:${port}" >&2
+                exit 1
+            fi
+            sleep 0.1
+        done
+
         # determine socket location
         uid="$(id -u)"
         socket_dir="$(mktemp --tmpdir --directory tuxmake.XXXXXXXXX)"
-        export TUXMAKE_OFFLINE_BUILD_SOCKET="${socket_dir}/${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT}.sock"
+        export TUXMAKE_OFFLINE_BUILD_SOCKET="${socket_dir}/${port}.sock"
         # start TCP -> UNIX socket tunnel
         socat \
             "unix-listen:${TUXMAKE_OFFLINE_BUILD_SOCKET},reuseaddr,fork" \
-            "tcp-connect:localhost:${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT}" \
+            "tcp-connect:localhost:${port}" \
             &
         export TUXMAKE_OFFLINE_BUILD_FORWARDER1_PID="$!"
     fi
