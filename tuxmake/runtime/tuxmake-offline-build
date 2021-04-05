@@ -29,7 +29,7 @@ if [ -z "${TUXMAKE_OFFLINE_BUILD:-}" ]; then
         socket_dir="$(mktemp --tmpdir --directory tuxmake.XXXXXXXXX)"
         export TUXMAKE_OFFLINE_BUILD_SOCKET="${socket_dir}/${port}.sock"
         # start TCP -> UNIX socket tunnel
-        socat \
+        socat -lp'socat-external' \
             "unix-listen:${TUXMAKE_OFFLINE_BUILD_SOCKET},reuseaddr,fork" \
             "tcp-connect:localhost:${port}" \
             &
@@ -47,7 +47,7 @@ else
 
     if [ -n "${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT:-}" ]; then
         # start TCP -> UNIX socket
-        socat \
+        socat -lp'socat-internal' \
             "tcp-listen:${TUXMAKE_OFFLINE_BUILD_ALLOW_LOCAL_PORT},reuseaddr,fork" \
             "unix-connect:${TUXMAKE_OFFLINE_BUILD_SOCKET}" \
             &
