@@ -2,7 +2,7 @@
 
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
-all: unit-tests integration-tests docker-build-tests man doc typecheck codespell style bash_completion
+all: typecheck codespell style unit-tests integration-tests docker-build-tests man doc bash_completion
 	@printf "\033[01;32m$(ALL_TESTS_PASSED)\033[m\n"
 
 
