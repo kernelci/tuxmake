@@ -1,5 +1,6 @@
 import multiprocessing
 import shlex
+from typing import List
 
 from tuxmake.arch import Architecture
 from tuxmake.target import supported_targets
@@ -9,16 +10,16 @@ from tuxmake.wrapper import Wrapper
 
 
 class supported:
-    architectures = Architecture.supported()
-    targets = supported_targets()
-    toolchains = Toolchain.supported()
-    runtimes = Runtime.supported()
-    wrappers = Wrapper.supported()
+    architectures: List[str] = Architecture.supported()
+    targets: List[str] = supported_targets()
+    toolchains: List[str] = Toolchain.supported()
+    runtimes: List[str] = Runtime.supported()
+    wrappers: List[str] = Wrapper.supported()
 
 
 class defaults:
     kconfig = "defconfig"
-    targets = [
+    targets: List[str] = [
         "config",
         "kernel",
         "xipkernel",
@@ -28,8 +29,8 @@ class defaults:
         "debugkernel",
         "headers",
     ]
-    jobs = multiprocessing.cpu_count()
+    jobs: int = multiprocessing.cpu_count()
 
 
-def quote_command_line(cmd):
+def quote_command_line(cmd: List[str]) -> str:
     return " ".join([shlex.quote(c) for c in cmd])
