@@ -339,7 +339,7 @@ class Build:
         final_cmd = self.runtime.get_command_line(
             self, cmd, interactive, offline=self.offline
         )
-        extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C.UTF-8")
+        extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C")
         env = dict(os.environ, **extra_env)
 
         logger = self.logger.stdin
