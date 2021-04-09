@@ -1,5 +1,7 @@
 .PHONY: test tags dist
 
+export PROJECT := tuxmake
+
 ALL_TESTS_PASSED = ======================== All tests passed ========================
 
 all: typecheck codespell style unit-tests integration-tests docker-build-tests man doc bash_completion
