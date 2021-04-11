@@ -18,6 +18,7 @@ arm          |             | 32-bit ARM               | yes      | yes
 hexagon      |             | Qualcomm Hexagon (DSP6)  | yes²     | no
 i386         |             | 32-bit X86               | yes      | yes
 mips         |             | 32-bit MIPS              | yes      | yes
+openrisc     |             | OpenRISC                 | no       | no
 parisc       |             | 64-bit parisc            | yes      | no
 powerpc      |             | 64-bit PowerPC (EL)      | yes      | yes
 riscv        |             | 64-bit RISC-V            | yes      | no
