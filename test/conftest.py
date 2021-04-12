@@ -14,10 +14,15 @@ if pytest.__version__ < "3.9":
         return pathlib.Path(tmpdir)
 
 
+@pytest.fixture(scope="session", autouse=True)
+def session_home(tmpdir_factory):
+    os.environ["HOME"] = str(tmpdir_factory.mktemp("HOME"))
+
+
 @pytest.fixture(autouse=True)
-def home(mocker, tmp_path):
+def home(monkeypatch, tmp_path):
     h = tmp_path / "HOME"
-    os.environ["HOME"] = str(h)
+    monkeypatch.setenv("HOME", str(h))
     return h
 
 
