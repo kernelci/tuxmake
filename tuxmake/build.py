@@ -11,10 +11,11 @@ from tuxmake import __version__
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
-from tuxmake.output import get_new_output_dir
+from tuxmake.output import get_default_build_dir, get_new_output_dir
 from tuxmake.target import create_target
 from tuxmake.runtime import get_runtime
 from tuxmake.metadata import MetadataExtractor
+from tuxmake.exceptions import BuildDirAlreadyExists
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 from tuxmake.exceptions import UnsupportedMakeVariable
@@ -301,8 +302,11 @@ class Build:
             self.__build_dir__ = Path(self.__build_dir_input__)
             self.__build_dir__.mkdir(parents=True, exist_ok=True)
         else:
-            self.__build_dir__ = self.output_dir / "tmp"
-            self.__build_dir__.mkdir()
+            self.__build_dir__ = get_default_build_dir()
+            try:
+                self.__build_dir__.mkdir()
+            except FileExistsError:
+                raise BuildDirAlreadyExists(self.__build_dir__)
         return self.__build_dir__
 
     def get_silent(self):
@@ -578,17 +582,18 @@ class Build:
         with self.measure_duration("Preparation", metadata="prepare"):
             self.prepare()
 
-        with self.go_offline():
-            with self.measure_duration("Build", metadata="build"):
-                self.build_all_targets()
+        try:
+            with self.go_offline():
+                with self.measure_duration("Build", metadata="build"):
+                    self.build_all_targets()
 
-            with self.measure_duration("Copying Artifacts", metadata="copy"):
-                for target in self.targets:
-                    self.copy_artifacts(target)
+                with self.measure_duration("Copying Artifacts", metadata="copy"):
+                    for target in self.targets:
+                        self.copy_artifacts(target)
 
-            with self.measure_duration("Metadata Extraction", metadata="metadata"):
-                self.extract_metadata()
-
+                with self.measure_duration("Metadata Extraction", metadata="metadata"):
+                    self.extract_metadata()
+        finally:
             with self.measure_duration("Cleanup", metadata="cleanup"):
                 self.terminate()
                 if self.auto_cleanup:

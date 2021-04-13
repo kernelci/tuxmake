@@ -300,6 +300,23 @@ def test_ctrl_c(linux, mocker, Popen):
     process.terminate.assert_called()
 
 
+def test_always_run_cleanup(linux, mocker):
+    build = Build(tree=linux)
+    mocker.patch(
+        "tuxmake.build.Build.build_all_targets", side_effect=KeyboardInterrupt()
+    )
+    with pytest.raises(KeyboardInterrupt):
+        build.run()
+    assert not build.build_dir.exists()
+
+
+def test_existing_build_dir(linux, home):
+    (home / ".cache" / "tuxmake" / "builds" / "current").mkdir(parents=True)
+    build = Build(tree=linux)
+    with pytest.raises(tuxmake.exceptions.TuxMakeException):
+        build.build_dir
+
+
 class TestArchitecture:
     def test_x86_64(self, linux):
         result = build(tree=linux, target_arch="x86_64")

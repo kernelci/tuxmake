@@ -86,3 +86,7 @@ class UnsupportedMetadata(TuxMakeInfrastructureError):
 class UnsupportedMetadataType(TuxMakeInfrastructureError):
     msg = "Unsupported metadata type: {name}"
     pass
+
+
+class BuildDirAlreadyExists(TuxMakeUserError):
+    msg = "Build directory {name} already exists. If you are doing parallel builds, you need to specify a build directory explicitly"
