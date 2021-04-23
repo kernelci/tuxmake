@@ -30,7 +30,7 @@ if [ ! -f ${relnotes} ]; then
     printf "Bug fixes:\n\n" >> ${relnotes}
     printf "Documentation updates:\n\n" >> ${relnotes}
     printf "Container images:\n\n" >> ${relnotes}
-    git log --no-merges --reverse --oneline v${current_version}.. || true >> ${relnotes}
+    (git log --no-merges --reverse --oneline v${current_version}.. || true) >> ${relnotes}
 fi
 
 ${EDITOR} ${relnotes}
