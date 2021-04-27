@@ -2,18 +2,27 @@
 
 use strict;
 use warnings;
-use Test::More;
 
 my $LATEST_CLANG_NIGHTLY = "13";
 
 my $image = shift;
 my $cross_compile = shift;
 
+my $failures = 0;
+my $PASS = "\033[32mPASS\033[m";
+my $FAIL = "\033[31mFAIL\033[m";
+
+
 sub check($$) {
   my ($name, $command) = @_;
   my $output = `$command 2>&1`;
   my $rc = $?;
-  is($rc, 0, "${name} (\`${command}\`)");
+  if ($rc == 0) {
+    print STDERR "${PASS} - ${name} (\`${command}\`)\n";
+  } else {
+    print STDERR "${FAIL} - ${name} (\`${command}\`)\n";
+    $failures++;
+  }
 }
 
 sub check_program($) {
@@ -84,4 +93,6 @@ exit(0) if ($image =~ /^ci-/);
 check_base_image();
 check_toolchain_image unless ($image =~ /^base-/);
 
-done_testing();
+if ($failures > 0) {
+  exit(1)
+}
