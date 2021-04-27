@@ -14,12 +14,6 @@ sub check($$) {
   my $output = `$command 2>&1`;
   my $rc = $?;
   is($rc, 0, "${name} (\`${command}\`)");
-  if ($rc == 0) {
-    my @lines = split(/\n/, $output);
-    diag($lines[0]);
-  } else {
-    diag($output);
-  }
 }
 
 sub check_program($) {
@@ -75,7 +69,6 @@ sub check_toolchain_image() {
     my $actual_version = `${compiler_bin} -dumpversion`;
     chomp $actual_version;
     like($actual_version, qr/^${version}(\.\d+)*/, "${compiler_bin} version ${version}");
-    diag("${compiler_bin} version: ${actual_version}");
   }
 
   if ($compiler =~ /clang/) {
