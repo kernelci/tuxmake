@@ -12,7 +12,7 @@ versions.
 
 ## clang
 
-This toolchain uses `clang` as compiler, but the GNU binutils tools forV
+This toolchain uses `clang` as compiler, but the GNU binutils tools for
 assembling and linking. Specify `clang-N` for specific versions. Special
 variants of `clang` are also available:
 
@@ -23,7 +23,7 @@ variants of `clang` are also available:
 
 ## llvm
 
-This toolchain does a full LLBV build, i.e. one with `LLVM=1`: compile with
+This toolchain does a full LLVM build, i.e. one with `LLVM=1`: compile with
 clang, and assemble/link with the LLVM tools. Specify `llvm-N` for requesting
 specific LLVM versions. As with `clang`, the `llvm-nightly` and `llvm-android`
 are also available.
