@@ -12,11 +12,18 @@ versions.
 
 ## clang
 
-This toolchain uses `clang` as compiler, but the GNU binutils tools for
-assembling and linking. Specify `clang-N` for specific versions.
+This toolchain uses `clang` as compiler, but the GNU binutils tools forV
+assembling and linking. Specify `clang-N` for specific versions. Special
+variants of `clang` are also available:
+
+| Variant | Description |
+|---------|-------------|
+| `clang-nightly` | Nightly clang builds, updated daily |
+| `clang-android` | The exact clang compiler used for official Android builds |
 
 ## llvm
 
 This toolchain does a full LLBV build, i.e. one with `LLVM=1`: compile with
 clang, and assemble/link with the LLVM tools. Specify `llvm-N` for requesting
-specific LLVM versions.
+specific LLVM versions. As with `clang`, the `llvm-nightly` and `llvm-android`
+are also available.
