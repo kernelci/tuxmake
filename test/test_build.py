@@ -317,6 +317,11 @@ def test_existing_build_dir(linux, home):
         build.build_dir
 
 
+clang_version = int(
+    subprocess.check_output(["clang", "-dumpversion"], encoding="utf-8").split(".")[0]
+)
+
+
 class TestArchitecture:
     def test_x86_64(self, linux):
         result = build(tree=linux, target_arch="x86_64")
@@ -365,6 +370,12 @@ class TestArchitecture:
     def test_arc(self, linux):
         result = build(tree=linux, target_arch="arc")
         assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
+
+    @pytest.mark.skipif(shutil.which("ld.lld") is None, reason="requires lld")
+    @pytest.mark.skipif(clang_version < 10, reason="requires clang 10+")
+    def test_hexagon(self, linux):
+        result = build(tree=linux, target_arch="hexagon", toolchain="clang")
+        assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_invalid_arch(self):
         with pytest.raises(tuxmake.exceptions.UnsupportedArchitecture):

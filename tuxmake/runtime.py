@@ -178,7 +178,7 @@ class DockerRuntime(Runtime):
 
     @lru_cache(None)
     def is_supported(self, arch, toolchain):
-        image_name = toolchain.get_image(arch)
+        image_name = arch.get_image(toolchain) or toolchain.get_image(arch)
         image = self.toolchain_images_map.get(image_name)
         if image:
             return host_arch.name in image.hosts or any(
@@ -191,6 +191,7 @@ class DockerRuntime(Runtime):
         image = (
             os.getenv("TUXMAKE_IMAGE")
             or os.getenv("TUXMAKE_DOCKER_IMAGE")
+            or build.target_arch.get_image(build.toolchain)
             or build.toolchain.get_image(build.target_arch)
         )
         registry = os.getenv("TUXMAKE_IMAGE_REGISTRY", DEFAULT_CONTAINER_REGISTRY)
