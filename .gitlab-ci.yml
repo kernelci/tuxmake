@@ -1,7 +1,7 @@
 include: '/support/docker/gitlab-ci.yml'
 
 image:
-  name: tuxmake/ci-python3.8
+  name: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
 
 variables:
   LANG: C.UTF-8
@@ -136,27 +136,27 @@ ci-ubuntu-20.04:
 
 unit-tests-python3.8:
   extends: .unit-tests
-  image: tuxmake/ci-python3.8
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
 
 unit-tests-python3.7:
   extends: .unit-tests
-  image: tuxmake/ci-python3.7
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
 
 unit-tests-python3.6:
   extends: .unit-tests
-  image: tuxmake/ci-python3.6
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
 
 unit-tests-python3.8-arm64:
   extends: [.unit-tests, .arm64]
-  image: tuxmake/ci-python3.8
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
 
 unit-tests-python3.7-arm64:
   extends: [.unit-tests, .arm64]
-  image: tuxmake/ci-python3.7
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
 
 unit-tests-python3.6-arm64:
   extends: [.unit-tests, .arm64]
-  image: tuxmake/ci-python3.6
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
 
 .code-checks:
   extends: .tuxmake
@@ -197,27 +197,27 @@ docker-build-tests:
 
 integration-python3.8:
   extends: .integration
-  image: tuxmake/ci-python3.8
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
 
 integration-python3.7:
   extends: .integration
-  image: tuxmake/ci-python3.7
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
 
 integration-python3.6:
   extends: .integration
-  image: tuxmake/ci-python3.7
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
 
 integration-python3.8-arm64:
   extends: [.integration, .arm64]
-  image: tuxmake/ci-python3.8
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
 
 integration-python3.7-arm64:
   extends: [.integration, .arm64]
-  image: tuxmake/ci-python3.7
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
 
 integration-python3.6-arm64:
   extends: [.integration, .arm64]
-  image: tuxmake/ci-python3.6
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
 
 integration-docker:
   extends: integration-python3.8
@@ -238,7 +238,7 @@ build-docs:
   extends: .tuxmake
   stage: build
   needs: []
-  image: tuxmake/ci-python3.8
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
   before_script:
     - apt-get update -q
     - python3 -m pip install mkautodoc mkdocs-material  # FIXME not in Debian
