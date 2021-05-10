@@ -134,6 +134,10 @@ ci-ubuntu-20.04:
   script:
     - make unit-tests
 
+unit-tests-python3.9:
+  extends: .unit-tests
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
+
 unit-tests-python3.8:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
@@ -145,6 +149,10 @@ unit-tests-python3.7:
 unit-tests-python3.6:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
+
+unit-tests-python3.9-arm64:
+  extends: [.unit-tests, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
 
 unit-tests-python3.8-arm64:
   extends: [.unit-tests, .arm64]
@@ -195,6 +203,10 @@ docker-build-tests:
   script:
     - make integration-tests TMV=1
 
+integration-python3.9:
+  extends: .integration
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
+
 integration-python3.8:
   extends: .integration
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
@@ -206,6 +218,10 @@ integration-python3.7:
 integration-python3.6:
   extends: .integration
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
+
+integration-python3.9-arm64:
+  extends: [.integration, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
 
 integration-python3.8-arm64:
   extends: [.integration, .arm64]
