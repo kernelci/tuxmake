@@ -15,8 +15,6 @@ RUN apt-get update \
         gcc \
         git \
         iproute2 \
-        llvm \
-        lld \
         make \
         mkdocs \
         mypy \
@@ -37,6 +35,8 @@ RUN apt-get update \
         done \
     && (apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
         black || true) \
+    && (apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
+        llvm lld || true) \
     && (apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
         flit || python3 -m pip install flit)
 
