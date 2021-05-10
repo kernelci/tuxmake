@@ -122,7 +122,6 @@ sub check_toolchain_image() {
   }
 }
 
-exit(0) if ($image =~ /^ci-/);
 check_base_image();
 check_toolchain_image unless ($image =~ /^base-/);
 

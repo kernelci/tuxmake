@@ -148,7 +148,6 @@ class DockerRuntime(Runtime):
         self.toolchains = split(self.config["runtime"]["toolchains"])
         for image_list, config in (
             (self.base_images, self.config["runtime"]["bases"]),
-            (self.ci_images, self.config["runtime"]["ci"]),
             (self.toolchain_images, self.toolchains),
         ):
             for entry in split(config):
@@ -156,8 +155,6 @@ class DockerRuntime(Runtime):
                     continue
                 if entry.startswith("base"):
                     group = "base"
-                elif entry.startswith("ci-"):
-                    group = "ci"
                 else:
                     group = f"{entry}_all"
                 image = Image(name=entry, group=group, **self.config[entry])

@@ -218,9 +218,6 @@ class TestDockerRuntime(TestContainerRuntime):
             if not t.name.startswith("base-debian")
         ] == []
 
-    def test_ci_images(self):
-        assert "ci-python3.8" in [t.name for t in DockerRuntime().ci_images]
-
     def test_toolchain_images(self):
         images = [t.name for t in DockerRuntime().toolchain_images]
         assert "gcc" in images
