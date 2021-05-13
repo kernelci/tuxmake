@@ -375,7 +375,8 @@ class TestArchitecture:
     @pytest.mark.skipif(clang_version < 10, reason="requires clang 10+")
     def test_hexagon(self, linux):
         result = build(tree=linux, target_arch="hexagon", toolchain="clang")
-        assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
+        assert result.passed
+        assert "vmlinux" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_invalid_arch(self):
         with pytest.raises(tuxmake.exceptions.UnsupportedArchitecture):
