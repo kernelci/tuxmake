@@ -24,6 +24,7 @@ from tuxmake.log import LogParser
 from tuxmake.cmdline import CommandLine
 from tuxmake.utils import defaults
 from tuxmake.utils import quote_command_line
+from tuxmake.utils import get_directory_timestamp
 
 
 class BuildInfo:
@@ -181,7 +182,13 @@ class Build:
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
-        self.environment = environment
+        self.environment = {}
+        self.environment["KBUILD_BUILD_TIMESTAMP"] = "@" + get_directory_timestamp(
+            self.source_tree
+        )
+        self.environment["KBUILD_BUILD_USER"] = "tuxmake"
+        self.environment["KBUILD_BUILD_HOST"] = "tuxmake"
+        self.environment.update(environment)
 
         self.kconfig = kconfig
         self.kconfig_add = kconfig_add

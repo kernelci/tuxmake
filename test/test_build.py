@@ -843,3 +843,17 @@ class TestCheckEnvironment:
         build = Build(tree=linux)
         with pytest.raises(tuxmake.exceptions.EnvironmentCheckFailed):
             build.check_environment()
+
+
+class TestReproducible:
+    def test_reproducible(self, linux):
+        build = Build(tree=linux)
+        assert "KBUILD_BUILD_TIMESTAMP" in build.environment
+        assert build.environment["KBUILD_BUILD_TIMESTAMP"].startswith("@")
+        assert "KBUILD_BUILD_USER" in build.environment
+        assert "KBUILD_BUILD_HOST" in build.environment
+
+    def test_reproducible_sets_constant_values(self, linux):
+        build1 = Build(tree=linux)
+        build2 = Build(tree=linux)
+        assert build1.environment == build2.environment
