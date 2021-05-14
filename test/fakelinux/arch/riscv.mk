@@ -1,3 +1,3 @@
 IMAGE = Image.gz
-COMPRESS = gzip
+COMPRESS = gzip -n
 ARCHDIRNAME = riscv

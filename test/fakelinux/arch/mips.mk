@@ -1,3 +1,3 @@
 IMAGE = uImage.gz
-COMPRESS = gzip
+COMPRESS = gzip -n
 ARCHDIRNAME = mips

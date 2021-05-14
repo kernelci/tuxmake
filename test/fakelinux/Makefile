@@ -21,6 +21,15 @@ CFLAGS += --target=$(triplet)
 endif
 endif
 
+KBUILD_BUILD_TIMESTAMP ?= $(shell LANG=C date)
+KBUILD_BUILD_USER ?= $(shell whoami)
+KBUILD_BUILD_HOST ?= $(shell hostname)
+
+CFLAGS += -DSOURCE_DATE_EPOCH=$(shell date -d "$(KBUILD_BUILD_TIMESTAMP)" +%s)
+CFLAGS += -DKBUILD_BUILD_TIMESTAMP='"$(KBUILD_BUILD_TIMESTAMP)"'
+CFLAGS += -DKBUILD_BUILD_USER='"$(KBUILD_BUILD_USER)"'
+CFLAGS += -DKBUILD_BUILD_HOST='"$(KBUILD_BUILD_HOST)"'
+
 all:
 
 include arch/$(ARCH).mk
