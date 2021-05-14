@@ -38,6 +38,8 @@ RUN apt-get update \
     && (apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
         llvm lld || true) \
     && (apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
-        flit || python3 -m pip install flit)
+        flit || python3 -m pip install flit) \
+    && apt-get install --assume-yes --option=debug::pkgProblemResolver=yes \
+        --no-install-recommends diffoscope
 
 # vim: ft=dockerfile
