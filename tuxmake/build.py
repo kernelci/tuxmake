@@ -182,10 +182,9 @@ class Build:
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
+        self.timestamp = get_directory_timestamp(self.source_tree)
         self.environment = {}
-        self.environment["KBUILD_BUILD_TIMESTAMP"] = "@" + get_directory_timestamp(
-            self.source_tree
-        )
+        self.environment["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
         self.environment["KBUILD_BUILD_USER"] = "tuxmake"
         self.environment["KBUILD_BUILD_HOST"] = "tuxmake"
         self.environment.update(environment)
@@ -405,6 +404,16 @@ class Build:
                 + ["--keep-going", f"--jobs={self.jobs}", f"O={self.build_dir}"]
                 + self.make_args
             )
+        elif part == "{tar_caf}":
+            return [
+                "tar",
+                "--sort=name",
+                "--owner=tuxmake:1000",
+                "--group=tuxmake:1000",
+                "--mtime=@" + self.timestamp,
+                "--clamp-mtime",
+                "-caf",
+            ]
         else:
             return [self.format_cmd_part(part)]
 

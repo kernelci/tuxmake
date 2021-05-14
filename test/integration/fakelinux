@@ -222,6 +222,40 @@ test_check_environment_fails() {
   assertNotEquals 0 "${rc}"
 }
 
+__test_reproducible_builds__() {
+  if ! command -v diffoscope > /dev/null; then
+    echo "I: diffoscope is not installed, but needed for this test; skipping"
+    return
+  fi
+  diffoscope_version="$(diffoscope --version | awk '{print($2)}')"
+  if [ "${diffoscope_version}" -lt 113 ]; then
+    echo "I: diffoscope version ${diffoscope_version} is tool old for this test; skipping"
+    return
+  fi
+  git init --quiet
+  git config user.name 'Foo Bar'
+  git config user.email 'foo.bar@example.com'
+  git add .
+  GIT_COMMITTER_DATE='2021-05-14 15:00 -0300' git commit --quiet -m 'Initial commit'
+  run tuxmake "$@"
+  assertEquals 0 "${rc}"
+  run faketime '+1 year' tuxmake "$@"
+  assertEquals 0 "${rc}"
+  builds="$XDG_CACHE_HOME/tuxmake/builds"
+  run diffoscope \
+    --exclude=metadata.json \
+    --exclude-directory-metadata=yes \
+    ${builds}/1 ${builds}/2
+  assertEquals 0 "${rc}"
+}
+
+test_reproducible_builds_x86_64() {
+  __test_reproducible_builds__ --target-arch=x86_64
+}
+
+test_reproducible_builds_arm64() {
+  __test_reproducible_builds__ --target-arch=arm64
+}
 
 if [ $# -gt 0 ]; then
   export TESTCASES="$(echo "$@")"
