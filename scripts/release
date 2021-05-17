@@ -47,10 +47,10 @@ fi
 if [ -f debian/changelog ]; then
     sed -i -e "1 { s/(.*)/(${version}-1)/ }" debian/changelog
 fi
-$git commit -a -m "Release ${version}"
+$git commit -a --file=${relnotes}
 
 $git push
-$git tag --sign --file=${relnotes} v${version}
+$git tag --sign --message="${version} release" v${version}
 $flit publish
 $git push --tags
 rm -f ${relnotes}
