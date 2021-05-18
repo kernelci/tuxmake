@@ -62,6 +62,10 @@ class TestCommandLine:
         cmd = cmdline.reproduce(Build(debug=True))
         assert "--debug" in cmd
 
+    def test_no_check_environment(self, cmdline):
+        cmd = cmdline.reproduce(Build(debug=True))
+        assert "--check-environment" not in cmd
+
 
 class TestBashCompletion:
     def test_basic(self):
