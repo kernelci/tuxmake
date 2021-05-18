@@ -272,7 +272,7 @@ class ReverseParser:
 
 
 class CommandLine:
-    ignore = ["targets", "jobs", "output_dir", "build_dir"]
+    ignore = ["targets", "jobs", "output_dir", "build_dir", "check_environment"]
 
     def __init__(self):
         self.parser = build_parser(cls=ReverseParser)
