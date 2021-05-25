@@ -341,7 +341,7 @@ class TestArchitecture:
 
     def test_mips(self, linux):
         result = build(tree=linux, target_arch="mips")
-        assert "vmlinux" in [str(f.name) for f in result.output_dir.glob("*")]
+        assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_parisc(self, linux):
         result = build(tree=linux, target_arch="parisc")
@@ -349,11 +349,11 @@ class TestArchitecture:
 
     def test_powerpc(self, linux):
         result = build(tree=linux, target_arch="powerpc")
-        assert "vmlinux" in [str(f.name) for f in result.output_dir.glob("*")]
+        assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_riscv(self, linux):
         result = build(tree=linux, target_arch="riscv")
-        assert "Image" in [str(f.name) for f in result.output_dir.glob("*")]
+        assert "Image.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_s390(self, linux):
         result = build(tree=linux, target_arch="s390")
@@ -365,7 +365,7 @@ class TestArchitecture:
 
     def test_sparc(self, linux):
         result = build(tree=linux, target_arch="sparc")
-        assert "vmlinux" in [str(f.name) for f in result.output_dir.glob("*")]
+        assert "zImage" in [str(f.name) for f in result.output_dir.glob("*")]
 
     def test_arc(self, linux):
         result = build(tree=linux, target_arch="arc")
