@@ -54,6 +54,8 @@ class Image:
         self.packages = image_data.packages
         self.install_options = image_data.install_options
         self.group = re.sub(r"-", "_", image_data.group)
+        self.extra_apt_repo = image_data.extra_apt_repo
+        self.extra_apt_repo_key = image_data.extra_apt_repo_key
         self.args = []
         self.test_args = [self.name]
 
@@ -138,6 +140,10 @@ class BuildImage(Image):
         packages = " ".join(self.get_packages())
         if self.install_options:
             self.arg("INSTALL_OPTIONS", f'"{self.install_options}"')
+        if self.extra_apt_repo:
+            self.arg("EXTRA_APT_REPO", f'"{self.extra_apt_repo}"')
+        if self.extra_apt_repo:
+            self.arg("EXTRA_APT_REPO_KEY", self.extra_apt_repo_key)
         self.arg("PACKAGES", f'"{packages}"')
 
 

@@ -119,6 +119,8 @@ class Image:
         target_hosts="",
         packages="",
         install_options="",
+        extra_apt_repo=None,
+        extra_apt_repo_key=None,
     ):
         self.name = name
         self.kind = kind
@@ -133,6 +135,8 @@ class Image:
         self.packages = split(packages)
         self.install_options = install_options
         self.rebuild = rebuild
+        self.extra_apt_repo = extra_apt_repo
+        self.extra_apt_repo_key = extra_apt_repo_key
 
 
 class DockerRuntime(Runtime):
