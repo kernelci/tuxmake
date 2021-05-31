@@ -36,7 +36,8 @@ RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
 # where we can ensure that the foreign userspace libraries needed to cross
 # compile are available and in good shape enough to be installable and usable.
 RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_ARCH); \
-    if [ "${arch}" = "arm" ]; then arch=armhf; fi; \
+    triplet=$(echo ${HOSTARCH}-linux-gnu | tr _ -); \
+    if [ "${arch}" = "arm" ]; then arch=armhf; triplet=arm-linux-gnueabihf; fi; \
     case "${arch}" in \
         amd64|arm64|armel|armhf|i386|mips64el|mipsel|ppc64el|s390x) \
             ;; \
@@ -48,19 +49,24 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         dpkg --add-architecture ${arch}; \
     fi && \
     apt-get update && \
+    gccversion=$(gcc -dumpversion 2>/dev/null || (apt-cache policy gcc | sed -e '/Candidate:/!d; s/\s*Candidate:\s*.*://; s/\..*//')) && \
     apt-get install \
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
         ${INSTALL_OPTIONS} \
+        binutils-${triplet} \
         libbinutils:${arch} \
         libc6-dev:${arch} \
+        libgcc-${gccversion}-dev-${arch}-cross \
+        libstdc++-${gccversion}-dev-${arch}-cross \
         libc-dev-bin && \
     apt-get install \
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
         libbabeltrace-dev:${arch} \
+        libc6-dev-${arch}-cross \
         libcap-dev:${arch} \
         libcap-ng-dev:${arch} \
         libdrm-dev:${arch} \
@@ -80,6 +86,8 @@ RUN arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_
         libssl-dev:${arch} \
         $(test "${arch}" != "s390x" && echo libunwind-dev:${arch}) \
         libzstd-dev:${arch} \
+        linux-libc-dev \
+        linux-libc-dev-${arch}-cross \
         systemtap-sdt-dev:${arch} \
         && \
     # This is a horrible hack, but a foreign binutils-dev is not installable \

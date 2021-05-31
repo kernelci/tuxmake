@@ -203,13 +203,6 @@ class CrossGccBuildImage(CrossBuildMixin, BuildImage):
 class CrossClangBuildImage(CrossBuildMixin, ClangBuildImage):
     extra_lists = ["crossbuild"]
 
-    def get_packages(self):
-        cross = self.cross_package_suffix
-        return self.packages + [
-            f"gcc-{cross}",
-            f"g++-{cross}",
-        ]
-
 
 class ClangAndroidBuildImage(ClangBuildImage):
     kind = "clang-android"
