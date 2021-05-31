@@ -8,6 +8,18 @@ ARG INSTALL_OPTIONS
 # arch for which we are building for (i.e. the cross arch)
 ARG HOSTARCH
 
+ARG EXTRA_APT_REPO_KEY
+ARG EXTRA_APT_REPO
+
+RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
+    if [ -n "${EXTRA_APT_REPO_KEY}" ]; then \
+        wget -O /etc/apt/trusted.gpg.d/extra.asc "${EXTRA_APT_REPO_KEY}"; \
+    fi; \
+    if [ -n "${EXTRA_APT_REPO}" ]; then \
+        echo "${EXTRA_APT_REPO}" > /etc/apt/sources.list.d/extra.list; \
+    fi
+
+
 # Skip package installation if arch to build for is the same as the native. For
 # multi-arch images, only the foreign one will need a cross toolchain.
 RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
