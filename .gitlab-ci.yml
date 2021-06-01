@@ -47,6 +47,7 @@ stages:
     - 'docker push $CI_REGISTRY/linaro/tuxmake/$CI_JOB_NAME'
 
 .publish-ci-image:
+  extends: .tuxmake
   stage: publish-ci-images
   only:
     refs:
