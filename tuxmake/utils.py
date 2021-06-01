@@ -46,7 +46,7 @@ def get_directory_timestamp(directory):
                 cwd=str(directory),
                 encoding="utf-8",
             ).strip()
-        except subprocess.CalledProcessError as e:
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
             print(e)
 
     s = os.stat(directory)
