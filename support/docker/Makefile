@@ -75,7 +75,7 @@ test:
 test-images: $(patsubst %, test-%, $(all_images))
 
 SMOKE_ARCH = x86_64 arm64
-SMOKE_TOOLCHAINS = gcc gcc-8 gcc-9 gcc-10 gcc-11 clang-11 clang-12 clang-nightly
+SMOKE_TOOLCHAINS = gcc gcc-8 gcc-9 gcc-10 gcc-11 clang-11 clang-12 clang-nightly clang-android
 SMOKE_IMAGES = $(foreach toolchain,$(SMOKE_TOOLCHAINS),test-$(toolchain) $(foreach arch,$(SMOKE_ARCH),test-$(arch)_$(toolchain)))
 smoke-test: test-base-debian10 test-base-debian11 test-base-debiantesting $(SMOKE_IMAGES)
 

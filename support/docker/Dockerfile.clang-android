@@ -3,10 +3,12 @@ FROM ${BASE}
 
 ARG ANDROID_CLANG=r416183b
 
-RUN apt-get update -q=2 && apt-get install -q=2 -y gcc g++
-
 RUN wget --progress=dot:giga https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-${ANDROID_CLANG}.tar.gz && \
     tar xaf clang-${ANDROID_CLANG}.tar.gz -C /usr/local && \
     rm -f clang-${ANDROID_CLANG}.tar.gz
+
+RUN apt-get update -q=2 && \
+    gccversion=$(apt-cache policy gcc | sed -e '/Candidate:/!d; s/\s*Candidate:\s*.*://; s/\..*//') && \
+    apt-get install -q=2 -y libc6-dev linux-libc-dev libgcc-${gccversion}-dev libstdc++-${gccversion}-dev
 
 # vim: ft=dockerfile
