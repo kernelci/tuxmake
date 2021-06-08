@@ -103,7 +103,7 @@ class Image:
         test_args = " ".join(self.test_args)
         stream.write(f"test-{self.name}: {self.name}\n")
         stream.write(f"\t$(ANN_TEST) {self.name}\n")
-        stream.write(f"\t$(Q)$(docker) run --rm --volume={IMAGE_TEST_SCRIPT}:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args} $(LOG)\n\n")
+        stream.write(f"\t$(Q)$(docker) run --rm --volume={IMAGE_TEST_SCRIPT}:/test $(PROJECT)/{self.name}:latest$(TAG) /test {test_args} $(NOSTDOUT) \n\n")
 
 
 class BaseImage(Image):

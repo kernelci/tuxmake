@@ -23,7 +23,7 @@ my $WARN = "\033[33mWARN\033[m";
 sub check($$$) {
   my ($name, $test, $ok_to_fail) = @_;
   if ($test) {
-    print STDERR "${PASS} - ${name}\n";
+    print STDOUT "${PASS} - ${name}\n";
   } elsif ($ok_to_fail) {
     print STDERR "${WARN} - non fatal failure: ${name}\n";
   } else {

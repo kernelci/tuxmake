@@ -11,9 +11,11 @@ ifeq ($(V), 1)
 Q         :=
 LOG       :=
 ANN       := true
+NOSTDOUT  :=
 else
 Q         := @
 LOG       := > log/$@.log 2>&1 || (cat log/$@.log; false)
+NOSTDOUT  := > /dev/null
 endif
 
 ANN_BUILD := @$(ANN) " BUILD"
