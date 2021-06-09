@@ -7,7 +7,7 @@ site_description: |
 site_author: Tuxmake Team
 site_dir: public
 repo_url: https://gitlab.com/Linaro/tuxmake/
-site_url: ""
+site_url: "https://tuxmake.org/"
 theme:
   name: material
   logo: tuxmake.svg
