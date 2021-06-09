@@ -56,7 +56,7 @@ $(publish_releases): publish-%: test-%
 	fi
 
 $(test_releases): test-%: Makefile
-	  @$(MAKE) $(patsubst %, test-%, $(shell ./list-images $*))
+	  @list="$(patsubst %, test-%, $(shell ./list-images $*))"; if [ -n "$$list" ]; then $(MAKE) $$list; fi
 
 TIMESTAMP = $(shell date +%Y%m%d)
 
