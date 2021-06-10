@@ -5,7 +5,8 @@ other TuxMake users.
 
 ## IRC
 
-You can talk to the TuxMake team at the `#tuxmake` channel on Freenode.
+You can talk to the TuxMake team at the `#tuxmake` channel on
+[Libera Chat](https://libera.chat/).
 
 ## Discord
 
