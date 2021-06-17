@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 import shutil
-import pathlib
 import pytest
 from tuxmake import __version__
 from tuxmake.build import Build
@@ -17,8 +16,8 @@ def home(tmpdir_factory):
 
 
 @pytest.fixture(scope="module")
-def linux(tmpdir_factory):
-    orig = pathlib.Path(__file__).parent / "fakelinux"
+def linux(test_directory, tmpdir_factory):
+    orig = test_directory / "fakelinux"
     source = tmpdir_factory.mktemp("source")
     _linux = source / "linux"
     shutil.copytree(orig, _linux)

@@ -14,6 +14,16 @@ if pytest.__version__ < "3.9":
         return pathlib.Path(tmpdir)
 
 
+@pytest.fixture(scope="session")
+def test_directory():
+    return pathlib.Path(__file__).parent
+
+
+@pytest.fixture(scope="session")
+def logs_directory(test_directory):
+    return test_directory / "logs"
+
+
 @pytest.fixture(scope="session", autouse=True)
 def session_home(tmpdir_factory):
     os.environ["HOME"] = str(tmpdir_factory.mktemp("HOME"))
@@ -27,8 +37,8 @@ def home(monkeypatch, tmp_path):
 
 
 @pytest.fixture(scope="session")
-def linux(tmpdir_factory):
-    src = pathlib.Path(__file__).parent / "fakelinux"
+def linux(test_directory, tmpdir_factory):
+    src = test_directory / "fakelinux"
     dst = tmpdir_factory.mktemp("source") / "linux"
     shutil.copytree(src, dst)
     return dst

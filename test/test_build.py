@@ -675,14 +675,12 @@ class TestMetadata:
         assert type(metadata["build"]["reproducer_cmdline"]) is list
 
 
-LOG = (Path(__file__).parent / "logs/simple.log").read_text()
-
-
 class TestParseLog:
     @pytest.fixture(scope="class")
-    def build(self, linux):
+    def build(self, linux, logs_directory):
         b = Build(tree=linux)
-        (b.output_dir / "build.log").write_text(LOG)
+        log = (logs_directory / "simple.log").read_text()
+        (b.output_dir / "build.log").write_text(log)
         return b
 
     def test_warnings(self, build):

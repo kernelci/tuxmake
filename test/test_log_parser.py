@@ -1,8 +1,5 @@
-from pathlib import Path
 import pytest
 from tuxmake.log import LogParser
-
-logs = Path(__file__).parent / "logs"
 
 
 class TestLogParser:
@@ -20,7 +17,7 @@ class TestLogParser:
             ("garbage.log", 0, 2),
         ),
     )
-    def test_log(self, log, errors, warnings):
+    def test_log(self, logs_directory, log, errors, warnings):
         parser = LogParser()
-        parser.parse(logs / log)
+        parser.parse(logs_directory / log)
         assert (parser.errors, parser.warnings) == (errors, warnings)
