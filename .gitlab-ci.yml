@@ -285,7 +285,7 @@ rpm:
   stage: integration-tests
   image: fedora:33
   script:
-    - dnf install -y dnf-plugins-core rpm-build crontabs shunit2 gcc-x86_64-linux-gnu gcc-aarch64-linux-gnu ccache clang
+    - dnf install -y dnf-plugins-core rpm-build crontabs shunit2 gcc-x86_64-linux-gnu gcc-aarch64-linux-gnu ccache clang which
     - dnf builddep -y tuxmake.spec
     - make rpm
     - rpm --install dist/tuxmake*.rpm
