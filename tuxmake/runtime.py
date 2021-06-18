@@ -141,10 +141,7 @@ class Image:
         self.extra_apt_repo_key = extra_apt_repo_key
 
 
-class DockerRuntime(Runtime):
-    name = "docker"
-    command = "docker"
-    extra_opts_env_variable = "TUXMAKE_DOCKER_RUN"
+class ContainerRuntime(Runtime):
     prepare_failed_msg = "failed to pull remote image {image}"
 
     def __init_config__(self):
@@ -307,6 +304,16 @@ class DockerRuntime(Runtime):
             [self.command, "stop", self.container_id], stdout=subprocess.DEVNULL
         )
 
+    def __get_extra_opts__(self):
+        opts = os.getenv(self.extra_opts_env_variable, "")
+        return shlex.split(opts)
+
+
+class DockerRuntime(ContainerRuntime):
+    name = "docker"
+    command = "docker"
+    extra_opts_env_variable = "TUXMAKE_DOCKER_RUN"
+
     def get_user_opts(self):
         uid = os.getuid()
         gid = os.getgid()
@@ -318,12 +325,8 @@ class DockerRuntime(Runtime):
     def volume(self, source, target):
         return f"--volume={source}:{target}"
 
-    def __get_extra_opts__(self):
-        opts = os.getenv(self.extra_opts_env_variable, "")
-        return shlex.split(opts)
 
-
-class PodmanRuntime(DockerRuntime):
+class PodmanRuntime(ContainerRuntime):
     name = "podman"
     command = "podman"
     extra_opts_env_variable = "TUXMAKE_PODMAN_RUN"
@@ -335,7 +338,7 @@ class PodmanRuntime(DockerRuntime):
         return ["--log-level=ERROR"]
 
     def volume(self, source, target):
-        return super().volume(source, target) + ":z"
+        return f"--volume={source}:{target}:z"
 
 
 class LocalMixin:

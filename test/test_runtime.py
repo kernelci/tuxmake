@@ -82,7 +82,8 @@ class TestContainerRuntime:
     @pytest.fixture(autouse=True)
     def spawn_container(self, mocker, container_id):
         return mocker.patch(
-            "tuxmake.runtime.DockerRuntime.spawn_container", return_value=container_id
+            "tuxmake.runtime.ContainerRuntime.spawn_container",
+            return_value=container_id,
         )
 
     @pytest.fixture(autouse=True)
@@ -254,7 +255,7 @@ class TestDockerRuntimeOfflineAvailable:
         mocker.patch(
             "tuxmake.runtime.DockerRuntime.spawn_container", return_value=container_id
         )
-        mocker.patch("tuxmake.runtime.DockerRuntime.prepare_image")
+        mocker.patch("tuxmake.runtime.ContainerRuntime.prepare_image")
         r = DockerRuntime()
         r.prepare(build)
         return r
