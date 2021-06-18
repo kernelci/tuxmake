@@ -286,7 +286,7 @@ def test_quiet(linux, capfd):
     build(tree=linux, quiet=True)
     out, err = capfd.readouterr()
     assert out == ""
-    assert err == ""
+    assert "I:" not in err
 
 
 def test_ctrl_c(linux, mocker, Popen):
@@ -708,6 +708,12 @@ class TestUnsupportedToolchainArchitectureCombination:
 
 
 class TestDebug:
+    def test_no_debug_without_debug_options(self, linux, capfd):
+        build = Build(tree=linux)
+        build.run_cmd(["true"])
+        _, e = capfd.readouterr()
+        assert e == ""
+
     @pytest.fixture
     def debug_build(self, linux):
         return Build(tree=linux, debug=True, environment={"FOO": "BAR"})

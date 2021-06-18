@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 from tuxmake import __version__
+from tuxmake.logging import set_debug, debug
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
@@ -226,6 +227,7 @@ class Build:
         self.verbose = verbose
         self.quiet = quiet
         self.debug = debug
+        set_debug(self.debug)
 
         self.offline = False
 
@@ -363,9 +365,9 @@ class Build:
                 self.log(quote_command_line(cmd))
                 stdout = logger
 
-        self.log_debug(f"Command: {final_cmd}")
+        debug(f"Command: {final_cmd}")
         if extra_env:
-            self.log_debug(f"Environment: {extra_env}")
+            debug(f"Environment: {extra_env}")
         try:
             with self.measure_duration("Command"):
                 process = subprocess.Popen(
@@ -394,7 +396,7 @@ class Build:
             duration = time.time() - start
             if metadata:
                 self.__durations__[metadata] = duration
-            self.log_debug(f"{name} finished in {duration} seconds.")
+            debug(f"{name} finished in {duration} seconds.")
 
     def expand_cmd_part(self, part):
         if part == "{make}":
@@ -445,10 +447,6 @@ class Build:
     def log(self, *stuff):
         subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
 
-    def log_debug(self, *stuff):
-        if self.debug:
-            print("D:", *stuff, file=sys.stderr)
-
     @property
     def make_args(self):
         return [f"{k}={v}" for k, v in self.makevars.items() if v]
@@ -472,14 +470,12 @@ class Build:
     def build(self, target):
         for dep in target.dependencies:
             if not self.status[dep].passed:
-                self.log_debug(
-                    f"Skipping {target.name} because dependency {dep} failed"
-                )
+                debug(f"Skipping {target.name} because dependency {dep} failed")
                 return BuildInfo("SKIP")
 
         for precondition in target.preconditions:
             if not self.run_cmd(precondition, stdout=subprocess.DEVNULL):
-                self.log_debug(f"Skipping {target.name} because precondition failed")
+                debug(f"Skipping {target.name} because precondition failed")
                 return BuildInfo("SKIP")
 
         target.prepare()

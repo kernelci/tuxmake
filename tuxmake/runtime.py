@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 from tuxmake import cache
+from tuxmake.logging import debug, warning
 from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import InvalidRuntimeError
@@ -62,7 +63,7 @@ class Runtime(ConfigurableObject):
                 self.__offline_available__ = True
             except subprocess.CalledProcessError as exc:
                 error = exc.output.decode("utf-8").strip()
-                print(f"W: offline builds not available ({error})", file=sys.stderr)
+                warning(f"W: offline builds not available ({error})")
                 self.__offline_available__ = False
         return self.__offline_available__
 
@@ -280,9 +281,9 @@ class DockerRuntime(Runtime):
             "sleep",
             "1d",
         ]
-        build.log_debug(f"Starting container: {cmd}")
+        debug(f"Starting container: {cmd}")
         self.container_id = self.spawn_container(cmd)
-        build.log_debug(f"Container ID: {self.container_id}")
+        debug(f"Container ID: {self.container_id}")
 
     def spawn_container(self, cmd):
         return subprocess.check_output(cmd).strip().decode("utf-8")

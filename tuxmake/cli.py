@@ -6,6 +6,7 @@ import shlex
 import sys
 import tempfile
 from tuxmake import xdg
+from tuxmake.logging import set_quiet, info, warning, error
 from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
 from tuxmake.build import Build
@@ -22,7 +23,7 @@ def read_config(filename, missing_ok=False):
         if missing_ok:
             return []
         else:
-            sys.stderr.write(f"E: missing configuration file: {path}\n")
+            error(f"missing configuration file: {path}")
             sys.exit(1)
 
     res = []
@@ -40,7 +41,7 @@ def run_hooks(hooks, cwd):
             print(hook)
             subprocess.check_call(["sh", "-c", hook], cwd=str(cwd))
         except subprocess.CalledProcessError as e:
-            sys.stderr.write(f"E: hook `{hook}` failed with exit code {e.returncode}\n")
+            error(f"hook `{hook}` failed with exit code {e.returncode}")
             sys.exit(2)
 
 
@@ -115,14 +116,11 @@ def main(*origargv):
     if options.environment:
         options.environment = dict(options.environment)
 
-    if options.quiet:
-        err = open("/dev/null", "w")
-    else:
-        err = sys.stderr
+    set_quiet(options.quiet)
 
     if options.docker_image:
         os.environ["TUXMAKE_IMAGE"] = options.docker_image
-        sys.stderr.write("W: --docker-image is deprecated; use --image instead\n")
+        warning("--docker-image is deprecated; use --image instead")
 
     if options.image:
         if not options.runtime:
@@ -133,7 +131,7 @@ def main(*origargv):
         key_values = [arg for arg in options.targets if "=" in arg]
         for kv in key_values:
             if kv.count("=") > 1:
-                sys.stderr.write(f"E: invalid KEY=VALUE: {kv}")
+                error(f"E: invalid KEY=VALUE: {kv}")
                 sys.exit(1)
         options.make_variables = dict((arg.split("=") for arg in key_values))
         options.targets = [arg for arg in options.targets if "=" not in arg]
@@ -167,15 +165,15 @@ def main(*origargv):
         if options.shell:
             build.run_cmd(["bash"], interactive=True)
             build.cleanup()
-        for target, info in build.status.items():
-            duration = timedelta(seconds=info.duration)
-            print(f"I: {target}: {info.status} in {duration}", file=err)
-        print(f"I: build output in {build.output_dir}", file=err)
+        for target, results in build.status.items():
+            duration = timedelta(seconds=results.duration)
+            info(f"{target}: {results.status} in {duration}")
+        info(f"build output in {build.output_dir}")
         if build.failed:
             sys.exit(2)
         else:
             run_hooks(options.after_hooks, build.source_tree)
             run_hooks(options.results_hooks, build.output_dir)
     except TuxMakeException as e:
-        sys.stderr.write("E: " + str(e) + "\n")
+        error(str(e))
         sys.exit(1)
