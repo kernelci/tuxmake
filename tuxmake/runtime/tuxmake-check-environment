@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use File::Temp qw(tempdir);
 use Getopt::Long;
-my $libc_compile_nonfatal = 0;
+my $libc_compile_fatal = 0;
 GetOptions(
-  "libc-compile-nonfatal" => \$libc_compile_nonfatal,
+  "libc-compile-fatal" => \$libc_compile_fatal,
 ) or exit(1);
 
 my $LATEST_CLANG_NIGHTLY = "13";
@@ -98,7 +98,7 @@ sub check_compiler_no_libc($) {
 
 sub check_compiler_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n", $libc_compile_nonfatal);
+  check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n", !$libc_compile_fatal);
 }
 
 sub check_toolchain_image() {

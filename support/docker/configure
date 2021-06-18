@@ -187,8 +187,8 @@ class CrossBuildMixin:
         self.arg("HOSTARCH", self.gnu_arch)
         self.test_args.append(self.arch.makevars["CROSS_COMPILE"])
         # FIXME: this list should not be hardcoded here
-        if self.arch not in ['x86_64', 'arm64', 'arm', 'i386', 'powerpc', 's390']:
-            self.test_args.append("--libc-compile-nonfatal")
+        if self.arch in ['x86_64', 'arm64', 'arm', 'i386', 'powerpc', 's390']:
+            self.test_args.append("--libc-compile-fatal")
 
 
 class CrossGccBuildImage(CrossBuildMixin, BuildImage):
