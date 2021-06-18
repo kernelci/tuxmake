@@ -22,7 +22,6 @@ DEFAULT_RUNTIME = "null"
 DEFAULT_CONTAINER_REGISTRY = "docker.io"
 
 
-@lru_cache(None)
 def get_runtime(runtime):
     runtime = runtime or DEFAULT_RUNTIME
     name = "".join([w.title() for w in re.split(r"[_-]", runtime)]) + "Runtime"
