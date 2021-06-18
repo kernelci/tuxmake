@@ -189,6 +189,7 @@ class ContainerRuntime(Runtime):
         else:
             return False
 
+    @lru_cache(None)
     def get_image(self, build):
         image = (
             os.getenv("TUXMAKE_IMAGE")
