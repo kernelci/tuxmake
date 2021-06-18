@@ -603,13 +603,13 @@ class Build:
         build can be inspected though the `status`, `passed`, and `failed`
         properties.
         """
-        with self.measure_duration("Input validation", metadata="validate"):
-            self.validate()
-
-        with self.measure_duration("Preparation", metadata="prepare"):
-            self.prepare()
-
         try:
+            with self.measure_duration("Input validation", metadata="validate"):
+                self.validate()
+
+            with self.measure_duration("Preparation", metadata="prepare"):
+                self.prepare()
+
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):
                     self.build_all_targets()

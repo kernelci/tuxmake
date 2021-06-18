@@ -310,6 +310,14 @@ def test_always_run_cleanup(linux, mocker):
     assert not build.build_dir.exists()
 
 
+def test_cleans_up_even_if_prepare_fails(linux, mocker):
+    build = Build(tree=linux)
+    mocker.patch("tuxmake.build.Build.prepare", side_effect=KeyboardInterrupt())
+    with pytest.raises(KeyboardInterrupt):
+        build.run()
+    assert not build.build_dir.exists()
+
+
 def test_existing_build_dir(linux, home):
     (home / ".cache" / "tuxmake" / "builds" / "current").mkdir(parents=True)
     build = Build(tree=linux)
