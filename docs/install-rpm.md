@@ -3,7 +3,7 @@
 **Note:** TuxMake requires Python 3.6 or newer.
 
 TuxMake provides RPM packages that have minimal dependencies, and should work
-on any RPM-based (Ubuntu, etc) system. The instructions below were tested on
+on any RPM-based (Fedora, etc) system. The instructions below were tested on
 Fedora 33, you may need to adapt them to your system.
 
 1) Create `/etc/yum.repos.d/tuxmake.repo` with the following contents:
