@@ -1,5 +1,8 @@
 # Curated Containers
 
+Both Debian and Fedora containers are maintained for use with TuxMake.
+
+## Debian
 TuxMake provides curated [OCI](https://opencontainers.org/) containers for each
 of its supported native architecture/target architecture/toolchain
 combinations.
@@ -20,3 +23,41 @@ The container builds run on a regular schedule.
 
 The full set of TuxMake's containers can be found at
 [hub.docker.com/u/tuxmake](https://hub.docker.com/u/tuxmake).
+
+## Fedora
+
+[CKI project](https://cki-project.org) maintains Fedora containers for use with
+TuxMake. These containers are the same ones used for production CKI pipelines,
+so they can be used to reproduce CKI pipeline builds.
+
+CKI containers support the following toolchain and architecture combinations for
+building the kernel:
+
+|        | x86_64 | aarch64 | ppc64le | s390x |
+|--------|--------|---------|---------|-------|
+|`gcc`   | yes    | yes     | yes     | yes   |
+|`clang` | yes    | yes     | yes     | yes   |
+|`llvm`  | yes    | yes     | no      | no    |
+
+Building kernel tools is supported on the following:
+
+|        | x86_64 |
+|--------|--------|
+|`gcc`   | yes    |
+|`clang` | yes    |
+|`llvm`  | yes    |
+
+Only the versions of `gcc`, `clang`, and `llvm` provided by Fedora and Fedora
+Rawhide are supported.
+
+A stable Fedora image can be used by passing:
+```
+--image registry.gitlab.com/cki-project/containers/builder-fedora
+```
+The development Fedora Rawhide image can be used with:
+```
+--image registry.gitlab.com/cki-project/containers/builder-rawhide
+```
+
+The containers are defined in the
+[CKI containers repository](https://gitlab.com/cki-project/containers).
