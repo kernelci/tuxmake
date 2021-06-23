@@ -67,6 +67,7 @@ sub check_base_image() {
   check_program("wget");
   check_program("xz");
   check_program("zstd");
+  check_run("Perl JSON::PP module", "perl -MJSON::PP -e 'exit(0)'", 0);
 }
 
 my $PROGRAM = <<PROGRAM;
