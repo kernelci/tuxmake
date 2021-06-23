@@ -93,7 +93,7 @@ sub check_compiler($) {
 
 sub check_compiler_no_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries", $compiler, undef, 0);
+  check_compile_program("${compiler} can produce binaries", "${compiler} -nostdlib", undef, 0);
 }
 
 sub check_compiler_libc($) {
