@@ -76,9 +76,10 @@ version = $(shell sed -e '/^__version__/ !d; s/"\s*$$//; s/.*"//' tuxmake/__init
 
 rpm: dist/tuxmake-$(version)-0tuxmake.noarch.rpm
 
+RPMBUILD = rpmbuild
 dist/tuxmake-$(version)-0tuxmake.noarch.rpm: dist/tuxmake-$(version).tar.gz dist/tuxmake.spec
 	cd dist && \
-	rpmbuild -ta --define "dist tuxmake" --define "_rpmdir $$(pwd)" tuxmake-$(version).tar.gz
+	$(RPMBUILD) -ta --define "dist tuxmake" --define "_rpmdir $$(pwd)" tuxmake-$(version).tar.gz
 	mv $(patsubst dist/%, dist/noarch/%, $@) $@
 	rmdir dist/noarch
 

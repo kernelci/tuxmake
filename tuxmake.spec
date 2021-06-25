@@ -17,7 +17,6 @@ BuildRequires: python3-pip
 BuildRequires: python3-pytest
 BuildRequires: python3-pytest-cov
 BuildRequires: python3-pytest-mock
-BuildRequires: pyproject-rpm-macros
 BuildRequires: wget
 
 BuildArch: noarch
@@ -38,7 +37,6 @@ kernel configurations, and make targets.
 
 %build
 export FLIT_NO_NETWORK=1
-%pyproject_wheel
 make man
 make bash_completion
 
@@ -46,18 +44,20 @@ make bash_completion
 python3 -m pytest test/
 
 %install
-%pyproject_install
+mkdir -p %{buildroot}/usr/share/tuxmake/
+cp -r run tuxmake %{buildroot}/usr/share/tuxmake/
+mkdir -p %{buildroot}/usr/bin
+ln -sf ../share/tuxmake/run %{buildroot}/usr/bin/tuxmake
 mkdir -p %{buildroot}%{_mandir}/man1
 install -m 644 tuxmake.1 %{buildroot}%{_mandir}/man1/
 mkdir -p %{buildroot}/usr/share/bash-completion/completions/
 install -m 644 bash_completion/tuxmake %{buildroot}/usr/share/bash-completion/completions/
 
 %files
+/usr/share/tuxmake
 %{_bindir}/tuxmake
 %{_mandir}/man1/tuxmake.1*
 /usr/share/bash-completion/completions/tuxmake
-%{python3_sitelib}/tuxmake-*.dist-info/
-%{python3_sitelib}/tuxmake/
 
 %doc README.md
 %license LICENSE
