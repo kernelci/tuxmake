@@ -39,11 +39,19 @@ available.
     - **git_branch**: the git branch.
     - **git_commit**: the git commit hash at HEAD.
     - **git_url**: the URL of the `origin` remote.
+- **hardware**: metadata about the build hardware
+    - **cores**: number or cores, as reported by `nproc`.
+    - **ram**: amount of RAM, in megabytes.
+    - **free_disk_space**: amount of disk space available in the build
+      directory, before the build starts, in megabytes.
 - **os**: metadata about the OS used in the build. When using a container
   runtime, this will refer to the OS in the container, and not in the host
   system.
     - **name**: OS name.
     - **version**: OS version.
+- **resources:** resources used by the build
+    - **disk_usage:** amount of disk space used in the kernel build directory,
+      in megabytes (does not include the disk space taken by the source directory).
 - **results**: metadata about the build results
     - **status**: "PASS" or "FAIL" (string).
     - **targets**: key/value with target names as keys. Values are objects with

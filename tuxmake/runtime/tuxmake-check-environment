@@ -50,6 +50,7 @@ sub check_program($) {
 
 sub check_base_image() {
   check_program("bash");
+  check_program("time");
   check_program("bc");
   check_program("bison");
   check_program("bzip2");

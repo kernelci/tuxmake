@@ -235,6 +235,7 @@ class Build:
         self.__logger__ = None
         self.__status__ = {}
         self.__durations__ = {}
+        self.metadata_extractor = MetadataExtractor(self)
         self.metadata = OrderedDict()
         self.cmdline = CommandLine()
 
@@ -560,8 +561,8 @@ class Build:
         }
         self.metadata["tuxmake"] = {"version": __version__}
 
-        extractor = MetadataExtractor(self)
-        self.metadata.update(extractor.extract())
+        extracted = self.metadata_extractor.extract()
+        self.metadata.update(extracted)
 
     def save_metadata(self):
         with (self.output_dir / "metadata.json").open("w") as f:
@@ -600,6 +601,8 @@ class Build:
         properties.
         """
         try:
+            self.metadata_extractor.before_build()
+
             with self.measure_duration("Input validation", metadata="validate"):
                 self.validate()
 
