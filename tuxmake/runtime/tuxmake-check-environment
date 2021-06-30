@@ -128,13 +128,17 @@ sub check_toolchain_image() {
   }
 
   check_compiler($compiler);
-  my $compiler_bin = ($cross_compile && $compiler !~ /clang/) ? ($cross_compile . $compiler) : $compiler;
-  if ($compiler =~ /clang/ && $cross_compile) {
-    my $target = $cross_compile;
-    $target =~ s/-$//;
-    $compiler_bin = "${compiler_bin} --target=${target}";
+  my $compiler_bin = $compiler;
+  if ($cross_compile) {
+    if ($compiler =~ /gcc/) {
+      $compiler_bin = ($cross_compile . $compiler);
+    } else { # llvm or clang*
+      my $target = $cross_compile;
+      $target =~ s/-$//;
+      $compiler_bin = "${compiler} --target=${target}";
+    }
+    check_compiler($compiler_bin)
   }
-  check_compiler($compiler_bin) if ($compiler_bin ne $compiler);
   if ($version && $version =~ /^\d+$/) {
     my $actual_version = `${compiler_bin} -dumpversion`;
     chomp $actual_version;
