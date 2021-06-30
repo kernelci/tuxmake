@@ -117,6 +117,9 @@ sub check_toolchain_image() {
       $version = $LATEST_CLANG_NIGHTLY;
     }
   }
+  if ($compiler eq "llvm") {
+    $compiler = "clang"
+  }
 
   $arch ||= `arch`; chomp $arch;
   my @prefixes = ("");
