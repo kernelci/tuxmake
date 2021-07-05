@@ -300,6 +300,8 @@ class ContainerRuntime(Runtime):
         return super().get_check_environment_command().name
 
     def cleanup(self):
+        if not self.container_id:
+            return
         subprocess.check_call(
             [self.command, "stop", self.container_id], stdout=subprocess.DEVNULL
         )

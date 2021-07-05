@@ -171,6 +171,11 @@ class TestDockerRuntime(TestContainerRuntime):
         assert cmd[0:2] == ["docker", "stop"]
         assert cmd[-1] == container_id
 
+    def test_cleanup_before_container_exists(self, build):
+        runtime = DockerRuntime()
+        assert runtime.container_id is None
+        runtime.cleanup()  # if this doesn't crash we are good
+
     def test_get_command_line(self, build):
         cmd = DockerRuntime().get_command_line(build, ["date"], False)
         assert cmd[0:2] == ["docker", "exec"]
