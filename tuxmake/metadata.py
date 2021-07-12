@@ -35,10 +35,10 @@ class FreeDiskSpace(MetadataItemExtactor):
         return self.free_disk_space
 
 
-class MetadataExtractor:
-    def __init__(self, build):
+class MetadataCollector:
+    def __init__(self, build, handlers=None):
         self.build = build
-        self.handlers = Metadata.all()
+        self.handlers = handlers or Metadata.all()
         self.extractors = {}
         self.init_extractors()
 
@@ -57,7 +57,7 @@ class MetadataExtractor:
         for _, _, extractor in self.each_extractor():
             extractor.before_build()
 
-    def extract(self):
+    def collect(self):
         build = self.build
         compiler = build.toolchain.compiler(build.target_arch)
         metadata_input_data = {
@@ -78,7 +78,7 @@ class MetadataExtractor:
         with stdout.open("w") as f:
             build.run_cmd(["perl", str(script), str(metadata_input)], stdout=f)
         metadata = self.read_json(stdout.read_text())
-        self.extract_extra_metadata(metadata)
+        self.collect_extra_metadata(metadata)
         return metadata
 
     def read_json(self, metadata_json):
@@ -103,8 +103,9 @@ class MetadataExtractor:
 
         return result
 
-    def extract_extra_metadata(self, metadata):
+    def collect_extra_metadata(self, metadata):
         for handler, item, extractor in self.each_extractor():
+            metadata.setdefault(handler, {})
             metadata[handler][item] = extractor.get()
 
 

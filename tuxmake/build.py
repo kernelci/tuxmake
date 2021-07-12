@@ -15,7 +15,7 @@ from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_default_build_dir, get_new_output_dir
 from tuxmake.target import create_target
 from tuxmake.runtime import get_runtime
-from tuxmake.metadata import MetadataExtractor
+from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import BuildDirAlreadyExists
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import UnrecognizedSourceTree
@@ -235,7 +235,7 @@ class Build:
         self.__logger__ = None
         self.__status__ = {}
         self.__durations__ = {}
-        self.metadata_extractor = MetadataExtractor(self)
+        self.metadata_collector = MetadataCollector(self)
         self.metadata = OrderedDict()
         self.cmdline = CommandLine()
 
@@ -533,7 +533,7 @@ class Build:
         s = [info.failed for info in self.status.values()]
         return s and True in set(s)
 
-    def extract_metadata(self):
+    def collect_metadata(self):
         self.metadata["build"] = {
             "targets": [t.name for t in self.targets],
             "target_arch": self.target_arch.name,
@@ -561,7 +561,7 @@ class Build:
         }
         self.metadata["tuxmake"] = {"version": __version__}
 
-        extracted = self.metadata_extractor.extract()
+        extracted = self.metadata_collector.collect()
         self.metadata.update(extracted)
 
     def save_metadata(self):
@@ -601,7 +601,7 @@ class Build:
         properties.
         """
         try:
-            self.metadata_extractor.before_build()
+            self.metadata_collector.before_build()
 
             with self.measure_duration("Input validation", metadata="validate"):
                 self.validate()
@@ -618,7 +618,7 @@ class Build:
                         self.copy_artifacts(target)
 
                 with self.measure_duration("Metadata Extraction", metadata="metadata"):
-                    self.extract_metadata()
+                    self.collect_metadata()
         finally:
             with self.measure_duration("Cleanup", metadata="cleanup"):
                 self.terminate()

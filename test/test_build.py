@@ -44,7 +44,7 @@ def Popen(mocker, check_artifacts):
 # pretty slow.
 @pytest.fixture(autouse=True)
 def disable_metadata(mocker):
-    return mocker.patch("tuxmake.build.Build.extract_metadata")
+    return mocker.patch("tuxmake.build.Build.collect_metadata")
 
 
 def args(called):
