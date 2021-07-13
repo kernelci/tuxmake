@@ -14,7 +14,7 @@ ANN       := true
 NOSTDOUT  :=
 else
 Q         := @
-LOG       := > log/$@.log 2>&1 || (cat log/$@.log; false)
+LOG       = > log/$@.log 2>&1 || (cat log/$@.log; false)
 NOSTDOUT  := > /dev/null
 endif
 
