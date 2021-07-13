@@ -2,6 +2,7 @@ SRC = $(CURDIR)
 O ?= $(CURDIR)
 ARCH ?= $(shell basename $$(readlink -f $(SRC)/arch/$$(uname -m).mk) .mk)
 VERSION := $(shell uname -r)
+RELEASE := $(VERSION)+
 
 ifeq ($(LLVM), )
 HOSTCC = gcc
@@ -42,6 +43,10 @@ all: vmlinux $(IMAGE)
 kernelversion:
 	$(call maybefail,kernelversion)
 	@echo $(VERSION)
+
+kernelrelease:
+	$(call maybefail,kernelrelease)
+	@echo $(RELEASE)
 
 define maybefail
 	@if [ "$(filter $(1),$(FAIL))" = "$(1)" ]; then echo "error: target $(1) failed" >&2; exit 1; fi
