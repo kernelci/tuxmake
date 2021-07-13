@@ -66,6 +66,7 @@ available.
     - **cache_hits**: number of cache hits (integer).
     - **cache_misses**: number of cache misses (integer).
 - **source**: metadata about the source tree.
+    - **kernelrelease**: output of `make --silent kernelrelease`
     - **kernelversion**: output of `make --silent kernelversion`
 - **system_map**: metadata about `System.map`.
     - **text_offset**: offset of the .text section in hexadecimal (string).

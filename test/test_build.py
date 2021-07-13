@@ -658,6 +658,11 @@ class TestMetadata:
             is not None
         )
 
+    def test_kernelrelease(self, metadata):
+        assert metadata["source"]["kernelrelease"].startswith(
+            metadata["source"]["kernelversion"]
+        )
+
     def test_metadata_file(self, metadata):
         assert type(metadata) is dict
 
