@@ -96,6 +96,7 @@ class Image:
         stream.write("\t$(Q)$(docker) build \\\n")
         for k, v in self.args:
             stream.write(f"\t\t--build-arg={k}={v} \\\n")
+        stream.write(f"\t\t$(docker_build_args) \\\n")
         stream.write(f"\t\t--file=Dockerfile.{self.kind} \\\n")
         stream.write(f"\t\t--tag=$(PROJECT)/{self.name}:latest$(TAG) \\\n")
         stream.write("\t\t. $(LOG)\n\n")
