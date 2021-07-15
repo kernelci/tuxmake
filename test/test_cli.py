@@ -158,6 +158,30 @@ class TestImage:
         assert "docker_image" not in builder.call_args[1].keys()
 
 
+class TestImageRegistry:
+    @pytest.fixture(autouse=True)
+    def environment(self, monkeypatch):
+        env = dict(os.environ)
+        monkeypatch.setattr(os, "environ", env)
+        return env
+
+    def test_not_passed_to_builder_class(self, builder):
+        tuxmake("--image-registry=localhost")
+        assert "image_registry" not in builder.call_args[1].keys()
+
+    def test_sets_env_variable(self, environment):
+        tuxmake("--image-registry=localhost")
+        assert environment["TUXMAKE_IMAGE_REGISTRY"] == "localhost"
+
+    def test_implies_runtime_docker(self, builder):
+        tuxmake("--image-registry=localhost")
+        assert args(builder).runtime == "docker"
+
+    def test_does_not_override_explicit_runtime(self, builder):
+        tuxmake("--image-registry=localhost", "--runtime=podman")
+        assert args(builder).runtime == "podman"
+
+
 class TestVerbosity:
     def test_verbose(self, builder):
         tuxmake("--verbose")

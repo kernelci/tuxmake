@@ -127,6 +127,11 @@ def main(*origargv):
             options.runtime = "docker"
         os.environ["TUXMAKE_IMAGE"] = options.image
 
+    if options.image_registry:
+        if not options.runtime:
+            options.runtime = "docker"
+        os.environ["TUXMAKE_IMAGE_REGISTRY"] = options.image_registry
+
     if options.targets:
         key_values = [arg for arg in options.targets if "=" in arg]
         for kv in key_values:
@@ -146,6 +151,7 @@ def main(*origargv):
             "color",
             "docker_image",
             "image",
+            "image_registry",
             "shell",
             "before_hooks",
             "after_hooks",

@@ -119,6 +119,10 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         help=f"Runtime to use for the builds. By default, builds are run natively on the build host. Supported: {', '.join(supported.runtimes)}.",
     )
     buildenv.add_argument(
+        "--image-registry",
+        help="Explicit image registry to use for container-based runtimes. Implies --runtime=docker if no runtime is explicit specified. (default: none, meaning to just use docker.io).",
+    )
+    buildenv.add_argument(
         "-i",
         "--image",
         help="Image to build with, for container-based runtimes (docker, podman etc). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. Implies --runtime=docker if no runtime is explicit specified. (default: tuxmake-provided images).",
