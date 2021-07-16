@@ -271,6 +271,25 @@ def test_concurrency_set(linux, Popen):
     assert "--jobs=99" in args(Popen)
 
 
+def test_fail_fast(linux, mocker, Popen):
+    b = Build(tree=linux, targets=["config"], fail_fast=True)
+    b.build(b.targets[0])
+    assert "--keep-going" not in args(Popen)
+
+
+def test_fail_fast_aborts_build(linux, monkeypatch):
+    """
+    `dtbs` do not depend on `kernel`; normally, `dtbs` will still be built even
+    if the kernel build fails. When fail_fast is set, though, the build stops
+    after the first target fails, regardless of dependencies.
+    """
+    b = Build(tree=linux, fail_fast=True, target_arch="arm64")
+    monkeypatch.setenv("FAIL", "kernel")
+    b.run()
+    assert b.status["default"].failed
+    assert b.status["dtbs"].skipped
+
+
 def test_verbose(linux, mocker, Popen):
     b = Build(tree=linux, targets=["config"], verbose=True)
     b.build(b.targets[0])

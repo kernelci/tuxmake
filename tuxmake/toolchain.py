@@ -5,6 +5,7 @@ from tuxmake.exceptions import UnsupportedToolchain
 class Toolchain(ConfigurableObject):
     basedir = "toolchain"
     exception = UnsupportedToolchain
+    config_aliases = {"rust": "rustgcc"}
 
     def __init__(self, name):
         parts = name.split("-")

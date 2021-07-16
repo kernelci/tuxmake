@@ -129,4 +129,27 @@ RUN apt-get install \
           grep -E '^gcc-[0-9]*-(.*)-base(:.*)*$' | grep -v -- -cross-base | \
           sed -e 's/^gcc-\([0-9]*\)-/gcc-\1-plugin-dev-/; s/-base//;')
 
+
+ARG INSTALL_RUST
+ARG TUXMAKE_RUST_DIST=https://static.rust-lang.org/dist
+ARG TUXMAKE_RUST_RELEASE=2021-06-23
+
+RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
+    export TUXMAKE_RUST_FILENAME=rust-beta-$(uname -m)-unknown-linux-gnu; \
+    export TUXMAKE_RUST_TARBALL=${TUXMAKE_RUST_FILENAME}.tar.gz; \
+    export TUXMAKE_RUST_SRC_FILENAME=rustc-beta-src; \
+    export TUXMAKE_RUST_SRCTARBALL=${TUXMAKE_RUST_SRC_FILENAME}.tar.gz; \
+    wget --progress=dot:giga ${TUXMAKE_RUST_DIST}/${TUXMAKE_RUST_RELEASE}/${TUXMAKE_RUST_TARBALL} \
+    && wget --progress=dot:giga ${TUXMAKE_RUST_DIST}/${TUXMAKE_RUST_RELEASE}/${TUXMAKE_RUST_SRCTARBALL} \
+    && tar xaf ${TUXMAKE_RUST_TARBALL} -C /opt/ \
+    && cd /opt/${TUXMAKE_RUST_FILENAME} \
+    && ./install.sh --without=rust-docs \
+    && cd - \
+    && mkdir /usr/local/lib/rustlib/src \
+    && tar xaf ${TUXMAKE_RUST_SRCTARBALL} -C /usr/local/lib/rustlib/src  \
+    && mv /usr/local/lib/rustlib/src/rustc-beta-src /usr/local/lib/rustlib/src/rust  \
+    && rm -rf ${TUXMAKE_RUST_TARBALL} ${TUXMAKE_RUST_SRCTARBALL} /opt/${TUXMAKE_RUST_FILENAME} \
+    && cargo install --root /usr/local --locked --version 0.56.0 bindgen \
+    && rm -rf /root/.cargo
+
 # vim: ft=dockerfile

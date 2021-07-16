@@ -102,6 +102,17 @@ sub check_compiler_libc($) {
   check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n", !$libc_compile_fatal);
 }
 
+sub check_rust() {
+  check_program("rustc");
+  check_program("cargo");
+  check_program("rustdoc");
+  check_program("rustfmt");
+  check_program("clippy-driver");
+  check_program("bindgen");
+  my $tmpdir = tempdir(CLEANUP => 1);
+  check_run("rustc and cargo work", "cd ${tmpdir} && cargo new foobar 2> /dev/null && cd foobar && cargo run", 0);
+}
+
 sub check_toolchain_image() {
   my ($arch, $compiler, $version);
   if ($image =~ /^(.*)_(.*)$/) {
@@ -120,38 +131,47 @@ sub check_toolchain_image() {
   if ($compiler eq "llvm") {
     $compiler = "clang"
   }
+  my @compilers = ($compiler);
+
+  if ($compiler eq "rust") {
+    check_rust();
+    @compilers = ("gcc", "clang");
+  }
 
   $arch ||= `arch`; chomp $arch;
   my @prefixes = ("");
   push @prefixes, $cross_compile if $cross_compile;
-  for my $prefix (@prefixes) {
-    check_program($prefix . $compiler) unless ($prefix ne "" && $compiler =~ /clang/);
-    check_program($prefix . "ld");
-    check_program($prefix . "as");
-  }
 
-  check_compiler($compiler);
-  my $compiler_bin = $compiler;
-  if ($cross_compile) {
-    if ($compiler =~ /gcc/) {
-      $compiler_bin = ($cross_compile . $compiler);
-    } else { # llvm or clang*
-      my $target = $cross_compile;
-      $target =~ s/-$//;
-      $compiler_bin = "${compiler} --target=${target}";
+  for $compiler (@compilers) {
+    for my $prefix (@prefixes) {
+      check_program($prefix . $compiler) unless ($prefix ne "" && $compiler =~ /clang/);
+      check_program($prefix . "ld");
+      check_program($prefix . "as");
     }
-    check_compiler($compiler_bin)
-  }
-  if ($version && $version =~ /^\d+$/) {
-    my $actual_version = `${compiler_bin} -dumpversion`;
-    chomp $actual_version;
-    check("${compiler_bin} version is ${version}", $actual_version =~ qr/^${version}(\.\d+)*/, 0);
-  }
-  check_compiler("${compiler_bin} -use-ld=lld" ) if ($compiler =~ /clang/);
 
-  if ($compiler =~ /clang/) {
-    check_program("ld.lld");
-    check_program("llvm-as");
+    check_compiler($compiler);
+    my $compiler_bin = $compiler;
+    if ($cross_compile) {
+      if ($compiler =~ /gcc/) {
+        $compiler_bin = ($cross_compile . $compiler);
+      } else { # llvm or clang*
+        my $target = $cross_compile;
+        $target =~ s/-$//;
+        $compiler_bin = "${compiler} --target=${target}";
+      }
+      check_compiler($compiler_bin)
+    }
+    if ($version && $version =~ /^\d+$/) {
+      my $actual_version = `${compiler_bin} -dumpversion`;
+      chomp $actual_version;
+      check("${compiler_bin} version is ${version}", $actual_version =~ qr/^${version}(\.\d+)*/, 0);
+    }
+    check_compiler("${compiler_bin} -use-ld=lld" ) if ($compiler =~ /clang/);
+
+    if ($compiler =~ /clang/) {
+      check_program("ld.lld");
+      check_program("llvm-as");
+    }
   }
 }
 

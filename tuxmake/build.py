@@ -162,6 +162,7 @@ class Build:
         kernel_image=None,
         jobs=None,
         runtime=None,
+        fail_fast=False,
         verbose=False,
         quiet=False,
         debug=False,
@@ -224,6 +225,11 @@ class Build:
                 f"{self.target_arch}/{self.toolchain}"
             )
 
+        self.fail_fast = fail_fast
+        if self.fail_fast:
+            self.keep_going = []
+        else:
+            self.keep_going = ["--keep-going"]
         self.verbose = verbose
         self.quiet = quiet
         self.debug = debug
@@ -404,7 +410,8 @@ class Build:
             return (
                 ["make"]
                 + self.get_silent()
-                + ["--keep-going", f"--jobs={self.jobs}", f"O={self.build_dir}"]
+                + self.keep_going
+                + [f"--jobs={self.jobs}", f"O={self.build_dir}"]
                 + self.make_args
             )
         elif part == "{tar_caf}":
@@ -462,9 +469,15 @@ class Build:
         return mvars
 
     def build_all_targets(self):
+        skip_all = False
         for target in self.targets:
             start = time.time()
-            result = self.build(target)
+            if skip_all:
+                result = BuildInfo("SKIP")
+            else:
+                result = self.build(target)
+                if self.fail_fast and result.failed:
+                    skip_all = True
             result.duration = time.time() - start
             self.status[target.name] = result
 

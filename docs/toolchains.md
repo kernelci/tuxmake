@@ -27,3 +27,21 @@ This toolchain does a full LLVM build, i.e. one with `LLVM=1`: compile with
 clang, and assemble/link with the LLVM tools. Specify `llvm-N` for requesting
 specific LLVM versions. As with `clang`, the `llvm-nightly` and `llvm-android`
 are also available.
+
+## rustgcc
+
+This toolchain uses `gcc` as C compiler, and also includes the tools required
+to build the kernel with [Rust support](https://github.com/Rust-for-Linux).
+
+Alias: `rust`
+
+## rustclang
+
+This toolchain uses `clang` as C compiler, and also includes the tools required
+to build the kernel with [Rust support](https://github.com/Rust-for-Linux).
+
+## rustllvm
+
+This toolchain does a full LLVM build for C code (i.e. `LLVM=1`), and also
+includes the tools required to build the kernel with
+[Rust support](https://github.com/Rust-for-Linux).
