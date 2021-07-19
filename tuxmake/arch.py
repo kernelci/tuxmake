@@ -7,7 +7,7 @@ from tuxmake.exceptions import UnsupportedArchitecture
 class Architecture(ConfigurableObject):
     basedir = "arch"
     exception = UnsupportedArchitecture
-    config_aliases = {"aarch64": "arm64", "amd64": "x86_64"}
+    config_aliases = {"aarch64": "arm64", "amd64": "x86_64", "armv8l": "arm"}
 
     def __init_config__(self):
         self.targets = self.config["targets"]
