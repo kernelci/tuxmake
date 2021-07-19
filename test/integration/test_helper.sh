@@ -47,6 +47,12 @@ tearDown() {
 }
 
 run() {
+  if isSkipping; then
+    touch stdout
+    touch stderr
+    rc=0
+    return
+  fi
   if [ "${TMV:-}" = 1 ]; then
     echo '    $' "$@"
   fi
@@ -80,4 +86,14 @@ docker_in_docker() {
 
 program_installed() {
   /usr/bin/which "${@}" > /dev/null
+}
+
+skip_if() {
+  if "$@" > /dev/null; then
+    startSkipping
+  fi
+}
+
+not() {
+  ! "$@"
 }

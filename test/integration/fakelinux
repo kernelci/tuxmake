@@ -55,10 +55,8 @@ test_clang_arm64() {
 }
 
 test_llvm_x86_64() {
-  if ! program_installed ld.lld; then
-    echo "I: skipping test as ld.lld is not installed"
-    return
-  fi
+  skip_if not program_installed ld.lld
+
   run tuxmake --target-arch=x86_64 --toolchain=llvm
   assertTrue 'LLVM=1 in output' 'grep LLVM=1 stdout'
   assertEquals 'exits with 0' 0 "$rc"
@@ -68,10 +66,8 @@ test_llvm_x86_64() {
 }
 
 test_llvm_arm64() {
-  if ! program_installed ld.lld; then
-    echo "I: skipping test as ld.lld is not installed"
-    return
-  fi
+  skip_if not program_installed ld.lld
+
   run tuxmake --target-arch=arm64 --toolchain=llvm
   assertTrue 'LLVM=1 in output' 'grep LLVM=1 stdout'
   assertEquals 'exits with 0' 0 "$rc"
@@ -188,14 +184,9 @@ test_custom_kernel_image() {
 }
 
 test_no_network_access() {
-  if docker_runtime; then
-    echo "I: test skipped, not supported when using the docker runtime"
-    return
-  fi
-  if under_docker;then
-    echo "I: test skipped, not supported when running inside docker"
-    return
-  fi
+  skip_if docker_runtime
+  skip_if under_docker
+
   sed -i -e 's#\S*call maybefail,debugkernel.*#wget http://tuxmake.org/#' Makefile
   run tuxmake
   assertFalse 'wget needs to be installed in the build environment' 'grep "wget: Command not found" stdout'
@@ -204,34 +195,26 @@ test_no_network_access() {
 }
 
 test_check_environment() {
-  if docker_in_docker; then
-      echo "I: test skipped, not supported when using the docker runtime under docker"
-    return
-  fi
+  skip_if docker_in_docker
+
   run tuxmake --check-environment
   assertEquals 0 "${rc}"
 }
 
 test_check_environment_fails() {
-  if docker_in_docker; then
-      echo "I: test skipped, not supported when using the docker runtime under docker"
-    return
-  fi
+  skip_if docker_in_docker
+
   export TUXMAKE_WHICH_MISSING=make
   run tuxmake --check-environment
   assertNotEquals 0 "${rc}"
 }
 
 __test_reproducible_builds__() {
-  if ! command -v diffoscope > /dev/null; then
-    echo "I: diffoscope is not installed, but needed for this test; skipping"
-    return
-  fi
+  skip_if not command -v diffoscope
+
   diffoscope_version="$(diffoscope --version | awk '{print($2)}')"
-  if [ "${diffoscope_version}" -lt 113 ]; then
-    echo "I: diffoscope version ${diffoscope_version} is tool old for this test; skipping"
-    return
-  fi
+  skip_if [ "${diffoscope_version}" -lt 113 ]
+
   git init --quiet
   git config user.name 'Foo Bar'
   git config user.email 'foo.bar@example.com'
