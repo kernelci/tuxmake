@@ -285,7 +285,7 @@ rpm:
   stage: integration-tests
   image: fedora
   script:
-    - dnf install -y dnf-plugins-core rpm-build crontabs shunit2 gcc-x86_64-linux-gnu gcc-aarch64-linux-gnu ccache clang which
+    - dnf install -y dnf-plugins-core rpm-build crontabs shunit2 gcc-x86_64-linux-gnu gcc-aarch64-linux-gnu ccache clang lld which
     - dnf builddep -y tuxmake.spec
     - make rpm
     - rpm --install dist/tuxmake*.rpm
@@ -301,7 +301,7 @@ deb:
   script:
     - apt-get update
     - apt-get install -qy auto-apt-proxy
-    - apt-get install -qy shunit2 gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu ccache clang
+    - apt-get install -qy shunit2 gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu ccache clang lld
     - apt-get build-dep -qy .
     - make deb
     - apt-get install -qy ./dist/tuxmake*.deb
