@@ -89,7 +89,10 @@ program_installed() {
 }
 
 skip_if() {
-  if "$@" > /dev/null; then
+  if isSkipping; then
+    return
+  fi
+  if "$@" > /dev/null 2>&1; then
     startSkipping
   fi
 }
