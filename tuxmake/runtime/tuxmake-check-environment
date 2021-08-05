@@ -9,7 +9,7 @@ GetOptions(
   "libc-compile-fatal" => \$libc_compile_fatal,
 ) or exit(1);
 
-my $LATEST_CLANG_NIGHTLY = "13";
+my $LATEST_CLANG_NIGHTLY = "14";
 
 my $image = shift;
 my $cross_compile = shift;
