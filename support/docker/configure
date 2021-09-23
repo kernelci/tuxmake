@@ -119,10 +119,6 @@ class BaseImage(Image):
         return f"{self.base}"
 
 
-class BaseLlvmImage(BaseImage):
-    kind = "base-llvm"
-
-
 class CiImage(BaseImage):
     kind = "ci"
     extra_lists = ["ci"]
