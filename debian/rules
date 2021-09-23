@@ -17,7 +17,7 @@ endif
 # FIXME this should not be necessary with PYBUILD_TEST_PYTEST = 1 above
 # but I can't get it to work for some reason.
 override_dh_auto_test:
-	for p in $$(py3versions --supported); do $$p -m pytest; done
+	for p in $$(py3versions --supported); do $$p -m pytest test/; done
 
 override_dh_auto_build:
 	dh_auto_build
