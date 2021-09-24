@@ -52,16 +52,6 @@ RUN apt-get update \
 RUN true \
     && useradd --create-home tuxmake \
     && ln -s /usr/bin/python3 /usr/local/bin/python \
-    && if grep -q '^deb .* testing main' /etc/apt/sources.list; then \
-        echo "APT::Default-Release \"testing\";" > /etc/apt/apt.conf.d/00release; \
-        sed -e  '/^deb .* testing main/ !d; s/testing/unstable/' /etc/apt/sources.list \
-        > /etc/apt/sources.list.d/unstable.list && \
-        apt-get update \
-        && apt-get install --assume-yes --no-install-recommends --option=debug::pkgProblemResolver=yes \
-        -t unstable libssl1.1 libssl-dev; fi \
-    && if grep -q '^deb .* \(testing\|sid\|unstable\) main' /etc/apt/sources.list; then \
-        sed -e  '/^deb .* \(testing\|sid\|unstable\) main/ !d; s/\(testing\|sid\|unstable\)/experimental/' /etc/apt/sources.list \
-        > /etc/apt/sources.list.d/experimental.list; fi \
     && true
 
 # vim: ft=dockerfile
