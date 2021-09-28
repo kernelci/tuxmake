@@ -517,10 +517,10 @@ class Build:
         return ret
 
     def copy_artifacts(self, target):
-        if not self.status[target.name].passed:
-            return
         self.artifacts[target.name] = []
         for origdest, src in target.find_artifacts(self.build_dir):
+            if not src.exists():
+                continue
             dest = self.output_dir / origdest
             shutil.copy(src, Path(self.output_dir / dest))
             self.artifacts[target.name].append(origdest)

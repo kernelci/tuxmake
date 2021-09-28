@@ -233,6 +233,13 @@ def test_output_dir(linux, output_dir, kernel):
     assert "arch" not in artifacts
 
 
+def test_copies_artifacts_from_failed_targets(linux, output_dir, mocker):
+    mocker.patch("tuxmake.build.Build.check_artifacts", return_value=False)
+    build(tree=linux, output_dir=output_dir, targets=["config"])
+    artifacts = [str(f.name) for f in output_dir.glob("*")]
+    assert "config" in artifacts
+
+
 def test_saves_log(linux):
     result = build(tree=linux)
     artifacts = [str(f.name) for f in result.output_dir.glob("*")]
