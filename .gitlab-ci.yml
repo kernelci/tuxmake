@@ -1,7 +1,7 @@
 include: '/support/docker/gitlab-ci.yml'
 
 image:
-  name: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-20.04
+  name: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
 
 variables:
   LANG: C.UTF-8
