@@ -96,139 +96,150 @@ def test_unsupported_target(linux):
         build(tree=linux, targets=["unknown-target"])
 
 
-def test_kconfig_default(linux, Popen):
-    b = Build(tree=linux, targets=["config"])
-    b.build(b.targets[0])
-    assert "defconfig" in args(Popen)
+class TestKconfig:
+    def test_kconfig_default(self, linux, Popen):
+        b = Build(tree=linux, targets=["config"])
+        b.build(b.targets[0])
+        assert "defconfig" in args(Popen)
 
+    def test_kconfig_named(self, linux, Popen):
+        b = Build(tree=linux, targets=["config"], kconfig="fooconfig")
+        b.build(b.targets[0])
+        assert "fooconfig" in args(Popen)
 
-def test_kconfig_named(linux, Popen):
-    b = Build(tree=linux, targets=["config"], kconfig="fooconfig")
-    b.build(b.targets[0])
-    assert "fooconfig" in args(Popen)
+    def test_kconfig_named_invalid(self, linux, mocker):
+        with pytest.raises(tuxmake.exceptions.UnsupportedKconfig):
+            build(tree=linux, targets=["config"], kconfig="foobar")
 
+    def test_kconfig_url(self, linux, mocker, output_dir):
+        response = mocker.MagicMock()
+        response.getcode.return_value = 200
+        response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
+        mocker.patch("urllib.request.urlopen", return_value=response)
 
-def test_kconfig_named_invalid(linux, mocker):
-    with pytest.raises(tuxmake.exceptions.UnsupportedKconfig):
-        build(tree=linux, targets=["config"], kconfig="foobar")
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig="https://example.com/config.txt",
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
 
+    def test_kconfig_url_not_found(self, linux, mocker):
+        mocker.patch(
+            "urllib.request.urlopen",
+            side_effect=urllib.error.HTTPError(
+                "https://example.com/config.txt", 404, "Not Found", {}, None
+            ),
+        )
 
-def test_kconfig_url(linux, mocker, output_dir):
-    response = mocker.MagicMock()
-    response.getcode.return_value = 200
-    response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
-    mocker.patch("urllib.request.urlopen", return_value=response)
+        with pytest.raises(tuxmake.exceptions.InvalidKConfig):
+            build(
+                tree=linux, targets=["config"], kconfig="https://example.com/config.txt"
+            )
 
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig="https://example.com/config.txt",
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
+    def test_kconfig_localfile(self, linux, tmp_path, output_dir):
+        extra_config = tmp_path / "extra_config"
+        extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig=str(extra_config),
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
 
+    def test_kconfig_add_url(self, linux, mocker, output_dir):
+        response = mocker.MagicMock()
+        response.getcode.return_value = 200
+        response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
+        mocker.patch("urllib.request.urlopen", return_value=response)
 
-def test_kconfig_url_not_found(linux, mocker):
-    mocker.patch(
-        "urllib.request.urlopen",
-        side_effect=urllib.error.HTTPError(
-            "https://example.com/config.txt", 404, "Not Found", {}, None
-        ),
-    )
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig="defconfig",
+            kconfig_add=["https://example.com/config.txt"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
 
-    with pytest.raises(tuxmake.exceptions.InvalidKConfig):
-        build(tree=linux, targets=["config"], kconfig="https://example.com/config.txt")
+    def test_kconfig_add_localfile(self, linux, tmp_path, output_dir):
+        extra_config = tmp_path / "extra_config"
+        extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=[str(extra_config)],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
 
+    def test_kconfig_add_inline(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_FOO=y"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO=y\n" in config.read_text()
 
-def test_kconfig_localfile(linux, tmp_path, output_dir):
-    extra_config = tmp_path / "extra_config"
-    extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
-    build(
-        tree=linux, targets=["config"], kconfig=str(extra_config), output_dir=output_dir
-    )
-    config = output_dir / "config"
-    assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
+    def test_kconfig_add_inline_not_set(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["# CONFIG_FOO is not set"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO is not set\n" in config.read_text()
 
+    def test_kconfig_add_inline_set_to_no(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_FOO=n"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO=n\n" in config.read_text()
 
-def test_kconfig_add_url(linux, mocker, output_dir):
-    response = mocker.MagicMock()
-    response.getcode.return_value = 200
-    response.read.return_value = b"CONFIG_FOO=y\nCONFIG_BAR=y\n"
-    mocker.patch("urllib.request.urlopen", return_value=response)
+    def test_kconfig_add_in_tree(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["kvm_guest.config", "qemu-gdb.config"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert ("CONFIG_KVM_GUEST=y") in config.read_text()
+        assert ("CONFIG_DEBUG_INFO=y") in config.read_text()
 
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig="defconfig",
-        kconfig_add=["https://example.com/config.txt"],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_FOO=y\nCONFIG_BAR=y\n" in config.read_text()
+    def test_kconfig_add_invalid(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
+            build(tree=linux, targets=["config"], kconfig_add=["foo"])
 
+    def test_kconfig_validation(self, linux):
+        result = build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_XOR_1=y", "CONFIG_XOR_2=y"],
+        )
+        assert result.failed
+        assert result.status["config"].failed
 
-def test_kconfig_add_localfile(linux, tmp_path, output_dir):
-    extra_config = tmp_path / "extra_config"
-    extra_config.write_text("CONFIG_XYZ=y\nCONFIG_ABC=m\n")
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig_add=[str(extra_config)],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_XYZ=y\nCONFIG_ABC=m\n" in config.read_text()
-
-
-def test_kconfig_add_inline(linux, output_dir):
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig_add=["CONFIG_FOO=y"],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_FOO=y\n" in config.read_text()
-
-
-def test_kconfig_add_inline_not_set(linux, output_dir):
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig_add=["# CONFIG_FOO is not set"],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_FOO is not set\n" in config.read_text()
-
-
-def test_kconfig_add_inline_set_to_no(linux, output_dir):
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig_add=["CONFIG_FOO=n"],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert "CONFIG_FOO=n\n" in config.read_text()
-
-
-def test_kconfig_add_in_tree(linux, output_dir):
-    build(
-        tree=linux,
-        targets=["config"],
-        kconfig_add=["kvm_guest.config", "qemu-gdb.config"],
-        output_dir=output_dir,
-    )
-    config = output_dir / "config"
-    assert ("CONFIG_KVM_GUEST=y") in config.read_text()
-    assert ("CONFIG_DEBUG_INFO=y") in config.read_text()
-
-
-def test_kconfig_add_invalid(linux):
-    with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
-        build(tree=linux, targets=["config"], kconfig_add=["foo"])
+    def test_kconfig_validation_is_not_set(self, linux):
+        result = build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_SHOULD_NOT_BE_SET=n"],
+        )
+        assert result.passed
 
 
 def test_output_dir(linux, output_dir, kernel):
@@ -237,6 +248,13 @@ def test_output_dir(linux, output_dir, kernel):
     assert "config" in artifacts
     assert kernel in artifacts
     assert "arch" not in artifacts
+
+
+def test_copies_artifacts_from_failed_targets(linux, output_dir, mocker):
+    mocker.patch("tuxmake.build.Build.check_artifacts", return_value=False)
+    build(tree=linux, output_dir=output_dir, targets=["config"])
+    artifacts = [str(f.name) for f in output_dir.glob("*")]
+    assert "config" in artifacts
 
 
 def test_saves_log(linux):

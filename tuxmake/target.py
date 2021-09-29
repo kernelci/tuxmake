@@ -54,6 +54,9 @@ class Target(ConfigurableObject):
     def prepare(self):
         pass
 
+    def check(self):
+        return True
+
     def find_artifacts(self, build_dir: Path) -> List[Tuple[str, Path]]:
         results = []
         for dest, src in self.artifacts.items():
@@ -77,11 +80,16 @@ class Target(ConfigurableObject):
 class Config(Target):
     def __init_config__(self):
         super().__init_config__()
+        self.inline_fragments = []
+
+    @property
+    def dot_config(self):
+        return self.build.build_dir / ".config"
 
     def prepare(self):
         olddefconfig = False
         build_dir = self.build.build_dir
-        config = build_dir / ".config"
+        config = self.dot_config
         conf = self.build.kconfig
         if config.exists():
             return
@@ -101,13 +109,25 @@ class Config(Target):
         for i in range(len(kconfig_add)):
             frag = kconfig_add[i]
             fragfile = build_dir / f"{i}.config"
-            if (
-                self.handle_url(fragfile, frag)
-                or self.handle_local_file(fragfile, frag)
-                or self.handle_inline_fragment(fragfile, frag)
-            ):
-                merge.append(str(fragfile))
-                self.build.log(f"# {frag} -> {fragfile}")
+
+            handlers = (
+                (self.handle_url, False),
+                (self.handle_local_file, False),
+                (self.handle_inline_fragment, True),
+            )
+
+            handled = False
+            for handler, inline in handlers:
+                if handler(fragfile, frag):
+                    if inline:
+                        self.inline_fragments.append(frag)
+                    merge.append(str(fragfile))
+                    self.build.log(f"# {frag} -> {fragfile}")
+                    handled = True
+                    break
+
+            if handled:
+                continue
             elif self.handle_in_tree_config(frag):
                 pass
             else:
@@ -126,6 +146,25 @@ class Config(Target):
             olddefconfig = True
         if olddefconfig:
             self.commands.append(["{make}", "olddefconfig"])
+
+    def check(self):
+        if not self.inline_fragments:
+            return True
+
+        found = []
+        with self.dot_config.open() as f:
+            for line in f.readlines():
+                for frag in self.inline_fragments:
+                    text = re.sub(r"^(CONFIG_\w*)=n$", r"# \1 is not set", frag)
+                    if re.match(f"^{text}", line):
+                        found.append(frag)
+        not_found = set(self.inline_fragments) - set(found)
+        if not_found:
+            for frag in not_found:
+                self.build.log(f"E: {frag} not found in {self.dot_config}!")
+            return False
+
+        return True
 
     def handle_url(self, config, url):
         if not url.startswith("http://") and not url.startswith("https://"):
