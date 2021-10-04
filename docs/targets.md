@@ -133,7 +133,3 @@ This target builds the cpupower program and libraries, from
 This target builds the perf tool, from `tools/perf`. The resulting artifact is
 a tarball named `perf.tar.gz` that can be extracted in a rootfs to provide
 `perf`, `trace`, and it plugins.
-
-## check
-
-This target runs a sparse check, `C=1`.
