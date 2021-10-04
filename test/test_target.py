@@ -31,6 +31,14 @@ def test_comparison(build):
     assert t1 in [t2]
 
 
+class TestInstantiateAll:
+    @pytest.mark.parametrize("target_name", Target.supported())
+    def test_instantiate(self, build, target_name):
+        target = Target(target_name, build)
+        assert type(target.commands) is list
+        assert type(target.artifacts) is dict
+
+
 class TestConfig:
     def test_name(self, config):
         assert config.name == "config"

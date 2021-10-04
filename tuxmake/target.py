@@ -34,12 +34,15 @@ class Target(ConfigurableObject):
         self.commands = self.__split_cmds__("target", "commands")
         self.kconfig_add = self.__split_kconfigs__()
         try:
-            self.artifacts = self.config["artifacts"]
+            self.artifacts = dict(self.config["artifacts"])
         except KeyError:
             mapping = self.build.target_overrides
-            key = mapping[self.name]
-            value = self.target_arch.artifacts[self.name].format(**mapping)
-            self.artifacts = {key: value}
+            if mapping and self.name in mapping:
+                key = mapping[self.name]
+                value = self.target_arch.artifacts[self.name].format(**mapping)
+                self.artifacts = {key: value}
+            else:
+                self.artifacts = {}
 
     def __str__(self):
         return self.name
