@@ -457,6 +457,11 @@ class TestDebugKernel:
         assert "vmlinux.xz" in artifacts
         assert "System.map" in artifacts
 
+    def test_reuse_build_directory(self, linux, tmp_path):
+        build(tree=linux, targets=["config", "debugkernel"], build_dir=tmp_path)
+        r = build(tree=linux, targets=["config", "debugkernel"], build_dir=tmp_path)
+        assert r.passed
+
 
 class TestRunCmd:
     def test_pass(self, linux):
