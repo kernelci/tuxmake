@@ -11,7 +11,7 @@ To install TuxMake on your system globally:
 sudo pip3 install -U tuxmake
 ```
 
-To install tuxbuild to your home directory at ~/.local/bin:
+To install tuxmake to your home directory at ~/.local/bin:
 
 ```
 pip3 install -U --user tuxmake
