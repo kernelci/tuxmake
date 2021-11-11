@@ -48,6 +48,12 @@ RUN apt-get update \
         zstd \
         xz-utils
 
+RUN wget -O /etc/apt/trusted.gpg.d/tuxmake.gpg \
+        https://tuxmake.org/packages/signing-key.gpg \
+    && echo 'deb https://tuxmake.org/packages/ ./' > /etc/apt/sources.list.d/tuxmake.list \
+    && apt-get update \
+    && apt-get install --assume-yes tuxmake
+
 # Lightweight: base container customizations
 RUN true \
     && useradd --create-home tuxmake \
