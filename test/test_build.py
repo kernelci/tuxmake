@@ -309,33 +309,31 @@ def test_quiet(linux, capfd):
     assert "I:" not in err
 
 
-def test_ctrl_c(linux, mocker, Popen):
-    mocker.patch("tuxmake.build.Build.logger")
-    process = mocker.MagicMock()
-    Popen.return_value = process
-    process.communicate.side_effect = KeyboardInterrupt()
-    with pytest.raises(SystemExit):
-        b = Build(tree=linux)
-        b.build(b.targets[0])
-    process.terminate.assert_called()
+class TestInterruptedBuild:
+    def test_ctrl_c(self, linux, mocker, Popen):
+        mocker.patch("tuxmake.build.Build.logger")
+        process = mocker.MagicMock()
+        Popen.return_value = process
+        process.communicate.side_effect = KeyboardInterrupt()
+        with pytest.raises(SystemExit):
+            b = Build(tree=linux)
+            b.build(b.targets[0])
 
+    def test_always_run_cleanup(self, linux, mocker):
+        build = Build(tree=linux)
+        mocker.patch(
+            "tuxmake.build.Build.build_all_targets", side_effect=KeyboardInterrupt()
+        )
+        with pytest.raises(KeyboardInterrupt):
+            build.run()
+        assert not build.build_dir.exists()
 
-def test_always_run_cleanup(linux, mocker):
-    build = Build(tree=linux)
-    mocker.patch(
-        "tuxmake.build.Build.build_all_targets", side_effect=KeyboardInterrupt()
-    )
-    with pytest.raises(KeyboardInterrupt):
-        build.run()
-    assert not build.build_dir.exists()
-
-
-def test_cleans_up_even_if_prepare_fails(linux, mocker):
-    build = Build(tree=linux)
-    mocker.patch("tuxmake.build.Build.prepare", side_effect=KeyboardInterrupt())
-    with pytest.raises(KeyboardInterrupt):
-        build.run()
-    assert not build.build_dir.exists()
+    def test_cleans_up_even_if_prepare_fails(self, linux, mocker):
+        build = Build(tree=linux)
+        mocker.patch("tuxmake.build.Build.prepare", side_effect=KeyboardInterrupt())
+        with pytest.raises(KeyboardInterrupt):
+            build.run()
+        assert not build.build_dir.exists()
 
 
 def test_existing_build_dir(linux, home):
