@@ -44,7 +44,7 @@ def Popen(mocker, check_artifacts):
 # Disable the metadata extraction for non-metadata related tests since its
 # pretty slow.
 @pytest.fixture(autouse=True)
-def disable_metadata(mocker):
+def collect_metadata(mocker):
     return mocker.patch("tuxmake.build.Build.collect_metadata")
 
 
@@ -350,6 +350,26 @@ class TestInterruptedBuild:
         with pytest.raises(KeyboardInterrupt):
             build.run()
         assert not build.build_dir.exists()
+
+    def test_copies_artifacts_even_when_interrupted(self, linux, mocker):
+        build = Build(tree=linux)
+        mocker.patch(
+            "tuxmake.build.Build.build_all_targets", side_effect=KeyboardInterrupt()
+        )
+        copy_artifacts = mocker.patch("tuxmake.build.Build.copy_artifacts")
+        with pytest.raises(KeyboardInterrupt):
+            build.run()
+        assert copy_artifacts.call_count > 0
+
+    def test_gets_metadata_even_when_interrupted(self, linux, mocker, collect_metadata):
+        build = Build(tree=linux)
+        mocker.patch(
+            "tuxmake.build.Build.build_all_targets", side_effect=KeyboardInterrupt()
+        )
+        with pytest.raises(KeyboardInterrupt):
+            build.run()
+        assert collect_metadata.call_count == 1
+        assert (build.output_dir / "metadata.json").exists()
 
 
 def test_existing_build_dir(linux, home):
