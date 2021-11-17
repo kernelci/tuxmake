@@ -12,7 +12,7 @@ from tuxmake.toolchain import Toolchain
 from tuxmake.build import Build
 from tuxmake.cmdline import build_parser
 from tuxmake.exceptions import TuxMakeException
-from tuxmake.runtime import get_runtime
+from tuxmake.runtime import Runtime
 from tuxmake.utils import supported
 
 
@@ -81,7 +81,7 @@ def main(*origargv):
             print(arch)
         return
     elif options.list_toolchains:
-        runtime = get_runtime(options.runtime)
+        runtime = Runtime.get(options.runtime)
         for toolchain in sorted(runtime.toolchains):
             print(toolchain)
         return
@@ -90,7 +90,7 @@ def main(*origargv):
             print(runtime)
         return
     elif options.print_support_matrix:
-        runtime = get_runtime(options.runtime)
+        runtime = Runtime.get(options.runtime)
         architectures = sorted(supported.architectures)
         toolchains = sorted(runtime.toolchains)
         matrix = {}

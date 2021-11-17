@@ -5,7 +5,6 @@ import pytest
 from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.exceptions import RuntimePreparationFailed
-from tuxmake.runtime import get_runtime
 from tuxmake.runtime import DEFAULT_CONTAINER_REGISTRY
 from tuxmake.runtime import Runtime
 from tuxmake.runtime import NullRuntime
@@ -24,19 +23,19 @@ def build(linux):
 
 class TestGetRuntime:
     def test_null_runtime(self):
-        assert isinstance(get_runtime(None), NullRuntime)
+        assert isinstance(Runtime.get(None), NullRuntime)
 
     def test_docker_runtime(self):
-        assert isinstance(get_runtime("docker"), DockerRuntime)
+        assert isinstance(Runtime.get("docker"), DockerRuntime)
 
     def test_docker_local_runtime(self):
-        assert isinstance(get_runtime("docker-local"), DockerLocalRuntime)
+        assert isinstance(Runtime.get("docker-local"), DockerLocalRuntime)
 
     def test_invalid_runtime(self):
         with pytest.raises(InvalidRuntimeError):
-            get_runtime("invalid")
+            Runtime.get("invalid")
         with pytest.raises(InvalidRuntimeError):
-            get_runtime("xyz")
+            Runtime.get("xyz")
 
 
 class TestRuntime:

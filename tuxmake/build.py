@@ -15,7 +15,7 @@ from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_default_build_dir, get_new_output_dir
 from tuxmake.target import create_target
-from tuxmake.runtime import get_runtime
+from tuxmake.runtime import Runtime
 from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import BuildDirAlreadyExists
 from tuxmake.exceptions import EnvironmentCheckFailed
@@ -226,7 +226,7 @@ class Build:
         else:
             self.jobs = defaults.jobs
 
-        self.runtime = get_runtime(runtime)
+        self.runtime = Runtime.get(runtime)
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"

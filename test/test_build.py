@@ -624,7 +624,7 @@ class TestRuntime:
         assert build.runtime
 
     def test_interactive_command(self, linux, mocker):
-        runtime = mocker.patch("tuxmake.build.get_runtime").return_value
+        runtime = mocker.patch("tuxmake.runtime.Runtime.get").return_value
         runtime.get_command_line.return_value = ["true"]
         build = Build(tree=linux, runtime="docker")
         build.run_cmd(["true"], interactive=True)

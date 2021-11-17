@@ -22,22 +22,21 @@ DEFAULT_RUNTIME = "null"
 DEFAULT_CONTAINER_REGISTRY = "docker.io"
 
 
-def get_runtime(runtime):
-    runtime = runtime or DEFAULT_RUNTIME
-    name = "".join([w.title() for w in re.split(r"[_-]", runtime)]) + "Runtime"
-    try:
-        here = sys.modules[__name__]
-        cls = getattr(here, name)
-        return cls()
-    except AttributeError:
-        raise InvalidRuntimeError(runtime)
-
-
 class Runtime(ConfigurableObject):
     basedir = "runtime"
     name = "runtime"
     exception = InvalidRuntimeError
     bindir = Path(__file__).parent / basedir / "bin"
+
+    def get(name):
+        name = name or DEFAULT_RUNTIME
+        name = "".join([w.title() for w in re.split(r"[_-]", name)]) + "Runtime"
+        try:
+            here = sys.modules[__name__]
+            cls = getattr(here, name)
+            return cls()
+        except AttributeError:
+            raise InvalidRuntimeError(name)
 
     def __init__(self):
         super().__init__(self.name)
