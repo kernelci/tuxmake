@@ -11,6 +11,7 @@ from tuxmake.toolchain import Toolchain
 from tuxmake.build import build
 from tuxmake.build import Build
 from tuxmake.build import defaults
+from tuxmake.build import Terminated
 import tuxmake.exceptions
 
 
@@ -915,3 +916,9 @@ class TestReproducible:
         build1 = Build(tree=linux)
         build2 = Build(tree=linux)
         assert build1.environment == build2.environment
+
+
+class TestTerminated:
+    def test_signal_handler_raises_exception(self):
+        with pytest.raises(Terminated):
+            Terminated.handle_signal(15, None)

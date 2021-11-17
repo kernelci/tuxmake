@@ -3,6 +3,7 @@ from collections import OrderedDict
 from pathlib import Path
 import json
 import os
+import signal
 import shutil
 import subprocess
 import sys
@@ -77,6 +78,12 @@ class BuildInfo:
         `True` if this target was skipped.
         """
         return self.status == "SKIP"
+
+
+class Terminated(Exception):
+    @staticmethod
+    def handle_signal(signum, _):
+        raise Terminated(f"received signal {signum}; terminating ...")
 
 
 class Build:
@@ -391,7 +398,8 @@ class Build:
                 return process.returncode != 0
             else:
                 return process.returncode == 0
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, Terminated) as ex:
+            self.log(str(ex))
             process.terminate()
             self.interrupted = True
             return False
@@ -615,6 +623,8 @@ class Build:
         build can be inspected though the `status`, `passed`, and `failed`
         properties.
         """
+        old_sigterm = signal.signal(signal.SIGTERM, Terminated.handle_signal)
+
         try:
             self.metadata_collector.before_build()
 
@@ -641,6 +651,8 @@ class Build:
                     self.cleanup()
 
             self.save_metadata()
+
+            signal.signal(signal.SIGTERM, old_sigterm)
 
 
 def build(**kwargs):
