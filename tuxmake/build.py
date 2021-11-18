@@ -15,7 +15,7 @@ from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_default_build_dir, get_new_output_dir
 from tuxmake.target import create_target
-from tuxmake.runtime import get_runtime
+from tuxmake.runtime import Runtime
 from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import BuildDirAlreadyExists
 from tuxmake.exceptions import EnvironmentCheckFailed
@@ -226,7 +226,7 @@ class Build:
         else:
             self.jobs = defaults.jobs
 
-        self.runtime = get_runtime(runtime)
+        self.runtime = Runtime.get(runtime)
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"
@@ -245,7 +245,7 @@ class Build:
 
         self.offline = False
 
-        self.artifacts = {"log": ["build.log"]}
+        self.artifacts = {"log": ["build.log", "build-debug.log"]}
         self.__logger__ = None
         self.__status__ = {}
         self.__durations__ = {}
@@ -456,7 +456,11 @@ class Build:
             else:
                 stdout = sys.stdout
             self.__logger__ = subprocess.Popen(
-                ["tee", str(self.output_dir / "build.log")],
+                [
+                    str(Runtime.bindir / "tuxmake-logger"),
+                    str(self.output_dir / "build.log"),
+                    str(self.output_dir / "build-debug.log"),
+                ],
                 stdin=subprocess.PIPE,
                 stdout=stdout,
             )
@@ -598,6 +602,7 @@ class Build:
         return parser.errors, parser.warnings
 
     def terminate(self):
+        self.logger.communicate()
         self.logger.terminate()
 
     def cleanup(self):

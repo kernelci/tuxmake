@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 import sys
 
-from tuxmake.runtime import get_runtime
+from tuxmake.runtime import Runtime
 from tuxmake.utils import supported, defaults
 from tuxmake import __version__
 
@@ -351,7 +351,7 @@ class BashCompletion:
         for target in supported.targets:
             options.append(target)
 
-        all_toolchains = get_runtime("podman").toolchains
+        all_toolchains = Runtime.get("podman").toolchains
 
         print(
             __bash_completion__.format(

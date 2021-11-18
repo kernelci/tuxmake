@@ -227,6 +227,7 @@ __test_reproducible_builds__() {
   builds="$XDG_CACHE_HOME/tuxmake/builds"
   run diffoscope \
     --exclude=metadata.json \
+    --exclude=build-debug.log \
     --exclude-directory-metadata=yes \
     ${builds}/1 ${builds}/2
   assertEquals 0 "${rc}"

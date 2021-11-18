@@ -22,21 +22,21 @@ DEFAULT_RUNTIME = "null"
 DEFAULT_CONTAINER_REGISTRY = "docker.io"
 
 
-def get_runtime(runtime):
-    runtime = runtime or DEFAULT_RUNTIME
-    name = "".join([w.title() for w in re.split(r"[_-]", runtime)]) + "Runtime"
-    try:
-        here = sys.modules[__name__]
-        cls = getattr(here, name)
-        return cls()
-    except AttributeError:
-        raise InvalidRuntimeError(runtime)
-
-
 class Runtime(ConfigurableObject):
     basedir = "runtime"
     name = "runtime"
     exception = InvalidRuntimeError
+    bindir = Path(__file__).parent / basedir / "bin"
+
+    def get(name):
+        name = name or DEFAULT_RUNTIME
+        name = "".join([w.title() for w in re.split(r"[_-]", name)]) + "Runtime"
+        try:
+            here = sys.modules[__name__]
+            cls = getattr(here, name)
+            return cls()
+        except AttributeError:
+            raise InvalidRuntimeError(name)
 
     def __init__(self):
         super().__init__(self.name)
@@ -85,10 +85,10 @@ class Runtime(ConfigurableObject):
         pass
 
     def get_go_offline_command(self):
-        return Path(__file__).parent / self.basedir / "tuxmake-offline-build"
+        return self.bindir / "tuxmake-offline-build"
 
     def get_check_environment_command(self):
-        return Path(__file__).parent / self.basedir / "tuxmake-check-environment"
+        return self.bindir / "tuxmake-check-environment"
 
 
 class NullRuntime(Runtime):
@@ -144,6 +144,7 @@ class Image:
 
 class ContainerRuntime(Runtime):
     prepare_failed_msg = "failed to pull remote image {image}"
+    bindir = Path("/tuxmake")
 
     def __init_config__(self):
         self.base_images = []
@@ -249,14 +250,7 @@ class ContainerRuntime(Runtime):
                 v = path
             wrapper_opts.append(f"--env={k}={v}")
 
-        orig_go_offline = super().get_go_offline_command()
-        go_offline = self.get_go_offline_command()
-        go_offline_volume = self.volume(orig_go_offline, f"/usr/local/bin/{go_offline}")
-        orig_check_environment = super().get_check_environment_command()
-        check_environment = self.get_check_environment_command()
-        check_environment_volume = self.volume(
-            orig_check_environment, f"/usr/local/bin/{check_environment}"
-        )
+        bin_volume = self.volume(super().bindir, self.bindir)
 
         env = (f"--env={k}={v}" for k, v in build.environment.items())
         user_opts = self.get_user_opts()
@@ -273,8 +267,7 @@ class ContainerRuntime(Runtime):
             *user_opts,
             self.volume(source_tree, source_tree),
             self.volume(build_dir, build_dir),
-            go_offline_volume,
-            check_environment_volume,
+            bin_volume,
             f"--workdir={source_tree}",
             *self.get_logging_opts(),
             *extra_opts,
@@ -295,12 +288,6 @@ class ContainerRuntime(Runtime):
         else:
             interactive_opts = []
         return [self.command, "exec", *interactive_opts, self.container_id]
-
-    def get_go_offline_command(self):
-        return super().get_go_offline_command().name
-
-    def get_check_environment_command(self):
-        return super().get_check_environment_command().name
 
     def cleanup(self):
         if not self.container_id:

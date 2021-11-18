@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+if (scalar(@ARGV) != 2) {
+    print(STDERR "usage: $0 LOG DEBUGLOG\n");
+    exit(1);
+}
+
+my $logfile = $ARGV[0];
+my $debug_logfile = $ARGV[1];
+
+my $start_time = time();
+my ($line, $current_time, $elapsed_time, $hours, $minutes, $seconds);
+my $log = undef;
+my $debug_log = undef;
+open($log, ">", $logfile);
+$log->autoflush();
+open($debug_log, ">", $debug_logfile);
+$debug_log->autoflush();
+while ($line = <STDIN>) {
+    my $current_time = time();
+    $elapsed_time = $current_time - $start_time;
+    $hours =  int($elapsed_time / 3600);
+    $minutes = int(($elapsed_time % 3600) / 60);
+    $seconds = $elapsed_time % 60;
+    print($line);
+    printf($log $line);
+    printf($debug_log "%02d:%02d:%02d %s", $hours, $minutes, $seconds, $line);
+}
+close($log);
