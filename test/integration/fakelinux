@@ -202,6 +202,7 @@ test_check_environment() {
 }
 
 test_check_environment_fails() {
+  skip_if docker_runtime
   skip_if docker_in_docker
 
   export TUXMAKE_WHICH_MISSING=make
