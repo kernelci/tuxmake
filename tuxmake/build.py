@@ -631,6 +631,7 @@ class Build:
         """
         old_sigterm = signal.signal(signal.SIGTERM, Terminated.handle_signal)
 
+        prepared = False
         try:
             self.metadata_collector.before_build()
 
@@ -639,6 +640,7 @@ class Build:
 
             with self.measure_duration("Preparation", metadata="prepare"):
                 self.prepare()
+            prepared = True
 
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):
@@ -649,7 +651,8 @@ class Build:
                     self.copy_artifacts(target)
 
             with self.measure_duration("Metadata Extraction", metadata="metadata"):
-                self.collect_metadata()
+                if prepared:
+                    self.collect_metadata()
 
             with self.measure_duration("Cleanup", metadata="cleanup"):
                 self.terminate()

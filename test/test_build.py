@@ -377,6 +377,18 @@ class TestInterruptedBuild:
         assert collect_metadata.call_count == 1
         assert (build.output_dir / "metadata.json").exists()
 
+    def test_does_not_collect_metadata_when_runtime_preparation_fails(
+        self, linux, mocker, collect_metadata
+    ):
+        build = Build(tree=linux)
+        mocker.patch(
+            "tuxmake.runtime.NullRuntime.prepare",
+            side_effect=RuntimeError("PREPARE FAILED"),
+        )
+        with pytest.raises(RuntimeError):
+            build.run()
+        assert collect_metadata.call_count == 0
+
 
 def test_existing_build_dir(linux, home):
     (home / ".cache" / "tuxmake" / "builds" / "current").mkdir(parents=True)
