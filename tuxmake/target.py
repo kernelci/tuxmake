@@ -107,6 +107,7 @@ class Config(Target):
             if (
                 self.handle_url(fragfile, frag)
                 or self.handle_local_file(fragfile, frag)
+                or self.handle_in_tree_file(fragfile, frag)
                 or self.handle_inline_fragment(fragfile, frag)
             ):
                 merge.append(str(fragfile))
@@ -146,6 +147,15 @@ class Config(Target):
 
     def handle_local_file(self, config, filename):
         path = Path(filename)
+        if not path.exists():
+            return False
+
+        with config.open("w") as f:
+            f.write(path.read_text())
+        return True
+
+    def handle_in_tree_file(self, config, filename):
+        path = self.build.source_tree / filename
         if not path.exists():
             return False
 

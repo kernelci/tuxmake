@@ -916,6 +916,7 @@ class TestBPFKselftest:
         assert result.kconfig_add == kselftest_target.kconfig_add
         config = output_dir / "config"
         assert ("CONFIG_DEBUG_INFO_BTF=y") in config.read_text()
+        assert ("CONFIG_INCLUDE_IN_TREE_FILE=y") in config.read_text()
 
 
 class TestHeaders:
