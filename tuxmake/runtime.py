@@ -305,15 +305,19 @@ class ContainerRuntime(Runtime):
 
     def get_metadata(self, build):
         image_name = self.get_image(build)
-        image_digest = subprocess.check_output(
-            [
-                self.command,
-                "image",
-                "inspect",
-                "--format='{{index .RepoDigests 0}}",
-                image_name,
-            ],
-        ).decode("utf-8")
+        image_digest = (
+            subprocess.check_output(
+                [
+                    self.command,
+                    "image",
+                    "inspect",
+                    "--format={{index .RepoDigests 0}}",
+                    image_name,
+                ],
+            )
+            .decode("utf-8")
+            .strip()
+        )
         return {
             "image_name": image_name,
             "image_digest": image_digest,
