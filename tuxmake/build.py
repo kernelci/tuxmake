@@ -192,11 +192,8 @@ class Build:
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
         self.timestamp = get_directory_timestamp(self.source_tree)
-        self.environment = {}
-        self.environment["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
-        self.environment["KBUILD_BUILD_USER"] = "tuxmake"
-        self.environment["KBUILD_BUILD_HOST"] = "tuxmake"
-        self.environment.update(environment)
+        self.__environment__ = None
+        self.__environment_input__ = environment
 
         self.kconfig = kconfig
         self.kconfig_add = kconfig_add
@@ -332,6 +329,18 @@ class Build:
             except FileExistsError:
                 raise BuildDirAlreadyExists(self.__build_dir__)
         return self.__build_dir__
+
+    @property
+    def environment(self):
+        if self.__environment__ is not None:
+            return self.__environment__
+        env = self.__environment_input__
+        env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
+        env["KBUILD_BUILD_USER"] = "tuxmake"
+        env["KBUILD_BUILD_HOST"] = "tuxmake"
+        env.update(self.__environment_input__)
+        self.__environment__ = env
+        return self.__environment__
 
     def get_silent(self):
         if self.verbose:
