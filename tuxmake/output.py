@@ -5,12 +5,6 @@ def get_default_output_basedir():
     return xdg.cache_dir() / "builds"
 
 
-def get_default_build_dir():
-    base = get_default_output_basedir()
-    base.mkdir(parents=True, exist_ok=True)
-    return base / "current"
-
-
 def get_new_output_dir():
     base = get_default_output_basedir()
     base.mkdir(parents=True, exist_ok=True)

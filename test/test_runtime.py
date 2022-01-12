@@ -190,8 +190,8 @@ class TestDockerRuntime(TestContainerRuntime):
         assert cmd[0:2] == ["docker", "exec"]
         assert cmd[-1] == "date"
 
-    def test_environment(self, build, spawn_container):
-        build.environment = {"FOO": "BAR"}
+    def test_environment(self, linux, spawn_container):
+        build = Build(linux, environment={"FOO": "BAR"})
         DockerRuntime().start_container(build)
         cmd = spawn_container.call_args[0][0]
         assert "--env=FOO=BAR" in cmd

@@ -391,13 +391,6 @@ class TestInterruptedBuild:
         assert collect_metadata.call_count == 0
 
 
-def test_existing_build_dir(linux, home):
-    (home / ".cache" / "tuxmake" / "builds" / "current").mkdir(parents=True)
-    build = Build(tree=linux)
-    with pytest.raises(tuxmake.exceptions.TuxMakeException):
-        build.build_dir
-
-
 clang_version = int(
     subprocess.check_output(["clang", "-dumpversion"], encoding="utf-8").split(".")[0]
 )

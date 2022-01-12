@@ -13,11 +13,10 @@ from tuxmake.logging import set_debug, debug
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
-from tuxmake.output import get_default_build_dir, get_new_output_dir
+from tuxmake.output import get_new_output_dir
 from tuxmake.target import create_target
 from tuxmake.runtime import Runtime
 from tuxmake.metadata import MetadataCollector
-from tuxmake.exceptions import BuildDirAlreadyExists
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
@@ -192,11 +191,8 @@ class Build:
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
         self.timestamp = get_directory_timestamp(self.source_tree)
-        self.environment = {}
-        self.environment["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
-        self.environment["KBUILD_BUILD_USER"] = "tuxmake"
-        self.environment["KBUILD_BUILD_HOST"] = "tuxmake"
-        self.environment.update(environment)
+        self.__environment__ = None
+        self.__environment_input__ = environment
 
         self.kconfig = kconfig
         self.kconfig_add = kconfig_add
@@ -326,12 +322,22 @@ class Build:
             self.__build_dir__ = Path(self.__build_dir_input__)
             self.__build_dir__.mkdir(parents=True, exist_ok=True)
         else:
-            self.__build_dir__ = get_default_build_dir()
-            try:
-                self.__build_dir__.mkdir()
-            except FileExistsError:
-                raise BuildDirAlreadyExists(self.__build_dir__)
+            self.__build_dir__ = self.output_dir / "build"
+            self.__build_dir__.mkdir()
         return self.__build_dir__
+
+    @property
+    def environment(self):
+        if self.__environment__ is not None:
+            return self.__environment__
+        env = self.__environment_input__
+        env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
+        env["KBUILD_BUILD_USER"] = "tuxmake"
+        env["KBUILD_BUILD_HOST"] = "tuxmake"
+        env["KCFLAGS"] = f"-ffile-prefix-map={self.build_dir}/="
+        env.update(self.__environment_input__)
+        self.__environment__ = env
+        return self.__environment__
 
     def get_silent(self):
         if self.verbose:
