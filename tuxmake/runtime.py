@@ -28,6 +28,7 @@ class Runtime(ConfigurableObject):
     exception = InvalidRuntimeError
     bindir = Path(__file__).parent / basedir / "bin"
 
+    @staticmethod
     def get(name):
         name = name or DEFAULT_RUNTIME
         name = "".join([w.title() for w in re.split(r"[_-]", name)]) + "Runtime"
