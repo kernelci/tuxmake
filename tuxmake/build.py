@@ -293,10 +293,7 @@ class Build:
         raise UnrecognizedSourceTree(source.absolute())
 
     def prepare(self):
-        self.log(
-            "# to reproduce this build locally: "
-            + quote_command_line(self.cmdline.reproduce(self))
-        )
+        self.log(quote_command_line(self.cmdline.reproduce(self)))
         self.wrapper.prepare_host()
         self.runtime.prepare(self)
         self.wrapper.prepare_runtime(self)
