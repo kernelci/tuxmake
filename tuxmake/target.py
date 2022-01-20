@@ -33,6 +33,7 @@ class Target(ConfigurableObject):
         self.preconditions = self.__split_cmds__("target", "preconditions")
         self.commands = self.__split_cmds__("target", "commands")
         self.kconfig_add = self.__split_kconfigs__()
+        self.interactive = self.config["target"].getboolean("interactive", False)
         try:
             self.artifacts = dict(self.config["artifacts"])
         except KeyError:
