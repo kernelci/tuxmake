@@ -92,6 +92,7 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
         libnuma-dev:${arch} \
         libpci-dev:${arch} \
         libpopt-dev:${arch} \
+        libreadline-dev \
         libreadline-dev:${arch} \
         libslang2-dev:${arch} \
         libssl-dev:${arch} \
