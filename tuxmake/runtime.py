@@ -68,7 +68,7 @@ class Runtime(ConfigurableObject):
                 self.__offline_available__ = False
         return self.__offline_available__
 
-    def get_command_line(self, build, cmd, interactive, offline=True):
+    def get_command_line(self, cmd, interactive, offline=True):
         prefix = self.get_command_prefix(interactive)
         if offline and self.offline_available:
             go_offline = [str(self.get_go_offline_command())]

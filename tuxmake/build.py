@@ -368,7 +368,7 @@ class Build:
             expect_failure = False
 
         final_cmd = self.runtime.get_command_line(
-            self, cmd, interactive, offline=self.offline
+            cmd, interactive, offline=self.offline
         )
         extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C")
         env = dict(os.environ, **extra_env)

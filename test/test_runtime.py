@@ -48,7 +48,7 @@ class TestRuntime:
 class TestNullRuntime:
     def test_get_command_line(self, build):
         assert NullRuntime().get_command_line(
-            build, ["date"], interactive=False, offline=False
+            ["date"], interactive=False, offline=False
         ) == ["date"]
 
     def test_prepare_warns_about_versioned_toolchain(self, build, mocker):
@@ -186,7 +186,7 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.cleanup()  # if this doesn't crash we are good
 
     def test_get_command_line(self, build):
-        cmd = DockerRuntime().get_command_line(build, ["date"], False)
+        cmd = DockerRuntime().get_command_line(["date"], False)
         assert cmd[0:2] == ["docker", "exec"]
         assert cmd[-1] == "date"
 
@@ -222,7 +222,7 @@ class TestDockerRuntime(TestContainerRuntime):
         assert "--env=FOO=bar baz" in cmd
 
     def test_interactive(self, build):
-        cmd = DockerRuntime().get_command_line(build, ["bash"], True)
+        cmd = DockerRuntime().get_command_line(["bash"], True)
         assert "--interactive" in cmd
         assert "--tty" in cmd
 
@@ -330,7 +330,7 @@ class TestPodmanRuntime(TestContainerRuntime):
         check_call.assert_called_with(["podman", "pull", q("myimage")])
 
     def test_get_command_line(self, build):
-        cmd = PodmanRuntime().get_command_line(build, ["date"], False)
+        cmd = PodmanRuntime().get_command_line(["date"], False)
         assert cmd[0:2] == ["podman", "exec"]
         assert cmd[-1] == "date"
 
