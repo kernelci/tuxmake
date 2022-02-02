@@ -12,6 +12,8 @@ from tuxmake.build import build
 from tuxmake.build import Build
 from tuxmake.build import defaults
 from tuxmake.build import Terminated
+from tuxmake.build import get_image
+from tuxmake.build import DEFAULT_CONTAINER_REGISTRY
 import tuxmake.exceptions
 
 
@@ -641,7 +643,7 @@ class TestRuntime:
         build = Build(tree=linux, runtime="docker")
         build.run_cmd(["true"], interactive=True)
         runtime.get_command_line.assert_called_with(
-            build, ["true"], True, offline=build.offline
+            ["true"], True, offline=build.offline
         )
 
 
@@ -955,3 +957,47 @@ class TestTerminated:
     def test_signal_handler_raises_exception(self):
         with pytest.raises(Terminated):
             Terminated.handle_signal(15, None)
+
+
+def q(img):
+    return f"{DEFAULT_CONTAINER_REGISTRY}/{img}"
+
+
+class TestGetImage:
+    @pytest.fixture
+    def build(self, linux):
+        return Build(linux)
+
+    @pytest.fixture
+    def toolchain_get_image(self, mocker):
+        return mocker.patch("tuxmake.toolchain.Toolchain.get_image")
+
+    def test_image(self, build, toolchain_get_image):
+        toolchain_get_image.return_value = "foobarbaz"
+        assert get_image(build) == q("foobarbaz")
+
+    def test_override_image(self, build, monkeypatch):
+        monkeypatch.setenv("TUXMAKE_IMAGE", "foobar")
+        assert get_image(build) == q("foobar")
+
+    def test_override_image_registry(self, build, monkeypatch, toolchain_get_image):
+        monkeypatch.setenv("TUXMAKE_IMAGE_REGISTRY", "foobar.com")
+        toolchain_get_image.return_value = "myimage"
+        assert get_image(build) == "foobar.com/myimage"
+
+    def test_override_image_tag(self, build, monkeypatch, toolchain_get_image):
+        monkeypatch.setenv("TUXMAKE_IMAGE_TAG", "20201201")
+        toolchain_get_image.return_value = "myimage"
+        assert get_image(build) == q("myimage:20201201")
+
+    def test_override_image_registry_and_tag(
+        self, build, monkeypatch, toolchain_get_image
+    ):
+        monkeypatch.setenv("TUXMAKE_IMAGE_REGISTRY", "foobar.com")
+        monkeypatch.setenv("TUXMAKE_IMAGE_TAG", "20201201")
+        toolchain_get_image.return_value = "myimage"
+        assert get_image(build) == "foobar.com/myimage:20201201"
+
+    def test_override_full_image_name_with_registry(self, build, monkeypatch):
+        monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo/bar")
+        assert get_image(build) == "docker.io/foo/bar"

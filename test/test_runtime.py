@@ -5,7 +5,6 @@ import pytest
 from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.exceptions import RuntimePreparationFailed
-from tuxmake.runtime import DEFAULT_CONTAINER_REGISTRY
 from tuxmake.runtime import Runtime
 from tuxmake.runtime import NullRuntime
 from tuxmake.runtime import DockerRuntime
@@ -48,7 +47,7 @@ class TestRuntime:
 class TestNullRuntime:
     def test_get_command_line(self, build):
         assert NullRuntime().get_command_line(
-            build, ["date"], interactive=False, offline=False
+            ["date"], interactive=False, offline=False
         ) == ["date"]
 
     def test_prepare_warns_about_versioned_toolchain(self, build, mocker):
@@ -64,20 +63,17 @@ class TestNullRuntime:
 
 
 @pytest.fixture
-def get_image(mocker):
-    return mocker.patch("tuxmake.toolchain.Toolchain.get_image")
-
-
-def q(img):
-    return f"{DEFAULT_CONTAINER_REGISTRY}/{img}"
-
-
-@pytest.fixture
 def container_id():
     return "0123456789abcdef"
 
 
-class TestContainerRuntime:
+class FakeGetImage:
+    @pytest.fixture(autouse=True)
+    def get_image(self, mocker):
+        return mocker.patch("tuxmake.runtime.Runtime.get_image")
+
+
+class TestContainerRuntime(FakeGetImage):
     @pytest.fixture(autouse=True)
     def spawn_container(self, mocker, container_id):
         return mocker.patch(
@@ -92,56 +88,34 @@ class TestContainerRuntime:
         )
 
 
+class TestGetImage:
+    def test_no_image(self):
+        runtime = NullRuntime()
+        with pytest.raises(Exception):
+            runtime.get_image()
+
+    def test_with_image(self):
+        runtime = NullRuntime()
+        runtime.set_image("myimage")
+        assert runtime.get_image() == "myimage"
+
+
 class TestDockerRuntime(TestContainerRuntime):
-    def test_image(self, build, get_image):
-        get_image.return_value = "foobarbaz"
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == q("foobarbaz")
-
-    def test_override_image(self, build, monkeypatch):
-        monkeypatch.setenv("TUXMAKE_IMAGE", "foobar")
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == q("foobar")
-
-    def test_override_image_registry(self, build, monkeypatch, get_image):
-        monkeypatch.setenv("TUXMAKE_IMAGE_REGISTRY", "foobar.com")
-        get_image.return_value = "myimage"
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == "foobar.com/myimage"
-
-    def test_override_image_tag(self, build, monkeypatch, get_image):
-        monkeypatch.setenv("TUXMAKE_IMAGE_TAG", "20201201")
-        get_image.return_value = "myimage"
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == q("myimage:20201201")
-
-    def test_override_image_registry_and_tag(self, build, monkeypatch, get_image):
-        monkeypatch.setenv("TUXMAKE_IMAGE_REGISTRY", "foobar.com")
-        monkeypatch.setenv("TUXMAKE_IMAGE_TAG", "20201201")
-        get_image.return_value = "myimage"
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == "foobar.com/myimage:20201201"
-
-    def test_override_full_image_name_with_registry(self, build, monkeypatch):
-        monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo/bar")
-        runtime = DockerRuntime()
-        assert runtime.get_image(build) == "docker.io/foo/bar"
-
     def test_get_metadata(self, build, get_image, mocker):
         get_image.return_value = "tuxmake/theimage"
         mocker.patch(
             "subprocess.check_output",
-            return_value=b"docker.io/tuxmake/theimage@sha256:deadbeef",
+            return_value=b"tuxmake/theimage@sha256:deadbeef",
         )
         metadata = DockerRuntime().get_metadata(build)
-        assert metadata["image_name"] == "docker.io/tuxmake/theimage"
-        assert metadata["image_digest"] == "docker.io/tuxmake/theimage@sha256:deadbeef"
+        assert metadata["image_name"] == "tuxmake/theimage"
+        assert metadata["image_digest"] == "tuxmake/theimage@sha256:deadbeef"
 
     def test_prepare(self, build, get_image, mocker):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")
         DockerRuntime().prepare(build)
-        check_call.assert_called_with(["docker", "pull", q("myimage")])
+        check_call.assert_called_with(["docker", "pull", "myimage"])
 
     def test_prepare_pull_only_once_a_day(self, build, get_image, mocker):
         get_image.return_value = "myimage"
@@ -186,7 +160,7 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.cleanup()  # if this doesn't crash we are good
 
     def test_get_command_line(self, build):
-        cmd = DockerRuntime().get_command_line(build, ["date"], False)
+        cmd = DockerRuntime().get_command_line(["date"], False)
         assert cmd[0:2] == ["docker", "exec"]
         assert cmd[-1] == "date"
 
@@ -222,7 +196,7 @@ class TestDockerRuntime(TestContainerRuntime):
         assert "--env=FOO=bar baz" in cmd
 
     def test_interactive(self, build):
-        cmd = DockerRuntime().get_command_line(build, ["bash"], True)
+        cmd = DockerRuntime().get_command_line(["bash"], True)
         assert "--interactive" in cmd
         assert "--tty" in cmd
 
@@ -251,7 +225,7 @@ class TestDockerRuntime(TestContainerRuntime):
         assert str(DockerRuntime()) == "docker"
 
 
-class TestDockerRuntimeSpawnContainer:
+class TestDockerRuntimeSpawnContainer(FakeGetImage):
     def test_spawn_container(self, build, mocker, container_id):
         check_output = mocker.patch(
             "subprocess.check_output", return_value=container_id.encode("utf-8")
@@ -263,7 +237,7 @@ class TestDockerRuntimeSpawnContainer:
         assert runtime.container_id == container_id
 
 
-class TestDockerRuntimeOfflineAvailable:
+class TestDockerRuntimeOfflineAvailable(FakeGetImage):
     @pytest.fixture
     def runtime(self, build, container_id, mocker):
         mocker.patch(
@@ -298,7 +272,7 @@ class TestDockerLocalRuntime(TestContainerRuntime):
 
         runtime.prepare(build)
         check_call.assert_called_with(
-            ["docker", "image", "inspect", q("mylocalimage")],
+            ["docker", "image", "inspect", "mylocalimage"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
@@ -313,7 +287,7 @@ class TestDockerLocalRuntime(TestContainerRuntime):
         )
         with pytest.raises(RuntimePreparationFailed) as exc:
             DockerLocalRuntime().prepare(build)
-        assert f"image {q('foobar')} not found locally" in str(exc)
+        assert "image foobar not found locally" in str(exc)
 
     def test_listed_as_supported(self):
         assert "docker-local" in Runtime.supported()
@@ -327,17 +301,17 @@ class TestPodmanRuntime(TestContainerRuntime):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")
         PodmanRuntime().prepare(build)
-        check_call.assert_called_with(["podman", "pull", q("myimage")])
+        check_call.assert_called_with(["podman", "pull", "myimage"])
 
     def test_get_command_line(self, build):
-        cmd = PodmanRuntime().get_command_line(build, ["date"], False)
+        cmd = PodmanRuntime().get_command_line(["date"], False)
         assert cmd[0:2] == ["podman", "exec"]
         assert cmd[-1] == "date"
 
     def test_listed_as_supported(self):
         assert "podman" in Runtime.supported()
 
-    def test_no_user_option(self, build, spawn_container):
+    def test_no_user_option(self, build, get_image, spawn_container):
         PodmanRuntime().start_container(build)
         cmd = spawn_container.call_args[0][0]
         assert len([c for c in cmd if "--user=" in c]) == 0
@@ -354,7 +328,7 @@ class TestPodmanRuntime(TestContainerRuntime):
         assert "--hostname=foobar" in cmd
         assert "--env=FOO=bar baz" in cmd
 
-    def test_selinux_label(self, build, spawn_container):
+    def test_selinux_label(self, build, get_image, spawn_container):
         PodmanRuntime().start_container(build)
         cmd = spawn_container.call_args[0][0]
         volumes = [o for o in cmd if o.startswith("--volume=")]
@@ -374,7 +348,7 @@ class TestPodmanLocalRuntime(TestContainerRuntime):
 
         runtime.prepare(build)
         check_call.assert_called_with(
-            ["podman", "image", "inspect", q("mylocalimage")],
+            ["podman", "image", "inspect", "mylocalimage"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
@@ -389,7 +363,7 @@ class TestPodmanLocalRuntime(TestContainerRuntime):
         )
         with pytest.raises(RuntimePreparationFailed) as exc:
             PodmanLocalRuntime().prepare(build)
-        assert f"image {q('foobar')} not found locally" in str(exc)
+        assert "image foobar not found locally" in str(exc)
 
     def test_listed_as_supported(self):
         assert "podman-local" in Runtime.supported()

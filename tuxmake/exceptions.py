@@ -78,6 +78,10 @@ class RuntimePreparationFailed(TuxMakeInfrastructureError):
     msg = "Runtime preparation failed: {name}"
 
 
+class ImageRequired(TuxMakeInfrastructureError):
+    msg = "Image is required, but was not set"
+
+
 class UnsupportedMetadata(TuxMakeInfrastructureError):
     msg = "Unsupported metadata extractor: {name}"
     pass

@@ -9,6 +9,7 @@ import subprocess
 import sys
 import time
 from tuxmake import __version__
+from tuxmake import deprecated
 from tuxmake.logging import set_debug, debug
 from tuxmake.arch import Architecture, host_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
@@ -23,7 +24,7 @@ from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 from tuxmake.exceptions import UnsupportedMakeVariable
 from tuxmake.log import LogParser
 from tuxmake.cmdline import CommandLine
-from tuxmake.utils import defaults
+from tuxmake.build_utils import defaults
 from tuxmake.utils import quote_command_line
 from tuxmake.utils import get_directory_timestamp
 
@@ -223,6 +224,7 @@ class Build:
             self.jobs = defaults.jobs
 
         self.runtime = Runtime.get(runtime)
+        self.runtime.set_image(get_image(self))
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"
@@ -368,7 +370,7 @@ class Build:
             expect_failure = False
 
         final_cmd = self.runtime.get_command_line(
-            self, cmd, interactive, offline=self.offline
+            cmd, interactive, offline=self.offline
         )
         extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C")
         env = dict(os.environ, **extra_env)
@@ -682,3 +684,25 @@ def build(**kwargs):
     builder = Build(**kwargs)
     builder.run()
     return builder
+
+
+DEFAULT_CONTAINER_REGISTRY = "docker.io"
+
+
+def get_image(build):
+    image = (
+        os.getenv("TUXMAKE_IMAGE")
+        or deprecated.getenv("TUXMAKE_DOCKER_IMAGE", "TUXMAKE_IMAGE")
+        or build.target_arch.get_image(build.toolchain)
+        or build.toolchain.get_image(build.target_arch)
+    )
+    registry = os.getenv("TUXMAKE_IMAGE_REGISTRY", DEFAULT_CONTAINER_REGISTRY)
+    if registry:
+        if len(image.split("/")) < 3:
+            # only prepend registry if the image name is not already a full
+            # image name.
+            image = registry + "/" + image
+    tag = os.getenv("TUXMAKE_IMAGE_TAG")
+    if tag:
+        image = image + ":" + tag
+    return image

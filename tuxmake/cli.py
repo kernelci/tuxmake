@@ -10,10 +10,10 @@ from tuxmake.logging import set_quiet, info, warning, error
 from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
 from tuxmake.build import Build
+from tuxmake.build_utils import supported
 from tuxmake.cmdline import build_parser
 from tuxmake.exceptions import TuxMakeException
 from tuxmake.runtime import Runtime
-from tuxmake.utils import supported
 
 
 def read_config(filename, missing_ok=False):

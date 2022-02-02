@@ -26,7 +26,7 @@ while ($line = <STDIN>) {
     $minutes = int(($elapsed_time % 3600) / 60);
     $seconds = $elapsed_time % 60;
     print($line);
-    printf($log $line);
+    print($log $line);
     printf($debug_log "%02d:%02d:%02d %s", $hours, $minutes, $seconds, $line);
 }
 close($log);

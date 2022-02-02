@@ -4,7 +4,7 @@ import re
 import sys
 
 from tuxmake.runtime import Runtime
-from tuxmake.utils import supported, defaults
+from tuxmake.build_utils import supported, defaults
 from tuxmake import __version__
 
 
@@ -298,7 +298,7 @@ class CommandLine:
                     continue
                 for c in option.expand(value):
                     cmd.append(c)
-        image = build.runtime.get_image(build)
+        image = build.runtime.get_image()
         if image:
             cmd.append(f"--image={image}")
         for k, v in build.make_variables.items():
