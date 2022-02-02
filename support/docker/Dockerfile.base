@@ -6,8 +6,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Heavyweight: package installation
 # This list of packages was seeded from kernelci's base image
 # https://github.com/kernelci/kernelci-core/blob/master/jenkins/dockerfiles/build-base/Dockerfile
-# docutils-common, python3-docutils and dwarves are only needed for
-# building BPF kselftests.
+# docutils-common, python3-docutils are only needed for building BPF
+# kselftests.
 RUN apt-get update \
     && apt-get install auto-apt-proxy --assume-yes \
     && apt-get install --assume-yes --no-install-recommends --option=debug::pkgProblemResolver=yes \
