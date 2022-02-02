@@ -3,6 +3,12 @@ FROM ${BASE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+COPY conf/ /srv/tuxmake-conf
+
+RUN . /etc/os-release \
+    && echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" > /etc/apt/sources.list.d/backports.list \
+    && cp /srv/tuxmake-conf/pinning-${VERSION_CODENAME} /etc/apt/preferences.d/
+
 # Heavyweight: package installation
 # This list of packages was seeded from kernelci's base image
 # https://github.com/kernelci/kernelci-core/blob/master/jenkins/dockerfiles/build-base/Dockerfile
