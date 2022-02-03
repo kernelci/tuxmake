@@ -2,7 +2,7 @@
 
 # This script is part of TuxMake.
 #
-# This script for extracts metadata from the build runtime environment in a
+# This script extracts metadata from the build runtime environment in a
 # single shot. It should receive a file containing a metadata extraction
 # specification in JSON format as its first argument. The format is the
 # following:
@@ -25,7 +25,7 @@
 #
 # The script will read this JSON, then replace each command by its output, and
 # print the resulting JSON to stdout. Any output to stderr produced by the
-# commands is not touched and still ends up in stderr.
+# commands is discard.
 
 use strict;
 use warnings;
