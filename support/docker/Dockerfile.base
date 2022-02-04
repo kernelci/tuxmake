@@ -18,6 +18,7 @@ RUN . /etc/os-release \
 # kselftests.
 RUN apt-get update \
     && apt-get install auto-apt-proxy --assume-yes \
+    && (timeout --signal=KILL 10s auto-apt-proxy || apt-get purge -qy auto-apt-proxy) \
     && apt-get install --assume-yes --no-install-recommends --option=debug::pkgProblemResolver=yes \
         procps \
         apt-transport-https \
