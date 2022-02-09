@@ -87,10 +87,11 @@ graph TD
   - `xz`
 
 These requirements can be automatically checked with the provided
-[test-image](test-image) script, like this:
+[tuxmake-check-environment](../../tuxmake/runtime/bin/tuxmake-check-environment)
+script, like this:
 
 ```
-docker run --volume=$(pwd)/test-image:/test $FULLIMAGE /test $IMAGE $CROSS_COMPILE
+docker run --volume=/path/to/tuxmake/tuxmake/runtime/bin/tuxmake-checked-environment:/test $FULLIMAGE /test $IMAGE $CROSS_COMPILE
 ```
 
 or, if you are adding your image to tuxmake, you can also use the `Makefile` in
