@@ -16,9 +16,6 @@ from tuxmake.arch import Architecture
 TAG = os.getenv("TAG")
 
 
-RUNTIME_BIN = NullRuntime().get_check_environment_command().parent
-
-
 class ImageList:
     __all__ = []
 
@@ -104,7 +101,7 @@ class Image:
         test_args = " ".join(self.test_args)
         stream.write(f"test-{self.name}: {self.name}\n")
         stream.write(f"\t$(ANN_TEST) {self.name}\n")
-        stream.write(f"\t$(Q)$(docker) run --rm --volume={RUNTIME_BIN}:/runtime $(PROJECT)/{self.name}:latest$(TAG) /runtime/tuxmake-check-environment {test_args} $(NOSTDOUT) \n\n")
+        stream.write(f"\t$(Q)$(docker) run --rm $(PROJECT)/{self.name}:latest$(TAG) tuxmake-check-environment {test_args} $(NOSTDOUT) \n\n")
 
 
 class BaseImage(Image):
@@ -112,7 +109,7 @@ class BaseImage(Image):
 
     @property
     def dependency(self):
-        return None
+        return "tuxmake-check-environment"
 
     @property
     def base_image(self):

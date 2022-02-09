@@ -40,7 +40,7 @@ publish_multiarch_releases = $(patsubst %, publish-multiarch-%, $(releases))
 $(noop_releases):
 
 log:
-	mkdir $@
+	$(Q)mkdir $@
 
 ifneq ($(findstring s,$(filter-out --%,$(MAKEFLAGS))),)
 xargs = xargs -r
@@ -76,6 +76,8 @@ $(publish_multiarch_releases): publish-multiarch-%: noop-%
 	@echo $(patsubst %, $(PROJECT)/%:latest, $(shell ./list-images $*)) | \
 		$(xargs) -n 1 $(docker) manifest push
 
+tuxmake-check-environment: ../../tuxmake/runtime/bin/tuxmake-check-environment
+	$(Q)cp $< $@
 
 test:
 	sh test/test_configure.sh
@@ -94,6 +96,7 @@ show:
 clean:
 	$(RM) configure.mk
 	$(RM) -r log/
+	$(RM) tuxmake-check-environment
 
 purge:
 	$(docker) image ls --format='{{.Repository}}:{{.Tag}}' $(PROJECT)/\* \

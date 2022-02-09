@@ -1,3 +1,4 @@
 configure.mk
 configure.local.mk
 /log
+tuxmake-check-environment
