@@ -329,7 +329,7 @@ class Build:
     def environment(self):
         if self.__environment__ is not None:
             return self.__environment__
-        env = self.__environment_input__
+        env = {}
         env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
         env["KBUILD_BUILD_USER"] = "tuxmake"
         env["KBUILD_BUILD_HOST"] = "tuxmake"

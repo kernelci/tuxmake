@@ -949,7 +949,8 @@ class TestReproducible:
     def test_reproducible_sets_constant_values(self, linux):
         build1 = Build(tree=linux)
         build2 = Build(tree=linux)
-        assert build1.environment == build2.environment
+        ts = "KBUILD_BUILD_TIMESTAMP"
+        assert build1.environment[ts] == build2.environment[ts]
 
 
 class TestTerminated:
