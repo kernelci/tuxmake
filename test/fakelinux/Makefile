@@ -33,7 +33,7 @@ CFLAGS += -DKBUILD_BUILD_HOST='"$(KBUILD_BUILD_HOST)"'
 
 all:
 
-include arch/$(ARCH).mk
+include arch/$(ARCH)/Makefile
 ARCHDIRNAME ?= $(ARCH)
 
 .PHONY: config vmlinux $(IMAGE) modules modules_install dtbs dtbs_install targz-pkg
