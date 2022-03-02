@@ -33,16 +33,6 @@ def check_artifacts(mocker):
     return mocker.patch("tuxmake.build.Build.check_artifacts", return_value=True)
 
 
-@pytest.fixture()
-def Popen(mocker, check_artifacts):
-    _Popen = mocker.patch("subprocess.Popen")
-    _Popen.return_value.communicate.return_value = (
-        mocker.MagicMock(),
-        mocker.MagicMock(),
-    )
-    return _Popen
-
-
 # Disable the metadata extraction for non-metadata related tests since its
 # pretty slow.
 @pytest.fixture(autouse=True)
@@ -58,45 +48,42 @@ def kwargs(called):
     return called.call_args[1]
 
 
-def test_invalid_directory(tmp_path):
-    (tmp_path / "Makefile").touch()
-    with pytest.raises(tuxmake.exceptions.UnrecognizedSourceTree):
-        build(tree=tmp_path)
+class TestBasicFunctionality:
+    def test_invalid_directory(self, tmp_path):
+        (tmp_path / "Makefile").touch()
+        with pytest.raises(tuxmake.exceptions.UnrecognizedSourceTree):
+            build(tree=tmp_path)
 
+    def test_build(self, linux, home, kernel):
+        result = build(tree=linux)
+        assert kernel in result.artifacts["kernel"]
+        assert (home / ".cache/tuxmake/builds/1" / kernel).exists()
+        assert result.passed
 
-def test_build(linux, home, kernel):
-    result = build(tree=linux)
-    assert kernel in result.artifacts["kernel"]
-    assert (home / ".cache/tuxmake/builds/1" / kernel).exists()
-    assert result.passed
+    def test_build_with_output_dir(self, linux, output_dir, kernel):
+        result = build(tree=linux, output_dir=output_dir)
+        assert kernel in result.artifacts["kernel"]
+        assert (output_dir / kernel).exists()
+        assert result.output_dir == output_dir
 
+    def test_build_with_build_dir(self, linux, tmp_path):
+        build(tree=linux, build_dir=tmp_path)
+        assert (tmp_path / ".config").exists
 
-def test_build_with_output_dir(linux, output_dir, kernel):
-    result = build(tree=linux, output_dir=output_dir)
-    assert kernel in result.artifacts["kernel"]
-    assert (output_dir / kernel).exists()
-    assert result.output_dir == output_dir
+    def test_no_directory_created_unecessarily(self, linux, home):
+        Build(tree=linux)
+        assert len(list(home.glob("*"))) == 0
 
+    def test_no_directory_created_unecessarily_with_explicit_paths(
+        self, linux, tmp_path
+    ):
+        Build(tree=linux, output_dir=tmp_path / "output", build_dir=tmp_path / "build")
+        assert not (tmp_path / "output").exists()
+        assert not (tmp_path / "build").exists()
 
-def test_build_with_build_dir(linux, tmp_path):
-    build(tree=linux, build_dir=tmp_path)
-    assert (tmp_path / ".config").exists
-
-
-def test_no_directory_created_unecessarily(linux, home):
-    Build(tree=linux)
-    assert len(list(home.glob("*"))) == 0
-
-
-def test_no_directory_created_unecessarily_with_explicit_paths(linux, tmp_path):
-    Build(tree=linux, output_dir=tmp_path / "output", build_dir=tmp_path / "build")
-    assert not (tmp_path / "output").exists()
-    assert not (tmp_path / "build").exists()
-
-
-def test_unsupported_target(linux):
-    with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
-        build(tree=linux, targets=["unknown-target"])
+    def test_unsupported_target(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
+            build(tree=linux, targets=["unknown-target"])
 
 
 class TestKconfig:
@@ -321,7 +308,6 @@ def test_quiet(linux, capfd):
 class TestInterruptedBuild:
     @pytest.fixture
     def interrupted(self, mocker, Popen):
-        mocker.patch("tuxmake.build.Build.logger")
         process = mocker.MagicMock()
         Popen.return_value = process
         process.communicate.side_effect = KeyboardInterrupt()
@@ -489,6 +475,13 @@ class TestToolchain:
         with pytest.raises(tuxmake.exceptions.UnsupportedToolchain):
             Toolchain("foocc")
 
+    def test_prepare_warns_about_versioned_toolchain(self, linux, mocker):
+        build = Build(tree=linux, toolchain="gcc-10", runtime="null")
+        log = mocker.patch("tuxmake.build.Build.log")
+        build.prepare()
+        log.assert_called()
+        assert "versioned toolchains" in log.call_args[0][0]
+
 
 class TestDebugKernel:
     def test_build_with_debugkernel(self, linux):
@@ -644,9 +637,7 @@ class TestRuntime:
         runtime.get_command_line.return_value = ["true"]
         build = Build(tree=linux, runtime="docker")
         build.run_cmd(["true"], interactive=True)
-        runtime.get_command_line.assert_called_with(
-            ["true"], True, offline=build.offline
-        )
+        assert kwargs(runtime.run_cmd)["interactive"]
 
 
 class TestEnvironment:
@@ -656,8 +647,8 @@ class TestEnvironment:
             environment={"KCONFIG_ALLCONFIG": "foo.config"},
             targets=["config"],
         )
-        b.build(b.targets[0])
-        assert kwargs(Popen)["env"]["KCONFIG_ALLCONFIG"] == "foo.config"
+        b.prepare()
+        assert b.runtime.environment["KCONFIG_ALLCONFIG"] == "foo.config"
 
 
 class TestMakeVariables:
@@ -674,10 +665,11 @@ class TestMakeVariables:
 class TestCompilerWrappers:
     def test_ccache(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], wrapper="ccache")
-        b.build(b.targets[0])
-        assert "CC=ccache gcc" in args(Popen)
-        assert "HOSTCC=ccache gcc" in args(Popen)
-        assert "CCACHE_DIR" in kwargs(Popen)["env"]
+        b.prepare()
+        assert "CCACHE_DIR" in b.runtime.environment
+        makevars = b.makevars
+        assert makevars["CC"] == "ccache gcc"
+        assert makevars["HOSTCC"] == "ccache gcc"
 
     def test_ccache_gcc_v(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")
@@ -711,6 +703,13 @@ class TestCompilerWrappers:
         )
         b.build(b.targets[0])
         assert "CC=ccache clang" in args(Popen)
+
+    def test_sccache_with_path(self, linux, mocker, Popen):
+        add_volume = mocker.patch("tuxmake.runtime.Runtime.add_volume")
+        b = Build(tree=linux, wrapper="/path/to/sccache")
+        b.prepare()
+        volumes = [call[0] for call in add_volume.call_args_list]
+        assert ("/path/to/sccache", "/usr/local/bin/sccache") in volumes
 
 
 @pytest.mark.skipif(
@@ -796,7 +795,9 @@ class TestDebug:
 
     @pytest.fixture
     def debug_build(self, linux):
-        return Build(tree=linux, debug=True, environment={"FOO": "BAR"})
+        b = Build(tree=linux, debug=True, environment={"FOO": "BAR"})
+        b.prepare()
+        return b
 
     @pytest.fixture
     def err(self, debug_build, mocker, capfd):
@@ -827,7 +828,7 @@ class TestPrepare:
         )
         mocker.patch(
             "tuxmake.runtime.NullRuntime.prepare",
-            side_effect=lambda _: order.append("runtime"),
+            side_effect=lambda: order.append("runtime"),
         )
         mocker.patch(
             "tuxmake.wrapper.Wrapper.prepare_runtime",
@@ -952,7 +953,8 @@ class TestReproducible:
     def test_reproducible_sets_constant_values(self, linux):
         build1 = Build(tree=linux)
         build2 = Build(tree=linux)
-        assert build1.environment == build2.environment
+        ts = "KBUILD_BUILD_TIMESTAMP"
+        assert build1.environment[ts] == build2.environment[ts]
 
 
 class TestTerminated:

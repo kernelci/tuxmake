@@ -3,10 +3,10 @@ from collections import OrderedDict
 from pathlib import Path
 import json
 import os
+import re
 import signal
 import shutil
 import subprocess
-import sys
 import time
 from tuxmake import __version__
 from tuxmake import deprecated
@@ -17,6 +17,7 @@ from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_new_output_dir
 from tuxmake.target import create_target
 from tuxmake.runtime import Runtime
+from tuxmake.runtime import Terminated
 from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import UnrecognizedSourceTree
@@ -78,12 +79,6 @@ class BuildInfo:
         `True` if this target was skipped.
         """
         return self.status == "SKIP"
-
-
-class Terminated(Exception):
-    @staticmethod
-    def handle_signal(signum, _):
-        raise Terminated(f"received signal {signum}; terminating ...")
 
 
 class Build:
@@ -244,7 +239,6 @@ class Build:
         self.offline = False
 
         self.artifacts = {"log": ["build.log", "build-debug.log"]}
-        self.__logger__ = None
         self.__status__ = {}
         self.__durations__ = {}
         self.metadata_collector = MetadataCollector(self)
@@ -295,10 +289,33 @@ class Build:
         raise UnrecognizedSourceTree(source.absolute())
 
     def prepare(self):
-        self.log(quote_command_line(self.cmdline.reproduce(self)))
         self.wrapper.prepare_host()
-        self.runtime.prepare(self)
+
+        self.runtime.basename = "build"
+        self.runtime.quiet = self.quiet
+        self.runtime.source_dir = self.source_tree
+        self.runtime.output_dir = self.output_dir
+        self.runtime.add_volume(self.build_dir)
+        if self.wrapper.path:
+            self.runtime.add_volume(
+                str(self.wrapper.path), f"/usr/local/bin/{self.wrapper.name}"
+            )
+        env = dict(**self.wrapper.environment, **self.environment, LANG="C")
+        self.runtime.environment = env
+        for k, v in env.items():
+            if k.endswith("_DIR"):
+                path = "/" + re.sub(r"[^a-zA-Z0-9]+", "-", k.lower())
+                self.runtime.add_volume(v, path)
+                v = path
+        self.runtime.prepare()
         self.wrapper.prepare_runtime(self)
+
+        if self.toolchain.version_suffix and self.runtime.name == "null":
+            toolchain = self.toolchain
+            compiler = toolchain.compiler(self.target_arch)
+            self.log(
+                f"W: Requested {toolchain}, but versioned toolchains are not supported by the null runtime. Will use whatever version of {compiler} that you have installed. To ensure {toolchain} is used, try use a container-based runtime instead."
+            )
 
     @property
     def output_dir(self):
@@ -329,7 +346,7 @@ class Build:
     def environment(self):
         if self.__environment__ is not None:
             return self.__environment__
-        env = self.__environment_input__
+        env = {}
         env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
         env["KBUILD_BUILD_USER"] = "tuxmake"
         env["KBUILD_BUILD_HOST"] = "tuxmake"
@@ -369,43 +386,17 @@ class Build:
         else:
             expect_failure = False
 
-        final_cmd = self.runtime.get_command_line(
-            cmd, interactive, offline=self.offline
-        )
-        extra_env = dict(**self.wrapper.environment, **self.environment, LANG="C")
-        env = dict(os.environ, **extra_env)
-
-        logger = self.logger.stdin
-        if interactive:
-            stdout = stderr = stdin = None
-        else:
-            stdin = subprocess.DEVNULL
-            stderr = logger
-            if not stdout:
-                self.log(quote_command_line(cmd))
-                stdout = logger
-
-        debug(f"Command: {final_cmd}")
-        if extra_env:
-            debug(f"Environment: {extra_env}")
         try:
             with self.measure_duration("Command"):
-                process = subprocess.Popen(
-                    final_cmd,
-                    cwd=self.source_tree,
-                    env=env,
-                    stdin=stdin,
+                return self.runtime.run_cmd(
+                    cmd,
+                    interactive=interactive,
                     stdout=stdout,
-                    stderr=stderr,
+                    expect_failure=expect_failure,
+                    offline=self.offline,
                 )
-            process.communicate()
-            if expect_failure:
-                return process.returncode != 0
-            else:
-                return process.returncode == 0
         except (KeyboardInterrupt, Terminated) as ex:
             self.log(str(ex))
-            process.terminate()
             self.interrupted = True
             return False
 
@@ -453,26 +444,8 @@ class Build:
             **self.target_overrides,
         )
 
-    @property
-    def logger(self):
-        if not self.__logger__:
-            if self.quiet:
-                stdout = subprocess.DEVNULL
-            else:
-                stdout = sys.stdout
-            self.__logger__ = subprocess.Popen(
-                [
-                    str(Runtime.bindir / "tuxmake-logger"),
-                    str(self.output_dir / "build.log"),
-                    str(self.output_dir / "build-debug.log"),
-                ],
-                stdin=subprocess.PIPE,
-                stdout=stdout,
-            )
-        return self.__logger__
-
     def log(self, *stuff):
-        subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
+        self.runtime.log(*stuff)
 
     def make_args(self, makevars):
         # we want to override target makevars with user provided make_variables
@@ -594,7 +567,7 @@ class Build:
             "duration": self.__durations__,
         }
         self.metadata["tuxmake"] = {"version": __version__}
-        self.metadata["runtime"] = self.runtime.get_metadata(self)
+        self.metadata["runtime"] = self.runtime.get_metadata()
 
         extracted = self.metadata_collector.collect()
         self.metadata.update(extracted)
@@ -609,17 +582,13 @@ class Build:
         parser.parse(self.output_dir / "build.log")
         return parser.errors, parser.warnings
 
-    def terminate(self):
-        self.logger.communicate()
-        self.logger.terminate()
-
     def cleanup(self):
         self.runtime.cleanup()
         if self.clean_build_tree:
             shutil.rmtree(self.build_dir, ignore_errors=True)
 
     def check_environment(self):
-        self.runtime.prepare(self)
+        self.runtime.prepare()
         cmd = [str(self.runtime.get_check_environment_command())]
         cmd.append(f"{self.target_arch.name}_{self.toolchain.name}")
         cross = self.makevars.get("CROSS_COMPILE")
@@ -648,6 +617,7 @@ class Build:
             with self.measure_duration("Preparation", metadata="prepare"):
                 self.prepare()
             prepared = True
+            self.log(quote_command_line(self.cmdline.reproduce(self)))
 
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):
@@ -662,7 +632,6 @@ class Build:
                     self.collect_metadata()
 
             with self.measure_duration("Cleanup", metadata="cleanup"):
-                self.terminate()
                 if self.auto_cleanup:
                     self.cleanup()
 

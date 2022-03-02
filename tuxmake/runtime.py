@@ -6,6 +6,7 @@ import sys
 import time
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional, TextIO
 
 
 from tuxmake import cache
@@ -16,13 +17,57 @@ from tuxmake.exceptions import ImageRequired
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.toolchain import Toolchain
 from tuxmake.arch import host_arch
+from tuxmake.utils import quote_command_line
 
 
 DEFAULT_RUNTIME = "null"
 DEFAULT_CONTAINER_REGISTRY = "docker.io"
 
 
+class Terminated(Exception):
+    """
+    This is an exception class raised by `Runtime.run_cmd` in the case the
+    currently running command gets terminated (via `kill`, or by the user
+    typing control-C).
+    """
+
+    def __init__(self, msg):
+        super().__init__(msg)
+
+    @staticmethod
+    def handle_signal(signum, _):
+        raise Terminated(f"received signal {signum}; terminating ...")
+
+
 class Runtime(ConfigurableObject):
+    """
+    This class encapsulates running commands against the local host system or a
+    container, in a way that is transparent to the caller.
+
+    You should usually not need to instantiate this class directly. Instead,
+    you can get objects of this class by calling `Runtime.get()` (see below).
+
+
+    After obtaining a runtime objects, you might set the following attributes
+    on it to control its behavior:
+
+    * **basename**: base name to use when creating file (e.g. log files). Files
+      will be named "{basename}.log" and "{basename}-debug.log". Type: `str`;
+      defaults to `"run"`.
+    * **quiet**: whether to run a quietly or not. Type: `bool`; defaults to `False`.
+    * **source_dir**: directory where commands are run. For container runtimes,
+      this directory is bind mounted inside the container under the same
+      location.
+      Type: `Path`; defaults to the current working directory.
+    * **output_dir**: directory where to save logs of the execution.
+      For container runtimes, this directory is bind mounted inside the
+      container under the same location.
+      Type: `Optional[Path]`; defaults to `None` (meaning, no logs are saved).
+    * **environment**: extra environment variables to be used for all commands
+      ran by this runtime. Type: `dict` with `str` keys and values; defaults to
+      an empty dict.
+    """
+
     basedir = "runtime"
     name = "runtime"
     exception = InvalidRuntimeError
@@ -30,6 +75,19 @@ class Runtime(ConfigurableObject):
 
     @staticmethod
     def get(name):
+        """
+        Creates and returns a new `Runtime` object.The returned objects will be
+        of a subclass of `Runtime`, depending on the **name** argument. Supported runtimes are:
+
+        * `null`: runs commands on the host system.
+        * `docker`: runs commands on a Docker container. All commands ran by
+          the same runtime instance are executed in the same container (i.e.
+          state between calls is persisted).
+        * `docker-local`: the same as `docker`, but will only use local images
+          (i.e. it will never pull remote images).
+        * `podman`: run commands on a Podman container.
+        * `podman-local`: like `docker-local`, but with Podman.
+        """
         name = name or DEFAULT_RUNTIME
         name = "".join([w.title() for w in re.split(r"[_-]", name)]) + "Runtime"
         try:
@@ -43,6 +101,13 @@ class Runtime(ConfigurableObject):
         super().__init__(self.name)
         self.__offline_available__ = None
         self.__image__ = None
+        self.__logger__: Optional[subprocess.Popen] = None
+
+        self.basename: str = "run"
+        self.quiet: bool = False
+        self.source_dir: Path = Path.cwd()
+        self.output_dir: Optional[Path] = None
+        self.environment = {}
 
     def __init_config__(self):
         self.toolchains = Toolchain.supported()
@@ -53,6 +118,10 @@ class Runtime(ConfigurableObject):
         return self.__image__
 
     def set_image(self, image):
+        """
+        Sets the container image to use. This has no effect on non-container
+        runtimes.
+        """
         self.__image__ = image
 
     def is_supported(self, arch, toolchain):
@@ -70,7 +139,7 @@ class Runtime(ConfigurableObject):
                 self.__offline_available__ = True
             except subprocess.CalledProcessError as exc:
                 error = exc.output.decode("utf-8").strip()
-                warning(f"offline builds not available ({error})")
+                warning(f"Support for running offline not available ({error})")
                 self.__offline_available__ = False
         return self.__offline_available__
 
@@ -85,33 +154,138 @@ class Runtime(ConfigurableObject):
     def get_command_prefix(self, interactive):
         return []
 
-    def prepare(self, build):
+    def add_volume(self, source, dest=None):
+        """
+        Ensures that the directory or file **source** is available for commands
+        run as **dest**. For container runtimes, this meand bind-mounting
+        **source** as **dest** inside the container. All volumes must be added
+        before `prepare()` is called.
+
+        This is a noop for non-container runtimes.
+        """
         pass
 
-    def cleanup(self):
+    def prepare(self):
+        """
+        Initializes the runtime object. Must be called before actually running
+        any commands with `run_cmd`.
+        """
         pass
 
     def get_go_offline_command(self):
-        return self.bindir / "tuxmake-offline-build"
+        return self.bindir / "tuxmake-run-offline"
 
     def get_check_environment_command(self):
         return self.bindir / "tuxmake-check-environment"
 
-    def get_metadata(self, build):
+    def get_metadata(self):
+        """
+        Extracts metadata about the runtime (e.g. docker version, image name
+        and sha256sum, etc).
+        """
         return {}
+
+    @property
+    def logger(self):
+        if not self.__logger__:
+            if self.quiet:
+                stdout = subprocess.DEVNULL
+            else:
+                stdout = sys.stdout
+            if self.output_dir:
+                log = self.output_dir / f"{self.basename}.log"
+                debug_log = self.output_dir / f"{self.basename}-debug.log"
+            else:
+                log = debug_log = Path("/dev/null")
+            self.__logger__ = subprocess.Popen(
+                [
+                    str(Runtime.bindir / "tuxmake-logger"),
+                    str(log),
+                    str(debug_log),
+                ],
+                stdin=subprocess.PIPE,
+                stdout=stdout,
+            )
+        return self.__logger__
+
+    def log(self, *stuff):
+        """
+        Logs **stuff** to both the console and to any log files in use.
+        """
+        subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
+
+    def cleanup(self):
+        """
+        Cleans up and returns resources used during execution. You must call
+        this methods after you are done with the runtime object.
+        """
+        self.logger.communicate()
+        self.logger.terminate()
+
+    def run_cmd(
+        self,
+        cmd,
+        interactive: bool = False,
+        offline: bool = True,
+        expect_failure: bool = False,
+        stdout: Optional[TextIO] = None,
+    ):
+        """
+        Runs a command in the desired runtime. Returns True if the command
+        succeeds (i.e. exits with a status code of 0); False otherwise.
+        Parameters:
+
+        * **cmd**: The command to run. must be a list of strings (like with the
+          `subprocess` functions, e.g. check_call).
+        * **interactive**: whether this commands needs user interaction.
+        * **offline**: whether this commands should run offline, i.e. with no
+          access to non-loopback network interfaces.
+        * **expect_failure**: whether a failure, i.e. a non-zero return status,
+          is to be expected. Reverses the logic of the return value of this
+          method, i.e. returns True if the command fails, False if it succeeds.
+        * **stdout**: a TextIO object to where the `stdout` of the called
+          command will be directed.
+
+        If the command in interrupted in some way (by a TERM signal, or by the
+        user typing control-C), an instance of `Terminated` is raised.
+        """
+        final_cmd = self.get_command_line(cmd, interactive=interactive, offline=offline)
+
+        if interactive:
+            stdout = stderr = stdin = None
+        else:
+            stdin = subprocess.DEVNULL
+            stderr = self.logger.stdin
+            if not stdout:
+                self.log(quote_command_line(cmd))
+                stdout = self.logger.stdin
+
+        env = dict(**os.environ)
+        env.update(self.environment)
+
+        debug(f"Command: {final_cmd}")
+        if self.environment:
+            debug(f"Environment: {self.environment}")
+        process = subprocess.Popen(
+            final_cmd,
+            cwd=self.source_dir,
+            env=env,
+            stdin=stdin,
+            stdout=stdout,
+            stderr=stderr,
+        )
+        try:
+            process.communicate()
+            if expect_failure:
+                return process.returncode != 0
+            else:
+                return process.returncode == 0
+        finally:
+            process.terminate()
 
 
 class NullRuntime(Runtime):
     name = "null"
-
-    def prepare(self, build):
-        super().prepare(build)
-        toolchain = build.toolchain
-        if toolchain.version_suffix:
-            compiler = toolchain.compiler(build.target_arch)
-            build.log(
-                f"W: Requested {toolchain}, but versioned toolchains are not supported by the null runtime. Will use whatever version of {compiler} that you have installed. To ensure {toolchain} is used, try use a container-based runtime instead."
-            )
 
 
 class Image:
@@ -192,6 +366,17 @@ class ContainerRuntime(Runtime):
         }
         self.container_id = None
 
+    __volumes__ = None
+
+    @property
+    def volumes(self):
+        if self.__volumes__ is None:
+            self.__volumes__ = []
+        return self.__volumes__
+
+    def add_volume(self, source, dest=None):
+        self.volumes.append((source, dest or source))
+
     @lru_cache(None)
     def is_supported(self, arch, toolchain):
         image_name = arch.get_image(toolchain) or toolchain.get_image(arch)
@@ -203,17 +388,17 @@ class ContainerRuntime(Runtime):
         else:
             return False
 
-    def prepare(self, build):
-        super().prepare(build)
+    def prepare(self):
+        super().prepare()
         try:
-            self.prepare_image(build)
-            self.start_container(build)
+            self.prepare_image()
+            self.start_container()
         except subprocess.CalledProcessError:
             raise RuntimePreparationFailed(
                 self.prepare_failed_msg.format(image=self.get_image())
             )
 
-    def prepare_image(self, build):
+    def prepare_image(self):
         pull = [self.command, "pull", self.get_image()]
         last_pull = cache.get(pull)
         now = time.time()
@@ -224,26 +409,9 @@ class ContainerRuntime(Runtime):
         subprocess.check_call(pull)
         cache.set(pull, time.time())
 
-    def start_container(self, build):
-        source_tree = os.path.abspath(build.source_tree)
-        build_dir = os.path.abspath(build.build_dir)
+    def start_container(self):
+        env = (f"--env={k}={v}" for k, v in self.environment.items())
 
-        wrapper = build.wrapper
-        wrapper_opts = []
-        if wrapper.path:
-            wrapper_opts.append(
-                f"--volume={wrapper.path}:/usr/local/bin/{wrapper.name}"
-            )
-        for k, v in wrapper.environment.items():
-            if k.endswith("_DIR"):
-                path = "/" + re.sub(r"[^a-zA-Z0-9]+", "-", k.lower())
-                wrapper_opts.append(f"--volume={v}:{path}")
-                v = path
-            wrapper_opts.append(f"--env={k}={v}")
-
-        bin_volume = self.volume(super().bindir, self.bindir)
-
-        env = (f"--env={k}={v}" for k, v in build.environment.items())
         user_opts = self.get_user_opts()
         extra_opts = self.__get_extra_opts__()
         cmd = [
@@ -252,14 +420,11 @@ class ContainerRuntime(Runtime):
             "--rm",
             "--init",
             "--detach",
-            *wrapper_opts,
             "--env=KBUILD_BUILD_USER=tuxmake",
             *env,
             *user_opts,
-            self.volume(source_tree, source_tree),
-            self.volume(build_dir, build_dir),
-            bin_volume,
-            f"--workdir={source_tree}",
+            *self.get_volume_opts(),
+            f"--workdir={self.source_dir}",
             *self.get_logging_opts(),
             *extra_opts,
             self.get_image(),
@@ -286,12 +451,24 @@ class ContainerRuntime(Runtime):
         subprocess.check_call(
             [self.command, "stop", self.container_id], stdout=subprocess.DEVNULL
         )
+        super().cleanup()
 
     def __get_extra_opts__(self):
         opts = os.getenv(self.extra_opts_env_variable, "")
         return shlex.split(opts)
 
-    def get_metadata(self, build):
+    def get_volume_opts(self):
+        volumes = []
+        if self.source_dir:
+            volumes.append((self.source_dir, self.source_dir))
+        if self.output_dir:
+            volumes.append((self.output_dir, self.output_dir))
+        volumes.append((super().bindir, self.bindir))
+        volumes += self.volumes
+
+        return [self.volume(src, dst) for src, dst in volumes]
+
+    def get_metadata(self):
         version = (
             subprocess.check_output([self.command, "--version"]).decode("utf-8").strip()
         )
@@ -351,7 +528,7 @@ class PodmanRuntime(ContainerRuntime):
 class LocalMixin:
     prepare_failed_msg = "image {image} not found locally"
 
-    def prepare_image(self, build):
+    def prepare_image(self):
         subprocess.check_call(
             [self.command, "image", "inspect", self.get_image()],
             stdout=subprocess.DEVNULL,

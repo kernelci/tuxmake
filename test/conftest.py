@@ -69,3 +69,13 @@ def fake_cross_compilers(tmpdir_factory):
         for p, real in missing.items():
             os.symlink(f"/usr/bin/{real}", testbin / p)
         os.environ["PATH"] = f"{testbin}:" + os.environ["PATH"]
+
+
+@pytest.fixture()
+def Popen(mocker):
+    _Popen = mocker.patch("subprocess.Popen")
+    _Popen.return_value.communicate.return_value = (
+        mocker.MagicMock(),
+        mocker.MagicMock(),
+    )
+    return _Popen

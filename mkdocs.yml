@@ -38,7 +38,9 @@ nav:
   - Custom Containers: custom_containers.md
 - Reference:
   - Command Line Reference: cli.md
-  - Python API Reference: python.md
+  - Python API Reference:
+    - Build: python.md
+    - Runtime Library: python_runtime.md
 - Community:
   - Chat: chat.md
   - Code of Conduct: code-of-conduct.md
