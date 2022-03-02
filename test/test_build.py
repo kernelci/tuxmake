@@ -486,6 +486,13 @@ class TestToolchain:
         with pytest.raises(tuxmake.exceptions.UnsupportedToolchain):
             Toolchain("foocc")
 
+    def test_prepare_warns_about_versioned_toolchain(self, linux, mocker):
+        build = Build(tree=linux, toolchain="gcc-10", runtime="null")
+        log = mocker.patch("tuxmake.build.Build.log")
+        build.prepare()
+        log.assert_called()
+        assert "versioned toolchains" in log.call_args[0][0]
+
 
 class TestDebugKernel:
     def test_build_with_debugkernel(self, linux):

@@ -50,13 +50,6 @@ class TestNullRuntime:
             ["date"], interactive=False, offline=False
         ) == ["date"]
 
-    def test_prepare_warns_about_versioned_toolchain(self, build, mocker):
-        build.toolchain.version_suffix = "-10"
-        log = mocker.patch("tuxmake.build.Build.log")
-        runtime = NullRuntime()
-        runtime.prepare(build)
-        log.assert_called()
-
     def test_toolchains(self):
         runtime = NullRuntime()
         assert "gcc" in runtime.toolchains

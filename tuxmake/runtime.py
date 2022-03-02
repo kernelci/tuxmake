@@ -104,15 +104,6 @@ class Runtime(ConfigurableObject):
 class NullRuntime(Runtime):
     name = "null"
 
-    def prepare(self, build):
-        super().prepare(build)
-        toolchain = build.toolchain
-        if toolchain.version_suffix:
-            compiler = toolchain.compiler(build.target_arch)
-            build.log(
-                f"W: Requested {toolchain}, but versioned toolchains are not supported by the null runtime. Will use whatever version of {compiler} that you have installed. To ensure {toolchain} is used, try use a container-based runtime instead."
-            )
-
 
 class Image:
     def __init__(

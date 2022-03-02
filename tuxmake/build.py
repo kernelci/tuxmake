@@ -295,8 +295,15 @@ class Build:
         raise UnrecognizedSourceTree(source.absolute())
 
     def prepare(self):
-        self.log(quote_command_line(self.cmdline.reproduce(self)))
         self.wrapper.prepare_host()
+
+        if self.toolchain.version_suffix and self.runtime.name == "null":
+            toolchain = self.toolchain
+            compiler = toolchain.compiler(self.target_arch)
+            self.log(
+                f"W: Requested {toolchain}, but versioned toolchains are not supported by the null runtime. Will use whatever version of {compiler} that you have installed. To ensure {toolchain} is used, try use a container-based runtime instead."
+            )
+
         self.runtime.prepare(self)
         self.wrapper.prepare_runtime(self)
 
@@ -648,6 +655,7 @@ class Build:
             with self.measure_duration("Preparation", metadata="prepare"):
                 self.prepare()
             prepared = True
+            self.log(quote_command_line(self.cmdline.reproduce(self)))
 
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):
