@@ -76,7 +76,9 @@ class MetadataCollector:
 
         stdout = build.build_dir / "extracted-metadata.json"
         with stdout.open("w") as f:
-            build.run_cmd(["perl", str(script), str(metadata_input)], stdout=f)
+            build.run_cmd(
+                ["perl", str(script), str(metadata_input)], echo=False, stdout=f
+            )
         metadata = self.read_json(stdout.read_text())
         self.collect_extra_metadata(metadata)
         return metadata

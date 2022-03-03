@@ -369,7 +369,7 @@ class Build:
         finally:
             self.offline = False
 
-    def run_cmd(self, origcmd, stdout=None, interactive=False, makevars={}):
+    def run_cmd(self, origcmd, stdout=None, interactive=False, echo=True, makevars={}):
         """
         Performs the build.
 
@@ -391,6 +391,7 @@ class Build:
                 return self.runtime.run_cmd(
                     cmd,
                     interactive=interactive,
+                    echo=echo,
                     stdout=stdout,
                     expect_failure=expect_failure,
                     offline=self.offline,
@@ -482,7 +483,7 @@ class Build:
                 return BuildInfo("SKIP")
 
         for precondition in target.preconditions:
-            if not self.run_cmd(precondition, stdout=subprocess.DEVNULL):
+            if not self.run_cmd(precondition, echo=False, stdout=subprocess.DEVNULL):
                 debug(f"Skipping {target.name} because precondition failed")
                 return BuildInfo("SKIP")
 
@@ -490,7 +491,9 @@ class Build:
 
         fail = False
         for cmd in target.commands:
-            if not self.run_cmd(cmd, makevars=target.makevars):
+            if not self.run_cmd(
+                cmd, makevars=target.makevars, interactive=cmd.interactive
+            ):
                 fail = True
                 break
 

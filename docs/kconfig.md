@@ -19,6 +19,9 @@ ways:
 - an explicit make target (`make:targetname`); TuxMake will call `make
   targetname` during the configuration step (e.g. `make:kselftest-merge` will
   cause `make kselftest-merge` to be called).
+- an explicit *interactive* make target (`imake:targetname`); like
+  `make:targetname`, but runs interactively (i.e. you can interact with it with
+  the keyboard). Use for interactive targets such as `menuconfig`.
 - a path to a config file on the local filesystem;
 - a URL to a config file, in which case TuxMake will download it;
 - a config fragment matching one of these:
