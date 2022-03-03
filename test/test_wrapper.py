@@ -26,7 +26,9 @@ class Test_ccache:
     def test_prepare_runtime(self, mocker):
         build = mocker.MagicMock()
         Wrapper("ccache").prepare_runtime(build)
-        build.run_cmd.assert_called_with(["ccache", "--zero-stats"], stdout=mocker.ANY)
+        build.run_cmd.assert_called_with(
+            ["ccache", "--zero-stats"], echo=False, stdout=mocker.ANY
+        )
 
 
 class Test_sccache:

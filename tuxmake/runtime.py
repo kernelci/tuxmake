@@ -229,6 +229,7 @@ class Runtime(ConfigurableObject):
         offline: bool = True,
         expect_failure: bool = False,
         stdout: Optional[TextIO] = None,
+        echo: bool = True,
     ):
         """
         Runs a command in the desired runtime. Returns True if the command
@@ -257,8 +258,9 @@ class Runtime(ConfigurableObject):
             stdin = subprocess.DEVNULL
             stderr = self.logger.stdin
             if not stdout:
-                self.log(quote_command_line(cmd))
                 stdout = self.logger.stdin
+        if echo:
+            self.log(quote_command_line(cmd))
 
         env = dict(**os.environ)
         env.update(self.environment)

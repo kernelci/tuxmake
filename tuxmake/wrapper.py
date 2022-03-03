@@ -37,7 +37,7 @@ class Wrapper(ConfigurableObject):
 
     def prepare_runtime(self, build):
         for cmd in self.prepare_cmds:
-            build.run_cmd(cmd, stdout=subprocess.DEVNULL)
+            build.run_cmd(cmd, echo=False, stdout=subprocess.DEVNULL)
 
     def wrap(self, makevars):
         if not self.command:
