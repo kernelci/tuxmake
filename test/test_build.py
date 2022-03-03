@@ -14,6 +14,7 @@ from tuxmake.build import defaults
 from tuxmake.build import Terminated
 from tuxmake.build import get_image
 from tuxmake.build import DEFAULT_CONTAINER_REGISTRY
+from tuxmake.target import Command
 import tuxmake.exceptions
 
 
@@ -219,6 +220,17 @@ class TestKconfig:
         )
         config = output_dir / "config"
         assert "CONFIG_KSELFTEST_MERGE=y" in config.read_text()
+
+    def test_kconfig_add_explicit_interactive_make_target(self, linux, Popen):
+        build = Build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["imake:menuconfig"],
+        )
+        build.build(build.targets[0])
+        cmd = build.targets[-1].commands[1]
+        assert cmd == ["{make}", "menuconfig"]
+        assert cmd.interactive
 
     def test_kconfig_add_invalid(self, linux):
         with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
@@ -610,7 +622,7 @@ class TestDtbsLegacy:
     ):
         build = Build(tree=oldlinux, target_arch="arm64")
         dtbs_legacy = [t for t in build.targets if t.name == "dtbs-legacy"][0]
-        monkeypatch.setattr(dtbs_legacy, "commands", [["false"]])
+        monkeypatch.setattr(dtbs_legacy, "commands", [Command(["false"])])
         build.run()
         assert build.failed
 

@@ -17,6 +17,10 @@ def supported_targets():
     return Target.supported()
 
 
+class Command(list):
+    interactive = False
+
+
 class Target(ConfigurableObject):
     basedir = "target"
     exception = UnsupportedTarget
@@ -56,7 +60,12 @@ class Target(ConfigurableObject):
 
     def __split_cmds__(self, section, item):
         s = self.config[section].get(item)
-        return split_commands(s)
+        return [Command(c) for c in split_commands(s)]
+
+    def add_command(self, cmd):
+        c = Command(cmd)
+        self.commands.append(c)
+        return c
 
     def prepare(self):
         pass
@@ -123,7 +132,7 @@ class Config(Target):
             else:
                 raise UnsupportedKconfigFragment(frag)
         if merge:
-            self.commands.append(
+            self.add_command(
                 [
                     "scripts/kconfig/merge_config.sh",
                     "-m",
@@ -135,7 +144,7 @@ class Config(Target):
             )
             olddefconfig = True
         if olddefconfig:
-            self.commands.append(["{make}", "olddefconfig"])
+            self.add_command(["{make}", "olddefconfig"])
 
     def handle_url(self, config, url):
         if not url.startswith("http://") and not url.startswith("https://"):
@@ -171,7 +180,7 @@ class Config(Target):
 
     def handle_make_target(self, t):
         if re.match(r"^[\w\-]+config$", t):
-            self.commands.append(["{make}", t])
+            self.add_command(["{make}", t])
             return True
         else:
             return False
@@ -179,14 +188,18 @@ class Config(Target):
     def handle_explicit_make_target(self, t):
         if re.match(r"^make:.*$", t):
             target = re.sub(r"^make:", "", t)
-            self.commands.append(["{make}", target])
+            self.add_command(["{make}", target])
+            return True
+        elif re.match(r"^imake:.*$", t):
+            target = re.sub(r"^imake:", "", t)
+            self.add_command(["{make}", target]).interactive = True
             return True
         else:
             return False
 
     def handle_in_tree_config(self, t):
         if re.match(r"^[\w\-]+.config$", t):
-            self.commands.append(["{make}", t])
+            self.add_command(["{make}", t])
             return True
         else:
             return False

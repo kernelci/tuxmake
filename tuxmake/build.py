@@ -491,7 +491,9 @@ class Build:
 
         fail = False
         for cmd in target.commands:
-            if not self.run_cmd(cmd, makevars=target.makevars):
+            if not self.run_cmd(
+                cmd, makevars=target.makevars, interactive=cmd.interactive
+            ):
                 fail = True
                 break
 
