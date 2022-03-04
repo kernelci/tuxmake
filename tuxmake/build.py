@@ -3,7 +3,6 @@ from collections import OrderedDict
 from pathlib import Path
 import json
 import os
-import re
 import signal
 import shutil
 import subprocess
@@ -300,13 +299,12 @@ class Build:
             self.runtime.add_volume(
                 str(self.wrapper.path), f"/usr/local/bin/{self.wrapper.name}"
             )
-        env = dict(**self.wrapper.environment, **self.environment, LANG="C")
+        wenv = self.wrapper.environment
+        env = dict(**wenv, **self.environment, LANG="C")
         self.runtime.environment = env
-        for k, v in env.items():
+        for k, v in wenv.items():
             if k.endswith("_DIR"):
-                path = "/" + re.sub(r"[^a-zA-Z0-9]+", "-", k.lower())
-                self.runtime.add_volume(v, path)
-                v = path
+                self.runtime.add_volume(v)
         self.runtime.prepare()
         self.wrapper.prepare_runtime(self)
 
