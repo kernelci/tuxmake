@@ -693,6 +693,14 @@ class TestCompilerWrappers:
         assert makevars["CC"] == "ccache gcc"
         assert makevars["HOSTCC"] == "ccache gcc"
 
+    def test_ccache_with_container_runtime(self, linux, Popen, mocker):
+        b = Build(tree=linux, targets=["config"], wrapper="ccache", runtime="podman")
+        mocker.patch("tuxmake.runtime.ContainerRuntime.prepare")
+        mocker.patch("tuxmake.wrapper.Wrapper.prepare_runtime")
+        b.prepare()
+        cache_dir = b.wrapper.environment["CCACHE_DIR"]
+        assert (cache_dir, cache_dir) in b.runtime.volumes
+
     def test_ccache_gcc_v(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")
         b.build(b.targets[0])
