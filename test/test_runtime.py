@@ -63,6 +63,20 @@ class TestRuntime:
         assert kwargs["stdout"] is None
         assert kwargs["stderr"] is None
 
+    def test_create_output_directory_on_prepare(self, tmp_path):
+        runtime = NullRuntime()
+        runtime.output_dir = tmp_path / "build" / "1"
+        runtime.prepare()
+        assert runtime.output_dir.exists()
+
+    def test_create_output_directory_on_prepare_already_exists(self, tmp_path):
+        runtime = NullRuntime()
+        d = tmp_path / "build" / "1"
+        d.mkdir(parents=True)
+        runtime.output_dir = d
+        runtime.prepare()
+        assert runtime.output_dir.exists()
+
 
 class TestNullRuntime:
     def test_get_command_line(self, build):
