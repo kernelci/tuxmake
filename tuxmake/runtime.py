@@ -170,7 +170,8 @@ class Runtime(ConfigurableObject):
         Initializes the runtime object. Must be called before actually running
         any commands with `run_cmd`.
         """
-        pass
+        if self.output_dir:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def get_go_offline_command(self):
         return self.bindir / "tuxmake-run-offline"
