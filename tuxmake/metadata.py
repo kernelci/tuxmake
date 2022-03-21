@@ -29,7 +29,7 @@ class MetadataItemExtactor(ABC):
 class FreeDiskSpace(MetadataItemExtactor):
     def before_build(self):
         disk_usage = shutil.disk_usage(self.build.build_dir.parent)
-        self.free_disk_space = int(disk_usage.free / (2 ** 20))
+        self.free_disk_space = int(disk_usage.free / (2 ** 20))  # fmt: skip
 
     def get(self):
         return self.free_disk_space
