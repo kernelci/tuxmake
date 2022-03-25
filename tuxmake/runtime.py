@@ -464,7 +464,7 @@ class ContainerRuntime(Runtime):
         volumes = []
         if self.source_dir:
             volumes.append((self.source_dir, self.source_dir))
-        if self.output_dir:
+        if self.output_dir and self.source_dir != self.output_dir:
             volumes.append((self.output_dir, self.output_dir))
         volumes.append((super().bindir, self.bindir))
         volumes += self.volumes
