@@ -87,8 +87,8 @@ class TestModules:
     def test_strip_modules(self, modules):
         assert modules.makevars["INSTALL_MOD_STRIP"] == "1"
 
-    def test_depends_on_default(self, modules):
-        assert modules.dependencies == ["default"]
+    def test_depends_on_config(self, modules):
+        assert modules.dependencies == ["config"]
 
 
 class TestDtbs:
