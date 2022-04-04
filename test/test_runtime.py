@@ -1,6 +1,7 @@
 import re
 import subprocess
 import pytest
+import os
 
 from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
@@ -172,6 +173,17 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.start_container()
         assert runtime.container_id == container_id
 
+    def test_get_user_opts_with_run_as_root(self, container_id):
+        runtime = DockerRuntime()
+        runtime.run_as_root = True
+        assert runtime.get_user_opts() == []
+
+    def test_get_user_opts(self, container_id):
+        runtime = DockerRuntime()
+        uid = os.getuid()
+        gid = os.getgid()
+        assert runtime.get_user_opts() == [f"--user={uid}:{gid}"]
+
     def test_cleanup(self, container_id, mocker):
         check_call = mocker.patch("subprocess.check_call")
         runtime = DockerRuntime()
@@ -187,8 +199,11 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.cleanup()  # if this doesn't crash we are good
 
     def test_get_command_line(self):
-        cmd = DockerRuntime().get_command_line(["date"], False)
+        runtime = DockerRuntime()
+        runtime.set_exec_user("tuxmake")
+        cmd = runtime.get_command_line(["date"], False)
         assert cmd[0:2] == ["docker", "exec"]
+        assert cmd[2:4] == ["--user", "tuxmake"]
         assert cmd[-1] == "date"
 
     def test_environment(self, linux, spawn_container):

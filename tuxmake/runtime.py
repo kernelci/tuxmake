@@ -337,6 +337,7 @@ class ContainerRuntime(Runtime):
         self.base_images = []
         self.ci_images = []
         self.toolchain_images = []
+        self.exec_user = None
         self.toolchains = split(self.config["runtime"]["toolchains"])
         for image_list, config in (
             (self.base_images, self.config["runtime"]["bases"]),
@@ -446,7 +447,17 @@ class ContainerRuntime(Runtime):
             interactive_opts = ["--interactive", "--tty"]
         else:
             interactive_opts = []
-        return [self.command, "exec", *interactive_opts, self.container_id]
+        if self.exec_user:
+            exec_user_opts = ["--user", self.exec_user]
+        else:
+            exec_user_opts = []
+        return [
+            self.command,
+            "exec",
+            *interactive_opts,
+            *exec_user_opts,
+            self.container_id,
+        ]
 
     def cleanup(self):
         if not self.container_id:
@@ -495,13 +506,19 @@ class ContainerRuntime(Runtime):
             "image_digest": image_digest,
         }
 
+    def set_exec_user(self, exec_user):
+        self.exec_user = exec_user
+
 
 class DockerRuntime(ContainerRuntime):
     name = "docker"
     command = "docker"
     extra_opts_env_variable = "TUXMAKE_DOCKER_RUN"
+    _run_as_root = False
 
     def get_user_opts(self):
+        if self.run_as_root:
+            return []
         uid = os.getuid()
         gid = os.getgid()
         return [f"--user={uid}:{gid}"]
@@ -511,6 +528,14 @@ class DockerRuntime(ContainerRuntime):
 
     def volume(self, source, target):
         return f"--volume={source}:{target}"
+
+    @property
+    def run_as_root(self):
+        return self._run_as_root
+
+    @run_as_root.setter
+    def run_as_root(self, val):
+        self._run_as_root = val
 
 
 class PodmanRuntime(ContainerRuntime):
