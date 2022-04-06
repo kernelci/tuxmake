@@ -24,7 +24,7 @@ def main(argv=sys.argv):
     parser.add_argument(
         "-I", "--interactive", action="store_true", help="Interactive (allocate a TTY)"
     )
-    parser.add_argument("command", nargs="*")
+    parser.add_argument("command", nargs="+")
     options = parser.parse_args(argv[1:])
 
     runtime = Runtime.get(options.runtime)
