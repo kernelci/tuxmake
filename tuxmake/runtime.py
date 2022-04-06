@@ -519,7 +519,7 @@ class PodmanRuntime(ContainerRuntime):
     extra_opts_env_variable = "TUXMAKE_PODMAN_RUN"
 
     def get_user_opts(self):
-        return []
+        return ["--userns=keep-id"]
 
     def get_logging_opts(self):
         return ["--log-level=ERROR"]
