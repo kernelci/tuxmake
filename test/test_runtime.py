@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import pytest
@@ -228,6 +229,29 @@ class TestDockerRuntime(TestContainerRuntime):
         cmd = spawn_container.call_args[0][0]
         assert "--hostname=foobar" in cmd
         assert "--env=FOO=bar baz" in cmd
+
+    def test_set_user(self, spawn_container, mocker):
+        check_call = mocker.patch("subprocess.check_call")
+        runtime = DockerRuntime()
+        runtime.set_user("tuxmake")
+        runtime.start_container()
+        cmd = spawn_container.call_args[0][0]
+        assert "--user=tuxmake" in cmd
+        usermod = check_call.call_args[0][0]
+        uid = str(os.getuid())
+        assert usermod[-4:] == ["usermod", "-u", uid, "tuxmake"]
+
+    def test_set_user_set_group(self, spawn_container, mocker):
+        check_call = mocker.patch("subprocess.check_call")
+        runtime = DockerRuntime()
+        runtime.set_user("tuxmake")
+        runtime.set_group("tuxmake")
+        runtime.start_container()
+        cmd = spawn_container.call_args[0][0]
+        assert "--user=tuxmake:tuxmake" in cmd
+        groupmod = check_call.call_args[0][0]
+        gid = str(os.getgid())
+        assert groupmod[-4:] == ["groupmod", "-g", gid, "tuxmake"]
 
     def test_interactive(self):
         cmd = DockerRuntime().get_command_line(["bash"], True)

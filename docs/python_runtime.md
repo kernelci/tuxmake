@@ -20,7 +20,7 @@ runtim.cleanup()
 
 ::: tuxmake.runtime.Runtime
     :docstring:
-    :members: get set_image add_volume prepare run_cmd cleanup log get_metadata
+    :members: get set_image set_user set_group add_volume prepare run_cmd cleanup log get_metadata
 
 ## The `Terminated` class
 

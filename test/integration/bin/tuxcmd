@@ -22,6 +22,12 @@ def main(argv=sys.argv):
         "-i", "--image", type=str, default="debian", help="Container image to use"
     )
     parser.add_argument(
+        "-u", "--user", type=str, help="User to run container as"
+    )
+    parser.add_argument(
+        "-g", "--group", type=str, help="Group to run container as"
+    )
+    parser.add_argument(
         "-I", "--interactive", action="store_true", help="Interactive (allocate a TTY)"
     )
     parser.add_argument("command", nargs="+")
@@ -29,6 +35,10 @@ def main(argv=sys.argv):
 
     runtime = Runtime.get(options.runtime)
     runtime.set_image(options.image)
+    if options.user:
+        runtime.set_user(options.user)
+    if options.group:
+        runtime.set_group(options.group)
     runtime.prepare()
     runtime.run_cmd(options.command, interactive=options.interactive, offline=False)
     runtime.cleanup()

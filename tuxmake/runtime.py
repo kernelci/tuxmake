@@ -101,6 +101,8 @@ class Runtime(ConfigurableObject):
         super().__init__(self.name)
         self.__offline_available__ = None
         self.__image__ = None
+        self.__user__ = None
+        self.__group__ = None
         self.__logger__: Optional[subprocess.Popen] = None
 
         self.basename: str = "run"
@@ -123,6 +125,21 @@ class Runtime(ConfigurableObject):
         runtimes.
         """
         self.__image__ = image
+
+    def set_user(self, user):
+        """
+        Sets the user (inside the container) that the container will be started
+        as. This has effect only on Docker runtimes.
+        """
+        self.__user__ = user
+
+    def set_group(self, group):
+        """
+        Sets the group (inside the container) that the container will be
+        started as. This has effect only on Docker runtimes, and only if
+        set_user is also used.
+        """
+        self.__group__ = group
 
     def is_supported(self, arch, toolchain):
         return True
@@ -502,9 +519,29 @@ class DockerRuntime(ContainerRuntime):
     extra_opts_env_variable = "TUXMAKE_DOCKER_RUN"
 
     def get_user_opts(self):
-        uid = os.getuid()
-        gid = os.getgid()
+        if self.__user__:
+            opt = f"--user={self.__user__}"
+            if self.__group__:
+                opt += ":" + self.__group__
+            return [opt]
+        else:
+            uid = os.getuid()
+            gid = os.getgid()
         return [f"--user={uid}:{gid}"]
+
+    def start_container(self):
+        super().start_container()
+        if self.__user__:
+            uid = str(os.getuid())
+            self.__exec_as_root(["usermod", "-u", uid, self.__user__])
+            if self.__group__:
+                gid = str(os.getuid())
+                self.__exec_as_root(["groupmod", "-g", gid, self.__group__])
+
+    def __exec_as_root(self, cmd):
+        subprocess.check_call(
+            [self.command, "exec", "--user=root", self.container_id, *cmd]
+        )
 
     def get_logging_opts(self):
         return []
