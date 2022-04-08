@@ -119,7 +119,7 @@ class Runtime(ConfigurableObject):
 
     def set_image(self, image):
         """
-        Sets the container image to use. This has no effect on non-container
+        Sets the container image to use. This has effect only on container
         runtimes.
         """
         self.__image__ = image
