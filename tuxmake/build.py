@@ -10,7 +10,7 @@ import time
 from tuxmake import __version__
 from tuxmake import deprecated
 from tuxmake.logging import set_debug, debug
-from tuxmake.arch import Architecture, host_arch
+from tuxmake.arch import Architecture, native_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_new_output_dir
@@ -181,7 +181,7 @@ class Build:
             self.clean_build_tree = True
         self.auto_cleanup = auto_cleanup
 
-        self.target_arch = target_arch and Architecture(target_arch) or host_arch
+        self.target_arch = target_arch and Architecture(target_arch) or native_arch
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 

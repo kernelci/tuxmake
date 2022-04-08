@@ -42,4 +42,4 @@ class Native(Architecture):
         self.makevars = {}
 
 
-host_arch = Native()
+native_arch = Native()

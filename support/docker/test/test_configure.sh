@@ -67,7 +67,7 @@ test_arm64_gcc_8() {
 test_x86_64_gcc() {
     get_build_args x86_64_gcc
     assertArg 'BASE=$(REGISTRY)$(PROJECT)/gcc' 'HOSTARCH=x86_64'\
-        'PACKAGES="gcc g++ gcc-x86-64-linux-gnu g++-x86-64-linux-gnu"'
+        'PACKAGES="gcc g++"'
 }
 
 test_clang() {
@@ -105,5 +105,10 @@ test_clang_all_includes_only_glang_images_not_clang_N() {
         echo ' \------------------------------------------------'
     fi
 }
+
+if [ "$(uname -m)" != "x86_64" ]; then
+    echo "I: skipping tests, as they only apply on x86_64"
+    exit
+fi
 
 . /usr/share/shunit2/shunit2

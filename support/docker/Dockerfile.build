@@ -22,14 +22,12 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
 
 # Install basic toolchain packages. Which toolchain exactly is defined by the
 # $PACKAGES build argument
-RUN if [ "$(uname -m)" != "${HOSTARCH}" ]; then apt-get update \
-    && apt-get install \
+RUN apt-get install \
         --assume-yes \
         --no-install-recommends \
         --option=debug::pkgProblemResolver=yes \
         ${INSTALL_OPTIONS} \
-        $PACKAGES; \
-    fi
+        $PACKAGES
 
 # Install extra development packages
 #

@@ -11,7 +11,7 @@ sys.path.insert(0, str(tuxmake))
 
 
 from tuxmake.runtime import NullRuntime, DockerRuntime
-from tuxmake.arch import Architecture
+from tuxmake.arch import Architecture, native_arch
 
 TAG = os.getenv("TAG")
 
@@ -203,10 +203,13 @@ class CrossGccBuildImage(CrossBuildMixin, GccBuildImage):
         self.pkgname = re.sub(r".*_(gcc.*)$", "\g<1>", self.name)
 
     def get_packages(self):
-        return super().get_packages() + [
-            pkg + "-" + self.cross_package_suffix
-            for pkg in self.packages
-        ]
+        extra_packages = []
+        if self.arch != native_arch.name:
+            extra_packages = [
+                pkg + "-" + self.cross_package_suffix
+                for pkg in self.packages
+            ]
+        return super().get_packages() + extra_packages
 
 
 class CrossClangBuildImage(CrossBuildMixin, ClangBuildImage):

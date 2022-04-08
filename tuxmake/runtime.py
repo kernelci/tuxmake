@@ -16,7 +16,7 @@ from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import ImageRequired
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.toolchain import Toolchain
-from tuxmake.arch import host_arch
+from tuxmake.arch import native_arch
 from tuxmake.utils import quote_command_line
 
 
@@ -402,8 +402,8 @@ class ContainerRuntime(Runtime):
         image_name = arch.get_image(toolchain) or toolchain.get_image(arch)
         image = self.toolchain_images_map.get(image_name)
         if image:
-            return host_arch.name in image.hosts or any(
-                [a in image.hosts for a in host_arch.aliases]
+            return native_arch.name in image.hosts or any(
+                [a in image.hosts for a in native_arch.aliases]
             )
         else:
             return False
