@@ -94,3 +94,7 @@ class UnsupportedMetadataType(TuxMakeInfrastructureError):
 
 class EnvironmentCheckFailed(TuxMakeUserError):
     msg = "Environment check failed"
+
+
+class UnsupportedCompression(TuxMakeUserError):
+    msg = "Unsupported compression type: {name}"

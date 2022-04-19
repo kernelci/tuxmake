@@ -2,6 +2,8 @@ import multiprocessing
 from typing import List
 from tuxmake.arch import Architecture
 from tuxmake.target import supported_targets
+from tuxmake.target import Compression
+from tuxmake.target import default_compression
 from tuxmake.toolchain import Toolchain
 from tuxmake.runtime import Runtime
 from tuxmake.wrapper import Wrapper
@@ -13,6 +15,7 @@ class supported:
     toolchains: List[str] = Toolchain.supported()
     runtimes: List[str] = Runtime.supported()
     wrappers: List[str] = Wrapper.supported()
+    compression: List[str] = Compression.supported
 
 
 class defaults:
@@ -28,3 +31,4 @@ class defaults:
         "headers",
     ]
     jobs: int = multiprocessing.cpu_count()
+    compression: str = default_compression.name

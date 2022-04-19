@@ -8,6 +8,7 @@ import urllib.request
 from tuxmake import __version__
 from tuxmake.config import ConfigurableObject, split_commands
 from tuxmake.exceptions import InvalidKConfig
+from tuxmake.exceptions import UnsupportedCompression
 from tuxmake.exceptions import UnsupportedTarget
 from tuxmake.exceptions import UnsupportedKconfig
 from tuxmake.exceptions import UnsupportedKconfigFragment
@@ -21,12 +22,55 @@ class Command(list):
     interactive = False
 
 
+class compression_types:
+    class xz:
+        command = ["xz", "-T0", "--force", "--keep"]
+        extension = ".xz"
+
+    class none:
+        command = ["true"]
+        extension = ""
+
+
+class Compression:
+    supported: List[str] = [
+        c for c in compression_types.__dict__ if not c.startswith("_")
+    ]
+
+    def __init__(self, ctype=None):
+        if ctype is None:
+            ctype = "xz"
+        try:
+            self.__type__ = getattr(compression_types, ctype)
+        except AttributeError:
+            raise UnsupportedCompression(ctype)
+
+    def format(self, s) -> str:
+        return s.format(z_ext=self.extension)
+
+    @property
+    def name(self) -> str:
+        return self.__type__.__name__
+
+    @property
+    def extension(self) -> str:
+        return self.__type__.extension
+
+    @property
+    def command(self) -> List[str]:
+        return self.__type__.command
+
+
+default_compression = Compression()
+
+
 class Target(ConfigurableObject):
     basedir = "target"
     exception = UnsupportedTarget
 
-    def __init__(self, name, build):
+    def __init__(self, name, build, compression=default_compression):
         self.build = build
+        self.compression = compression
         self.target_arch = build.target_arch
         super().__init__(name)
 
@@ -38,7 +82,12 @@ class Target(ConfigurableObject):
         self.commands = self.__split_cmds__("target", "commands")
         self.kconfig_add = self.__split_kconfigs__()
         try:
-            self.artifacts = dict(self.config["artifacts"])
+            artifacts = dict(self.config["artifacts"])
+            self.artifacts = {}
+            for k, v in artifacts.items():
+                key = self.compression.format(k)
+                value = self.compression.format(v)
+                self.artifacts[key] = value
         except KeyError:
             mapping = self.build.target_overrides
             if mapping and self.name in mapping:
@@ -233,6 +282,6 @@ class Kernel(Target):
 __special_targets__ = {"config": Config, "kernel": Kernel}
 
 
-def create_target(name, build):
+def create_target(name, build, compression=default_compression):
     cls = __special_targets__.get(name, Target)
-    return cls(name, build)
+    return cls(name, build, compression)

@@ -59,6 +59,13 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         default=None,
         help="Build directory. For incremental builds, specify the same directory on subsequential builds (default: temporary, clean directory).",
     )
+    build_output.add_argument(
+        "-z",
+        "--compression-type",
+        type=str,
+        default=None,
+        help=f"Compression type to use in compressed artifacts (default: {defaults.compression}; supported: {', '.join(supported.compression)})",
+    )
 
     target = parser.add_argument_group("Build output options")
     target.add_argument(

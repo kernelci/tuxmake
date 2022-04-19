@@ -14,6 +14,8 @@ from tuxmake.arch import Architecture, native_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_new_output_dir
+from tuxmake.target import Compression
+from tuxmake.target import default_compression
 from tuxmake.target import create_target
 from tuxmake.runtime import Runtime
 from tuxmake.runtime import Terminated
@@ -121,6 +123,8 @@ class Build:
       etc).
     - **targets**: targets to build, list of `str`. If `None` or an empty list
       is passed, the default list of targets will be built.
+    - **compression_type**: compression type to use in compressed artifacts.
+      `str`, must be one of "xz", "none".
     - **kernel_image**: which kernel image to build, overriding the default
       kernel image name defined for the target architecture.
     - **jobs**: number of concurrent jobs to run (as in `make -j N`). `int`,
@@ -160,6 +164,7 @@ class Build:
         kconfig_add=[],
         make_variables={},
         targets=defaults.targets,
+        compression_type=None,
         kernel_image=None,
         jobs=None,
         runtime=None,
@@ -205,6 +210,10 @@ class Build:
         else:
             self.target_overrides = self.target_arch.targets
 
+        if compression_type:
+            self.compression = Compression(compression_type)
+        else:
+            self.compression = default_compression
         self.targets = []
         self.__ordering_only_targets__ = {}
         for t in targets:
@@ -256,7 +265,7 @@ class Build:
         return self.__status__
 
     def add_target(self, target_name, ordering_only=False):
-        target = create_target(target_name, self)
+        target = create_target(target_name, self, self.compression)
 
         if ordering_only:
             if target_name not in self.__ordering_only_targets__:
@@ -429,6 +438,8 @@ class Build:
                 "--clamp-mtime",
                 "-caf",
             ]
+        elif part == "{z}":
+            return self.compression.command
         else:
             return [self.format_cmd_part(part)]
 
@@ -440,6 +451,7 @@ class Build:
             toolchain=self.toolchain.name,
             wrapper=self.wrapper.name,
             kconfig=self.kconfig,
+            z_ext=self.compression.extension,
             **self.target_overrides,
         )
 

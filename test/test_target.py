@@ -2,7 +2,7 @@ import pytest
 
 import tuxmake.exceptions
 from tuxmake.arch import Native
-from tuxmake.target import Target, Config
+from tuxmake.target import Compression, Target, Config
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ class TestConfig:
 class TestDebugKernel:
     def test_commands(self, build):
         debugkernel = Target("debugkernel", build)
-        assert debugkernel.commands[0][0] == "xz"
+        assert debugkernel.commands[0][0] == "{z}"
         assert debugkernel.commands[0][-1] == "{build_dir}/vmlinux"
 
 
@@ -126,3 +126,9 @@ class TestTargzPkg:
         artifacts = targzpkg.find_artifacts(tmp_path)
         assert artifacts[0][0] == filename
         assert artifacts[0][1].name == filename
+
+
+class TestCompression:
+    def test_invalid_compression(self):
+        with pytest.raises(tuxmake.exceptions.UnsupportedCompression):
+            Compression("unexisting")

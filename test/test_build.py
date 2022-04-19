@@ -15,6 +15,7 @@ from tuxmake.build import Terminated
 from tuxmake.build import get_image
 from tuxmake.build import DEFAULT_CONTAINER_REGISTRY
 from tuxmake.target import Command
+from tuxmake.target import default_compression
 import tuxmake.exceptions
 
 
@@ -1035,3 +1036,18 @@ class TestGetImage:
     def test_override_full_image_name_with_registry(self, build, monkeypatch):
         monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo/bar")
         assert get_image(build) == "docker.io/foo/bar"
+
+
+class TestCompression:
+    def test_default_compression(self, linux):
+        build = Build(tree=linux)
+        assert build.compression is default_compression
+        build.run()
+        artifacts = [str(f.name) for f in build.output_dir.glob("*")]
+        assert "modules.tar.xz" in artifacts
+
+    def test_compression_none(self, linux):
+        build = Build(tree=linux, compression_type="none")
+        build.run()
+        artifacts = [str(f.name) for f in build.output_dir.glob("*")]
+        assert "modules.tar" in artifacts
