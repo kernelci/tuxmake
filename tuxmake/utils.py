@@ -1,6 +1,8 @@
+import functools
 import os
 import subprocess
 import shlex
+import time
 from typing import List
 
 
@@ -21,3 +23,26 @@ def get_directory_timestamp(directory):
 
     s = os.stat(directory)
     return str(int(s.st_mtime))
+
+
+def retry(*exceptions, max_attempts=5, backoff=1):
+    def retry_decorator(func):
+        @functools.wraps(func)
+        def retry_wrapper(*args, **kwargs):
+            attempts = 0
+            wait = 1
+            while True:
+                try:
+                    ret = func(*args, **kwargs)
+                    return ret
+                except Exception as e:
+                    attempts += 1
+                    if type(e) in exceptions and attempts < max_attempts:
+                        time.sleep(wait)
+                        wait = wait ** (backoff * 2)
+                    else:
+                        raise
+
+        return retry_wrapper
+
+    return retry_decorator

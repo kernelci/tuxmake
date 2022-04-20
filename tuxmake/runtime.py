@@ -18,6 +18,7 @@ from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.toolchain import Toolchain
 from tuxmake.arch import native_arch
 from tuxmake.utils import quote_command_line
+from tuxmake.utils import retry
 
 
 DEFAULT_RUNTIME = "null"
@@ -426,7 +427,12 @@ class ContainerRuntime(Runtime):
             a_day_ago = now - (24 * 60 * 60)
             if last_pull > a_day_ago:
                 return
-        subprocess.check_call(pull)
+
+        @retry(subprocess.CalledProcessError)
+        def do_pull():
+            subprocess.check_call(pull)
+
+        do_pull()
         cache.set(pull, time.time())
 
     def start_container(self):
