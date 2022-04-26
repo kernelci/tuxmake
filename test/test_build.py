@@ -562,6 +562,21 @@ class TestModules:
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "modules.tar.xz" not in artifacts
 
+    def test_cleans_up_modules_install_directory(self, tmp_path, linux_rw):
+        build_dir = tmp_path / "build"
+        build(tree=linux_rw, build_dir=build_dir, targets=["modules"])
+        makefile = str(linux_rw / "Makefile")
+        subprocess.check_call(
+            ["sed", "-i", "-e", "s/^VERSION.*/VERSION = 9.9.9.9.9/", makefile]
+        )
+        b = build(tree=linux_rw, build_dir=build_dir, targets=["modules"])
+        tarball = b.output_dir / "modules.tar.xz"
+        items = subprocess.check_output(
+            ["tar", "taf", str(tarball)], encoding="utf-8"
+        ).split("\n")
+        modules = [i for i in items if i.endswith("/ext4.ko")]
+        assert modules == ["lib/modules/9.9.9.9.9/kernel/fs/ext4/ext4.ko"]
+
 
 def tarball_contents(tarball):
     return subprocess.check_output(["tar", "taf", tarball]).decode("utf-8").splitlines()
