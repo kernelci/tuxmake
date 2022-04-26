@@ -122,14 +122,16 @@ $(O)/arch/$(ARCHDIRNAME)/boot/xipImage: $(O)/vmlinux
 #########################################################################
 modules: $(O)/modules
 CLEAN += $(O)/modules
-$(O)/modules: $(O)/vmlinux
+$(O)/modules: $(O)/vmlinux $(O)/modules/lib/modules/$(VERSION)/kernel/fs/ext4/ext4.ko
 	$(call maybefail,modules)
-	mkdir -p $@/lib/modules/$(VERSION)/kernel/fs/ext4
-	touch    $@/lib/modules/$(VERSION)/kernel/fs/ext4/ext4.ko
+
+$(O)/modules/lib/modules/$(VERSION)/kernel/fs/ext4/ext4.ko:
+	mkdir -p $(shell dirname $@)
+	touch    $@
 
 modules_install: $(O)/modules
-	mkdir -p $(INSTALL_MOD_PATH)
-	cp -r $(O)/modules/lib $(INSTALL_MOD_PATH)/
+	mkdir -p $(INSTALL_MOD_PATH)/lib/modules
+	cp -r $(O)/modules/lib/modules/$(VERSION) $(INSTALL_MOD_PATH)/lib/modules/
 
 
 ########################################################################
