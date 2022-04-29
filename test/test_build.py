@@ -1052,6 +1052,18 @@ class TestGetImage:
         monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo/bar")
         assert get_image(build) == "docker.io/foo/bar"
 
+    def test_detect_dockerhub_registry_on_image_names_with_only_one_component(
+        self, build, monkeypatch
+    ):
+        monkeypatch.setenv("TUXMAKE_IMAGE", "docker.io/foo")
+        assert get_image(build) == "docker.io/foo"
+
+    def test_detect_localhost_registry_on_image_names_with_only_one_component(
+        self, build, monkeypatch
+    ):
+        monkeypatch.setenv("TUXMAKE_IMAGE", "localhost/foo")
+        assert get_image(build) == "localhost/foo"
+
 
 class TestCompression:
     def test_default_compression(self, linux):

@@ -680,7 +680,10 @@ def get_image(build):
     )
     registry = os.getenv("TUXMAKE_IMAGE_REGISTRY", DEFAULT_CONTAINER_REGISTRY)
     if registry:
-        if len(image.split("/")) < 3:
+        parts = image.split("/")
+        localhost = parts[0] == "localhost"
+        remotehost = len(parts[0].split(".")) > 1
+        if len(parts) < 3 and not localhost and not remotehost:
             # only prepend registry if the image name is not already a full
             # image name.
             image = registry + "/" + image
