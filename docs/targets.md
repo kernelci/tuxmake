@@ -126,6 +126,10 @@ does not require this, so if you want `kselftest-merge` to be built, it needs
 to be specified explicitly. If built, it will always be built before
 `kselftest` itself.
 
+## clang-analyzer
+
+This target run check with clang static analyzer.
+
 ## cpupower
 
 This target builds the cpupower program and libraries, from

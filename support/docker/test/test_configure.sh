@@ -72,18 +72,18 @@ test_x86_64_gcc() {
 
 test_clang() {
     get_build_args clang
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang llvm lld"'
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang clang-tidy llvm lld"'
 }
 
 test_arm64_clang() {
     get_build_args arm64_clang
     assertArg 'BASE=$(REGISTRY)$(PROJECT)/clang' 'HOSTARCH=aarch64' \
-        'PACKAGES="clang llvm lld binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu"'
+        'PACKAGES="clang clang-tidy llvm lld binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu"'
 }
 
 test_clang_11() {
     get_build_args clang-11
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-11 llvm-11 lld-11"'
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-11 clang-tidy-11 llvm-11 lld-11"'
 }
 
 test_gcc_all_includes_only_gcc_images_not_gcc_N() {
