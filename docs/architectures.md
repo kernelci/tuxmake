@@ -14,8 +14,8 @@ Architecture | Aliases     | Description              | Kernel   | Userspace
 -------------|-------------|--------------------------|----------|----------
 arc          |             | ARC                      | yes¹     | no
 arm64        | *aarch64*   | 64-bit ARMv8             | yes      | yes
-arm          |             | 32-bit ARM V7/hardfloat  | yes      | yes
-armv5        |             | 32-bit ARM V5            | yes      | yes
+arm          | *armhf*     | 32-bit ARM V7/hardfloat  | yes      | yes
+armv5        | *armel*     | 32-bit ARM V5            | yes      | yes
 hexagon      |             | Qualcomm Hexagon (DSP6)  | yes²     | no
 i386         |             | 32-bit X86               | yes      | yes
 mips         |             | 32-bit MIPS              | yes      | yes

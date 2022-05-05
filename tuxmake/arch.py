@@ -10,6 +10,8 @@ class Architecture(ConfigurableObject):
     config_aliases = {
         "aarch64": "arm64",
         "amd64": "x86_64",
+        "armhf": "arm",
+        "armel": "armv5",
         "armv8l": "arm",
         "i686": "i386",
     }
