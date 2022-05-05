@@ -150,7 +150,11 @@ class Config(Target):
         conf = self.build.kconfig
         if config.exists():
             return
-        if self.handle_url(config, conf) or self.handle_local_file(config, conf):
+        if (
+            self.handle_url(config, conf)
+            or self.handle_local_file(config, conf)
+            or self.handle_in_tree_file(config, conf)
+        ):
             self.build.log(f"# {conf} -> {config}")
             olddefconfig = True
         elif self.handle_make_target(conf):

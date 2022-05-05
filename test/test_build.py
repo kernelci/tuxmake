@@ -237,6 +237,11 @@ class TestKconfig:
         with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
             build(tree=linux, targets=["config"], kconfig_add=["foo"])
 
+    def test_kconfig_from_source_tree(self, linux):
+        b = build(tree=linux, targets=["config"], kconfig="config/test.config")
+        config = b.output_dir / "config"
+        assert "CONFIG_IN_SOURCE_CONFIG_FILE=y" in config.read_text()
+
 
 def test_output_dir(linux, output_dir, kernel):
     build(tree=linux, output_dir=output_dir)

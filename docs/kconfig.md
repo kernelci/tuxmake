@@ -9,6 +9,7 @@ configuration*. It can be specified in three different ways:
 
 - a named configuration target (`defconfig`, etc);
 - a path to a config file on the local filesystem;
+- a (relative) path to a config file in the source tree;
 - a URL to a config file, in which case TuxMake will download it.
 
 **kconfig_add** specifies extra configuration to apply on top of the main
