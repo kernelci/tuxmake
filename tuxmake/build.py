@@ -616,11 +616,18 @@ class Build:
 
     def check_environment(self):
         self.runtime.prepare()
+        self.get_dynamic_makevars()
         cmd = [str(self.runtime.get_check_environment_command())]
         cmd.append(f"{self.target_arch.name}_{self.toolchain.name}")
         cross = self.makevars.get("CROSS_COMPILE")
         if cross:
             cmd.append(cross)
+        if "CROSS_COMPILE_COMPAT" in self.dynamic_make_variables:
+            cross_compat = self.makevars.get("CROSS_COMPILE_COMPAT")
+            if cross_compat:
+                cmd.append(cross_compat)
+            else:
+                cmd.append("")
         result = self.run_cmd(cmd)
         self.cleanup()
         if not result:

@@ -13,6 +13,7 @@ my $LATEST_CLANG_NIGHTLY = "15";
 
 my $image = shift;
 my $cross_compile = shift;
+my $cross_compile_compat = shift;
 
 my $failures = 0;
 my $PASS = "\033[32mPASS\033[m";
@@ -141,7 +142,13 @@ sub check_toolchain_image() {
   $arch ||= `arch`; chomp $arch;
   my @prefixes = ("");
   push @prefixes, $cross_compile if $cross_compile;
-  push @prefixes, "arm-linux-gnueabihf-" if ($arch eq "arm64");
+  if (defined($cross_compile_compat)) {
+    if ($cross_compile_compat) {
+      push @prefixes, $cross_compile_compat;
+    } else {
+      print STDERR "${WARN} - non fatal failure: compiler for CROSS_COMPILE_COMPAT not found\n";
+    }
+  }
 
   for $compiler (@compilers) {
     for my $prefix (@prefixes) {

@@ -977,14 +977,32 @@ class TestHeaders:
 
 
 class TestCheckEnvironment:
-    def test_basics(self, linux, Popen):
-        Popen.return_value.returncode = 0
+    @pytest.fixture
+    def get_command_output(self, mocker):
+        return mocker.patch("tuxmake.build.Build.get_command_output")
+
+    @pytest.fixture
+    def run_cmd(self, mocker):
+        rcmd = mocker.patch("tuxmake.build.Build.run_cmd")
+        rcmd.return_value.returncode = 0
+        return rcmd
+
+    def test_basics(self, linux, get_command_output, run_cmd):
         build = Build(tree=linux, target_arch="arm64")
+        ccc = "arm-linux-gnu-"
+        get_command_output.return_value = ccc
         build.check_environment()
-        cmdline = args(Popen)
+        cmdline = args(run_cmd)
         assert cmdline[0].endswith("/tuxmake-check-environment")
         assert cmdline[1] == "arm64_gcc"
         assert cmdline[2] == "aarch64-linux-gnu-"
+        assert cmdline[3] == ccc
+
+    def test_CROSS_COMPILE_COMPAT_not_found(self, linux, run_cmd, get_command_output):
+        build = Build(tree=linux, target_arch="arm64")
+        get_command_output.return_value = ""
+        build.check_environment()
+        assert args(run_cmd)[3] == ""
 
     def test_fails(self, linux, Popen):
         Popen.return_value.returncode = 1
