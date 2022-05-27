@@ -31,7 +31,7 @@ if [ ! -f ${relnotes} ]; then
     printf "Documentation updates:\n\n" >> ${relnotes}
     printf "Container images:\n\n" >> ${relnotes}
     printf "Testing/infrastructure:\n\n" >> ${relnotes}
-    (git log --no-merges --reverse --oneline --format='- %s' v${current_version}.. || true) >> ${relnotes}
+    (git log --no-merges --reverse --oneline --format='- %s (%aN)' v${current_version}.. || true) >> ${relnotes}
 fi
 
 ${EDITOR} ${relnotes}
