@@ -21,3 +21,13 @@ class TestLogParser:
         parser = LogParser()
         parser.parse(logs_directory / log)
         assert (parser.errors, parser.warnings) == (errors, warnings)
+
+    def test_error_list(self, logs_directory):
+        parser = LogParser()
+        parser.parse(logs_directory / "simple.log")
+        assert parser.error_list == ["error: something failed"]
+
+    def test_warning_list(self, logs_directory):
+        parser = LogParser()
+        parser.parse(logs_directory / "simple.log")
+        assert parser.warning_list == ["warning: something might fail in the future"]

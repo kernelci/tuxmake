@@ -581,7 +581,7 @@ class Build:
             "verbose": self.verbose,
             "reproducer_cmdline": self.cmdline.reproduce(self),
         }
-        errors, warnings = self.parse_log()
+        log = self.parse_log()
         self.metadata["results"] = {
             "status": "PASS" if self.passed else "FAIL",
             "targets": {
@@ -589,8 +589,10 @@ class Build:
                 for name, s in self.status.items()
             },
             "artifacts": self.artifacts,
-            "errors": errors,
-            "warnings": warnings,
+            "errors": log.errors,
+            "error_list": log.error_list,
+            "warnings": log.warnings,
+            "warning_list": log.warning_list,
             "duration": self.__durations__,
         }
         self.metadata["tuxmake"] = {"version": __version__}
@@ -607,7 +609,7 @@ class Build:
     def parse_log(self):
         parser = LogParser()
         parser.parse(self.output_dir / "build.log")
-        return parser.errors, parser.warnings
+        return parser
 
     def cleanup(self):
         self.runtime.cleanup()

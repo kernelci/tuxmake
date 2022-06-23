@@ -12,13 +12,21 @@ ERRORS: Tuple[str, ...] = (
 
 class LogParser:
     def __init__(self):
-        self.errors = 0
-        self.warnings = 0
+        self.error_list = []
+        self.warning_list = []
+
+    @property
+    def errors(self):
+        return len(self.error_list)
+
+    @property
+    def warnings(self):
+        return len(self.warning_list)
 
     def parse(self, filepath: Path) -> None:
         for orig_line in filepath.open("r", errors="ignore"):
-            line = orig_line.lower()
+            line = orig_line.lower().strip()
             if "error:" in line or any([s in line for s in ERRORS]):
-                self.errors += 1
+                self.error_list.append(line)
             if "warning:" in line.lower():
-                self.warnings += 1
+                self.warning_list.append(line)

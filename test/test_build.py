@@ -632,7 +632,7 @@ class TestDtbsLegacy:
         artifacts = [str(f.name) for f in result.output_dir.glob("*")]
         assert "dtbs.tar.xz" in artifacts
         assert result.status["dtbs-legacy"].status == "PASS"
-        errors, _ = result.parse_log()
+        errors = result.parse_log().errors
         assert errors == 0
         assert "dtbs/hisilicon/hi6220-hikey.dtb" in tarball_contents(
             result.output_dir / "dtbs.tar.xz"
@@ -810,6 +810,14 @@ class TestMetadata:
     def test_command_line(self, metadata):
         assert type(metadata["build"]["reproducer_cmdline"]) is list
 
+    def test_warnings(self, metadata):
+        assert metadata["results"]["warnings"] > 0
+        assert len(metadata["results"]["warning_list"]) > 0
+
+    def test_errors(self, metadata):
+        assert metadata["results"]["errors"] > 0
+        assert len(metadata["results"]["error_list"]) > 0
+
 
 class TestParseLog:
     @pytest.fixture(scope="class")
@@ -820,12 +828,12 @@ class TestParseLog:
         return b
 
     def test_warnings(self, build):
-        _, warnings = build.parse_log()
-        assert warnings == 1
+        log = build.parse_log()
+        assert log.warnings == 1
 
     def test_errors(self, build):
-        errors, _ = build.parse_log()
-        assert errors == 1
+        log = build.parse_log()
+        assert log.errors == 1
 
 
 class TestUnsupportedToolchainArchitectureCombination:
@@ -904,7 +912,7 @@ class TestMissingArtifacts:
         build = Build(tree=linux_rw)
         build.run()
         assert build.failed
-        errors, _ = build.parse_log()
+        errors = build.parse_log().errors
         assert errors == 0
 
     def test_dont_bother_checking_artifacts_if_build_fails(

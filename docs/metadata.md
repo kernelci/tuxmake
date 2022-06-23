@@ -61,7 +61,9 @@ available.
     - **artifacts**: key/value with target names (string) as keys, and list of
       artifacts built for that target (list of strings).
     - **errors**: number of errors in the build (integer).
+    - **error_list**: list of errors in the build log (list of strings).
     - **warnings**: number of warnings in the build (integer).
+    - **warning_list**: list of warnings in the build log (list of strings).
 - **sccache**: sccache statistics.
     - **cache_hits**: number of cache hits (integer).
     - **cache_misses**: number of cache misses (integer).
