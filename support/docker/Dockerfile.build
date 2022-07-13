@@ -39,7 +39,8 @@ RUN apt-get update -q && \
 # official Debian architectures are supported, as those are the only ones where
 # we can ensure that the foreign userspace libraries needed to cross compile
 # are available and in good shape enough to be installable and usable.
-RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
+RUN set -x; \
+    if [ -z "${HOSTARCH}" ]; then exit; fi; \
     if [ "${HOSTARCH}" = armeabihf ]; then \
         arch=armhf; \
     elif [ "${HOSTARCH}" = "armeabi" ]; then \
@@ -76,6 +77,8 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
         ${INSTALL_OPTIONS} \
         libbinutils libbinutils:${arch} \
         libc6-dev libc6-dev:${arch} && \
+    : libcap-ng-dev is affected by https://bugs.debian.org/983476 && \
+    : systemtap-sdt-dev is not multiarch-ready && \
     apt-get install \
         --assume-yes \
         --no-install-recommends \
@@ -84,7 +87,7 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
         libc6-dev-${arch}-cross \
         libasound2-dev libasound2-dev:${arch} \
         libcap-dev libcap-dev:${arch} \
-        libcap-ng-dev:${arch} # https://bugs.debian.org/983476 \
+        libcap-ng-dev:${arch} \
         libdrm-dev libdrm-dev:${arch} \
         libdw-dev libdw-dev:${arch} \
         libelf-dev libelf-dev:${arch} \
@@ -105,10 +108,10 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
         libzstd-dev libzstd-dev:${arch} \
         linux-libc-dev \
         linux-libc-dev-${arch}-cross \
-        systemtap-sdt-dev systemtap-sdt-dev:${arch} \
+        systemtap-sdt-dev:${arch} \
         && \
-    # This is a horrible hack, but a foreign binutils-dev is not installable \
-    # See https://bugs.debian.org/983540 \
+    : This is a horrible hack, but a foreign binutils-dev is not installable && \
+    : See https://bugs.debian.org/983540 && \
     apt-get download ${INSTALL_OPTIONS} binutils-dev:${arch} && \
     dpkg -x binutils-dev*.deb /tmp/binutils-dev && \
     rsync -avp /tmp/binutils-dev/ / && \

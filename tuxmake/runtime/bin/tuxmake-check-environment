@@ -78,29 +78,48 @@ int main(int argc, char** argv) {
 }
 PROGRAM
 
-sub check_compile_program($$$$) {
-  my ($name, $compiler, $program, $ok_to_fail) = @_;
+sub check_compile_program($$$$$) {
+  my ($name, $compiler, $flags, $program, $ok_to_fail) = @_;
+  $flags ||= '';
   my $tmpdir = tempdir(CLEANUP => 1);
   open PROGRAM, ">", "${tmpdir}/program.c" or die($!);
   print PROGRAM $program;
   close PROGRAM;
-  check_run($name, "${compiler} -o ${tmpdir}/program ${tmpdir}/program.c", $ok_to_fail);
+  check_run($name, "${compiler} -o ${tmpdir}/program ${tmpdir}/program.c ${flags}", $ok_to_fail);
 }
 
-sub check_compiler($) {
+sub check_compiler($$) {
   my $compiler = shift;
+  my $prefix = shift;
   check_compiler_no_libc($compiler);
   check_compiler_libc($compiler);
+  check_compiler_fuse($compiler, $prefix);
 }
 
 sub check_compiler_no_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries", "${compiler} -nostdlib", $PROGRAM, 0);
+  check_compile_program("${compiler} can produce binaries", "${compiler} -nostdlib", undef, $PROGRAM, 0);
 }
 
 sub check_compiler_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n" . $PROGRAM, !$optional_compile_fatal);
+  check_compile_program("${compiler} can produce binaries using the libc", $compiler, undef, "#include <stdio.h>\n" . $PROGRAM, !$optional_compile_fatal);
+}
+
+my $fuse_program = <<PROGRAM;
+#include <fuse.h>
+int main(int argc, char *argv[])
+{
+	return fuse_main(argc, argv, NULL);
+}
+PROGRAM
+
+sub check_compiler_fuse($$) {
+  my $compiler = shift;
+  my $prefix = shift || '';
+  my $fuse_flags = `${prefix}pkg-config fuse --libs --cflags`;
+  chomp $fuse_flags;
+  check_compile_program("${compiler} can build against libfuse", ${compiler}, $fuse_flags, $fuse_program, !$optional_compile_fatal);
 }
 
 sub check_rust() {
@@ -157,7 +176,7 @@ sub check_toolchain_image() {
       check_program($prefix . "as");
     }
 
-    check_compiler($compiler);
+    check_compiler($compiler, undef);
     my $compiler_bin = $compiler;
     if ($cross_compile) {
       if ($compiler =~ /gcc/) {
@@ -167,14 +186,14 @@ sub check_toolchain_image() {
         $target =~ s/-$//;
         $compiler_bin = "${compiler} --target=${target}";
       }
-      check_compiler($compiler_bin)
+      check_compiler($compiler_bin, $cross_compile);
     }
     if ($version && $version =~ /^\d+$/) {
       my $actual_version = `${compiler_bin} -dumpversion`;
       chomp $actual_version;
       check("${compiler_bin} version is ${version}", $actual_version =~ qr/^${version}(\.\d+)*/, 0);
     }
-    check_compiler("${compiler_bin} -use-ld=lld" ) if ($compiler =~ /clang/);
+    check_compiler("${compiler_bin} -use-ld=lld", undef) if ($compiler =~ /clang/);
 
     if ($compiler =~ /clang/) {
       check_program("ld.lld");
