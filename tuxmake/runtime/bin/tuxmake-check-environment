@@ -78,11 +78,10 @@ int main(int argc, char** argv) {
 PROGRAM
 
 sub check_compile_program($$$$) {
-  my ($name, $compiler, $preamble, $ok_to_fail) = @_;
+  my ($name, $compiler, $program, $ok_to_fail) = @_;
   my $tmpdir = tempdir(CLEANUP => 1);
   open PROGRAM, ">", "${tmpdir}/program.c" or die($!);
-  print PROGRAM $preamble if $preamble;
-  print PROGRAM $PROGRAM;
+  print PROGRAM $program;
   close PROGRAM;
   check_run($name, "${compiler} -o ${tmpdir}/program ${tmpdir}/program.c", $ok_to_fail);
 }
@@ -95,12 +94,12 @@ sub check_compiler($) {
 
 sub check_compiler_no_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries", "${compiler} -nostdlib", undef, 0);
+  check_compile_program("${compiler} can produce binaries", "${compiler} -nostdlib", $PROGRAM, 0);
 }
 
 sub check_compiler_libc($) {
   my $compiler = shift;
-  check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n", !$libc_compile_fatal);
+  check_compile_program("${compiler} can produce binaries using the libc", $compiler, "#include <stdio.h>\n" . $PROGRAM, !$libc_compile_fatal);
 }
 
 sub check_rust() {
