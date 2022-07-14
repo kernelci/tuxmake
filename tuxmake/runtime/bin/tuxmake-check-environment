@@ -34,6 +34,11 @@ sub check($$$) {
   }
 }
 
+sub skip($) {
+  my $description = shift;
+  print STDOUT "SKIP - ${description}\n";
+}
+
 sub check_run($$$) {
   my ($name, $command, $ok_to_fail) = @_;
   my $output = `$command 2>&1`;
@@ -117,6 +122,12 @@ PROGRAM
 sub check_compiler_fuse($$) {
   my $compiler = shift;
   my $prefix = shift || '';
+  my $debianversion = `dpkg-query --show base-files | cut -f2`;
+  chomp $debianversion;
+  if ($debianversion && $debianversion lt '11') {
+    skip("not checking for development packages on Debian < 11");
+    return;
+  }
   my $fuse_flags = `${prefix}pkg-config fuse --libs --cflags`;
   chomp $fuse_flags;
   check_compile_program("${compiler} can build against libfuse", ${compiler}, $fuse_flags, $fuse_program, !$optional_compile_fatal);

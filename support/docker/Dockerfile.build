@@ -79,6 +79,8 @@ RUN set -x; \
         libc6-dev libc6-dev:${arch} && \
     : libcap-ng-dev is affected by https://bugs.debian.org/983476 && \
     : systemtap-sdt-dev is not multiarch-ready && \
+    debianversion=$(dpkg-query --show base-files | cut -f2) && \
+    if dpkg --compare-versions "${debianversion}" lt 11; then exit; fi && \
     apt-get install \
         --assume-yes \
         --no-install-recommends \
