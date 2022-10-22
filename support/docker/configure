@@ -56,6 +56,9 @@ class Image:
         self.args = []
         self.test_args = [self.name]
 
+        if version := re.match(r"^.*-([0-9]+)$", self.name):
+            self.arg("TOOLCHAIN_VERSION", version[1])
+
     @property
     def dependency(self):
         return self.base
