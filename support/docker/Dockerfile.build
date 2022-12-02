@@ -112,6 +112,13 @@ RUN set -x; \
         linux-libc-dev-${arch}-cross \
         systemtap-sdt-dev:${arch} \
         && \
+    if dpkg --compare-versions "${debianversion}" ge 12; then \
+        apt-get install  \
+            --assume-yes \
+            --no-install-recommends \
+            --option=debug::pkgProblemResolver=yes \
+            pkg-config:${arch}; \
+    fi && \
     : This is a horrible hack, but a foreign binutils-dev is not installable && \
     : See https://bugs.debian.org/983540 && \
     apt-get download ${INSTALL_OPTIONS} binutils-dev:${arch} && \
