@@ -12,6 +12,7 @@ theme:
   name: material
   logo: tuxmake.svg
   favicon: tuxmake_icon.svg
+  font: false
 markdown_extensions:
   - mkautodoc
 extra_css:
