@@ -67,6 +67,8 @@ class Runtime(ConfigurableObject):
     * **environment**: extra environment variables to be used for all commands
       ran by this runtime. Type: `dict` with `str` keys and values; defaults to
       an empty dict.
+    * **caps**: additional capabilities needed by the container ran by this runtime.
+      Type: `list` with `str`; defaults to an empty list.
     """
 
     basedir = "runtime"
@@ -111,6 +113,7 @@ class Runtime(ConfigurableObject):
         self.source_dir: Path = Path.cwd()
         self.output_dir: Optional[Path] = None
         self.environment = {}
+        self.caps: Optional[list] = []
 
     def __init_config__(self):
         self.toolchains = Toolchain.supported()
@@ -437,6 +440,7 @@ class ContainerRuntime(Runtime):
 
     def start_container(self):
         env = (f"--env={k}={v}" for k, v in self.environment.items())
+        caps = (f"--cap-add={cap}" for cap in self.caps)
 
         user_opts = self.get_user_opts()
         extra_opts = self.__get_extra_opts__()
@@ -448,6 +452,7 @@ class ContainerRuntime(Runtime):
             "--detach",
             "--env=KBUILD_BUILD_USER=tuxmake",
             *env,
+            *caps,
             *user_opts,
             *self.get_volume_opts(),
             f"--workdir={self.source_dir}",
