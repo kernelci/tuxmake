@@ -199,6 +199,13 @@ class TestDockerRuntime(TestContainerRuntime):
         cmd = spawn_container.call_args[0][0]
         assert "--env=FOO=BAR" in cmd
 
+    def test_caps(self, linux, spawn_container):
+        runtime = DockerRuntime()
+        runtime.caps = ["SYS_PTRACE"]
+        runtime.start_container()
+        cmd = spawn_container.call_args[0][0]
+        assert "--cap-add=SYS_PTRACE" in cmd
+
     def test_output_dir(self, linux, tmp_path, spawn_container):
         runtime = DockerRuntime()
         runtime.output_dir = tmp_path
