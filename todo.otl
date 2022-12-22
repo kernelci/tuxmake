@@ -1,0 +1,6 @@
+[_] tuxmake as a library: features
+  [X] runtime
+  [_] build artifact management
+  [_] metadata collection
+  [_] custom list of build commands
+[_] make prototype: building a custom project with the above features
