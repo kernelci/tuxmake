@@ -160,10 +160,10 @@ class Build:
         target_arch=None,
         toolchain=None,
         wrapper=None,
-        environment={},
+        environment=None,
         kconfig=defaults.kconfig,
-        kconfig_add=[],
-        make_variables={},
+        kconfig_add=None,
+        make_variables=None,
         targets=defaults.targets,
         compression_type=None,
         kernel_image=None,
@@ -193,15 +193,15 @@ class Build:
 
         self.timestamp = get_directory_timestamp(self.source_tree)
         self.__environment__ = None
-        self.__environment_input__ = environment
+        self.__environment_input__ = environment or {}
 
         self.kconfig = kconfig
-        self.kconfig_add = kconfig_add
+        self.kconfig_add = kconfig_add or []
 
-        for k in make_variables.keys():
+        self.make_variables = make_variables or {}
+        for k in self.make_variables.keys():
             if k in self.MAKE_VARIABLES_REJECTLIST:
                 raise UnsupportedMakeVariable(k)
-        self.make_variables = make_variables
 
         self.dynamic_make_variables = dict(self.target_arch.dynamic_makevars)
 
