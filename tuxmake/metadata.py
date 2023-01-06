@@ -59,7 +59,9 @@ class MetadataCollector:
 
     def collect(self):
         build = self.build
-        compiler = build.toolchain.compiler(build.target_arch)
+        compiler = build.toolchain.compiler(
+            build.target_arch, build.makevars.get("CROSS_COMPILE", None)
+        )
         metadata_input_data = {
             handler.name: {
                 key: build.format_cmd_part(cmd.replace("{compiler}", compiler))

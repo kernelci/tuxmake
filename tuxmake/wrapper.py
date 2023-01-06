@@ -45,8 +45,8 @@ class Wrapper(ConfigurableObject):
         cross = makevars.get("CROSS_COMPILE", "")
         if makevars.get("LLVM") == "1":
             return {"CC": f"{self.command} clang", "HOSTCC": f"{self.command} clang"}
-        return {
-            k: f"{self.command} {v}"
-            for k, v in makevars.items()
-            if k in ("CC", "HOSTCC")
-        } or {"CC": f"{self.command} {cross}gcc", "HOSTCC": f"{self.command} gcc"}
+        compilers = {
+            "CC": makevars.get("CC") or f"{cross}gcc",
+            "HOSTCC": makevars.get("HOSTCC") or "gcc",
+        }
+        return {k: f"{self.command} {v}" for k, v in compilers.items()}

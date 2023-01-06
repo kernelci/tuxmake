@@ -10,6 +10,7 @@ from tuxmake.arch import Architecture, Native
 from tuxmake.toolchain import Toolchain
 from tuxmake.build import build
 from tuxmake.build import Build
+from tuxmake.build import BuildInfo
 from tuxmake.build import defaults
 from tuxmake.build import Terminated
 from tuxmake.build import get_image
@@ -1101,3 +1102,24 @@ class TestCompression:
         build.run()
         artifacts = [str(f.name) for f in build.output_dir.glob("*")]
         assert "modules.tar" in artifacts
+
+
+class TestCustomCrossCompile:
+    def test_CROSS_COMPILE(self, linux, Popen):
+        build = Build(
+            tree=linux, target_arch="arm64", make_variables={"CROSS_COMPILE": "foo-"}
+        )
+        build.status["config"] = BuildInfo("PASS")
+        build.build(build.targets[1])
+        assert "CROSS_COMPILE=foo-" in args(Popen)
+
+    def test_CROSS_COMPILE_COMPAT(self, linux, Popen):
+        build = Build(
+            tree=linux,
+            target_arch="arm64",
+            make_variables={"CROSS_COMPILE_COMPAT": "foo-"},
+        )
+        build.get_dynamic_makevars()
+        build.status["config"] = BuildInfo("PASS")
+        build.build(build.targets[1])
+        assert "CROSS_COMPILE_COMPAT=foo-" in args(Popen)

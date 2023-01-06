@@ -34,9 +34,11 @@ class Toolchain(ConfigurableObject):
             toolchain=self.name, arch=arch.name, version_suffix=self.version_suffix
         )
 
-    def compiler(self, arch):
+    def compiler(self, arch, cross_compile=None):
+        if not cross_compile:
+            cross_compile = arch.makevars.get("CROSS_COMPILE", "")
         return self.__compiler__.format(
-            CROSS_COMPILE=arch.makevars.get("CROSS_COMPILE", "")
+            CROSS_COMPILE=cross_compile,
         )
 
 

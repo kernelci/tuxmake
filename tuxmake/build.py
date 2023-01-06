@@ -120,8 +120,7 @@ class Build:
     - **make_variables**: KEY=VALUE arguments to pass to `make`. `dict` with
       strings as values and strings as keys. Some `KEY`s are now allowed, as
       they would interfere with the tuxmake normal operation(e.g. `ARCH`, `CC`,
-      `CROSS_COMPILE`, `HOSTCC`, INSTALL_MOD_PATH`, `INSTALL_DTBS_PATH`, `O`,
-      etc).
+      `HOSTCC`, INSTALL_MOD_PATH`, `INSTALL_DTBS_PATH`, `O`,  etc).
     - **targets**: targets to build, list of `str`. If `None` or an empty list
       is passed, the default list of targets will be built.
     - **compression_type**: compression type to use in compressed artifacts.
@@ -145,7 +144,6 @@ class Build:
     MAKE_VARIABLES_REJECTLIST = [
         "ARCH",
         "CC",
-        "CROSS_COMPILE",
         "HOSTCC",
         "INSTALL_DTBS_PATH",
         "INSTALL_MOD_PATH",
@@ -160,10 +158,10 @@ class Build:
         target_arch=None,
         toolchain=None,
         wrapper=None,
-        environment={},
+        environment=None,
         kconfig=defaults.kconfig,
-        kconfig_add=[],
-        make_variables={},
+        kconfig_add=None,
+        make_variables=None,
         targets=defaults.targets,
         compression_type=None,
         kernel_image=None,
@@ -193,15 +191,15 @@ class Build:
 
         self.timestamp = get_directory_timestamp(self.source_tree)
         self.__environment__ = None
-        self.__environment_input__ = environment
+        self.__environment_input__ = environment or {}
 
         self.kconfig = kconfig
-        self.kconfig_add = kconfig_add
+        self.kconfig_add = kconfig_add or []
 
-        for k in make_variables.keys():
+        self.make_variables = make_variables or {}
+        for k in self.make_variables.keys():
             if k in self.MAKE_VARIABLES_REJECTLIST:
                 raise UnsupportedMakeVariable(k)
-        self.make_variables = make_variables
 
         self.dynamic_make_variables = dict(self.target_arch.dynamic_makevars)
 
@@ -470,15 +468,16 @@ class Build:
     @property
     def makevars(self):
         mvars = {}
-        mvars.update(self.make_variables)
         mvars.update(self.target_arch.makevars)
         mvars.update(self.toolchain.expand_makevars(self.target_arch))
+        mvars.update(self.make_variables)
         mvars.update(self.wrapper.wrap(mvars))
         return mvars
 
     def get_dynamic_makevars(self):
         for k, v in self.dynamic_make_variables.items():
-            self.make_variables[k] = self.get_command_output(v).strip()
+            if k not in self.make_variables:
+                self.make_variables[k] = self.get_command_output(v).strip()
 
     def get_command_output(self, cmd):
         with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as f:
@@ -619,11 +618,12 @@ class Build:
         self.get_dynamic_makevars()
         cmd = [str(self.runtime.get_check_environment_command())]
         cmd.append(f"{self.target_arch.name}_{self.toolchain.name}")
-        cross = self.makevars.get("CROSS_COMPILE")
+        makevars = self.makevars
+        cross = makevars.get("CROSS_COMPILE")
         if cross:
             cmd.append(cross)
         if "CROSS_COMPILE_COMPAT" in self.dynamic_make_variables:
-            cross_compat = self.makevars.get("CROSS_COMPILE_COMPAT")
+            cross_compat = makevars.get("CROSS_COMPILE_COMPAT")
             if cross_compat:
                 cmd.append(cross_compat)
             else:
