@@ -347,7 +347,7 @@ class Image:
         self.packages = split(packages)
         self.install_options = install_options
         self.rebuild = rebuild
-        self.rebuild_targets = splitlistmap(rebuild_targets)
+        self.rebuild_targets = splitmap(rebuild_targets)
         self.extra_apt_repo = extra_apt_repo
         self.extra_apt_repo_key = extra_apt_repo_key
 
@@ -381,7 +381,7 @@ class ContainerRuntime(Runtime):
                         target, "cross-" + image.kind
                     )
                     cross_config["hosts"] = image.target_hosts.get(target, image.hosts)
-                    cross_config["targets"] = image.rebuild_targets.get(
+                    cross_config["rebuild"] = image.rebuild_targets.get(
                         target, image.rebuild
                     )
                     cross_config["skip_build"] = target in image.target_skip
