@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 COPY conf/ /srv/tuxmake-conf
 
-RUN . /etc/os-release \
+RUN export VERSION_ID=0 && . /etc/os-release \
     && if [ "${VERSION_CODENAME}" = "" ]; then exit; fi \
     && echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" > /etc/apt/sources.list.d/backports.list \
     && if [ "${VERSION_ID}" -eq 11 ]; then echo "deb http://snapshot.debian.org/archive/debian/20221013T214821Z/ bullseye-backports main" > /etc/apt/sources.list.d/backports-snapshot.list && echo "Acquire::Check-Valid-Until no;" > /etc/apt/apt.conf.d/99novalidity; fi \

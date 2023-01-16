@@ -17,6 +17,11 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
     fi; \
     if [ -n "${EXTRA_APT_REPO}" ]; then \
         echo "${EXTRA_APT_REPO}" > /etc/apt/sources.list.d/extra.list; \
+    fi; \
+    if [ "${HOSTARCH}" = riscv64 ]; then \
+        apt-get update -q && apt-get install -qy debian-ports-archive-keyring; \
+        echo "deb http://deb.debian.org/debian-ports sid main" > /etc/apt/sources.list.d/foreign.list; \
+        echo "deb http://deb.debian.org/debian-ports unreleased main" >> /etc/apt/sources.list.d/foreign.list; \
     fi
 
 
@@ -49,7 +54,7 @@ RUN set -x; \
         arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_ARCH); \
     fi; \
     case "${arch}" in \
-        amd64|arm64|armel|armhf|i386|mips64el|mipsel|ppc64el|s390x) \
+        amd64|arm64|armel|armhf|i386|mips64el|mipsel|ppc64el|riscv64|s390x) \
             supported=yes; \
             ;; \
         *) \
