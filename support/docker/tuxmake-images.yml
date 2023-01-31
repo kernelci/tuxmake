@@ -293,6 +293,45 @@ docker-images-clang_15_all-multiarch:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_15_all")'
 
 
+docker-images-clang_16_all-amd64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-amd64"
+    script:
+        - "make publish-clang_16_all"
+    tags: []
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_16_all")'
+
+
+docker-images-clang_16_all-arm64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-arm64"
+    script:
+        - "make publish-clang_16_all"
+    tags: [arm64-dind]
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_16_all")'
+
+
+docker-images-clang_16_all-multiarch:
+    stage: publish
+    extends: .docker
+    variables:
+        DOCKER_CLI_EXPERIMENTAL: "enabled"
+        ARCH_TAGS: "-amd64 -arm64"
+    script:
+        - "make publish-multiarch-clang_16_all"
+    needs: ['docker-images-clang_16_all-amd64', 'docker-images-clang_16_all-arm64']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_16_all")'
+
+
 docker-images-clang_all-amd64:
     stage: build
     extends: .docker
