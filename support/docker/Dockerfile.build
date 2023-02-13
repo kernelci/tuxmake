@@ -15,6 +15,17 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
     if [ -n "${EXTRA_APT_REPO_KEY}" ]; then \
         wget -O /etc/apt/trusted.gpg.d/extra.asc "${EXTRA_APT_REPO_KEY}"; \
     fi; \
+    if [ -n "${EXTRA_APT_REPO}" ] && [ "${HOSTARCH}" = riscv64 ]; then \
+        if [[ "${INSTALL_OPTIONS}" != *-toolchain-bullseye-* ]]; then \
+            INSTALL_OPTIONS="-t llvm-toolchain"; \
+            CLANG_VERSION=""; \
+        else \
+            CLANG_VERSION="-$(echo ${INSTALL_OPTIONS}|awk -F'-' '{print $NF}')"; \
+            INSTALL_OPTIONS="-t llvm-toolchain${CLANG_VERSION}"; \
+        fi; \
+        echo "$INSTALL_OPTIONS" > /root/tmp_install_options; \
+        EXTRA_APT_REPO=$(echo "deb http://apt.llvm.org/unstable llvm-toolchain${CLANG_VERSION} main"); \
+    fi; \
     if [ -n "${EXTRA_APT_REPO}" ]; then \
         echo "${EXTRA_APT_REPO}" > /etc/apt/sources.list.d/extra.list; \
     fi; \
@@ -27,7 +38,10 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
 
 # Install basic toolchain packages. Which toolchain exactly is defined by the
 # $PACKAGES build argument
-RUN apt-get update -q && \
+RUN if [ -f /root/tmp_install_options ]; then \
+        INSTALL_OPTIONS=$(cat /root/tmp_install_options); \
+    fi; \
+    apt-get update -q && \
     apt-get install \
         --assume-yes \
         --no-install-recommends \
@@ -45,6 +59,9 @@ RUN apt-get update -q && \
 # we can ensure that the foreign userspace libraries needed to cross compile
 # are available and in good shape enough to be installable and usable.
 RUN set -x; \
+    if [ -f /root/tmp_install_options ]; then \
+        INSTALL_OPTIONS=$(cat /root/tmp_install_options); \
+    fi; \
     if [ -z "${HOSTARCH}" ]; then exit; fi; \
     if [ "${HOSTARCH}" = armeabihf ]; then \
         arch=armhf; \
