@@ -111,12 +111,16 @@ RUN set -x; \
         libmnl-dev libmnl-dev:${arch} \
         libmount-dev libmount-dev:${arch} \
         libnuma-dev libnuma-dev:${arch} \
+        libperl-dev libperl-dev:${arch} \
+        libpfm4-dev libpfm4-dev:${arch} \
         libpci-dev libpci-dev:${arch} \
         libpopt-dev libpopt-dev:${arch} \
+        libpython3-dev libpython3-dev:${arch} \
         libreadline-dev \
         libreadline-dev libreadline-dev:${arch} \
         libslang2-dev libslang2-dev:${arch} \
         libssl-dev libssl-dev:${arch} \
+        libtraceevent-dev libtraceevent-dev:${arch} \
         $(test "${arch}" != "s390x" && echo libunwind-dev libunwind-dev:${arch}) \
         libzstd-dev libzstd-dev:${arch} \
         linux-libc-dev \
