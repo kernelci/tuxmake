@@ -756,6 +756,30 @@ class TestCompilerWrappers:
         b.build(b.targets[0])
         assert "CC=ccache clang" in args(Popen)
 
+    def test_ccache_llvm_dir(self, linux, Popen):
+        b = Build(
+            make_variables={"LLVM": "/foo/bar/bin/"},
+            tree=linux,
+            targets=["config"],
+            toolchain="llvm",
+            target_arch="arm64",
+            wrapper="ccache",
+        )
+        b.build(b.targets[0])
+        assert "CC=ccache /foo/bar/bin/clang" in args(Popen)
+
+    def test_ccache_llvm_ver(self, linux, Popen):
+        b = Build(
+            make_variables={"LLVM": "-15"},
+            tree=linux,
+            targets=["config"],
+            toolchain="llvm",
+            target_arch="arm64",
+            wrapper="ccache",
+        )
+        b.build(b.targets[0])
+        assert "CC=ccache clang-15" in args(Popen)
+
     def test_sccache_with_path(self, linux, mocker, Popen):
         add_volume = mocker.patch("tuxmake.runtime.Runtime.add_volume")
         b = Build(tree=linux, wrapper="/path/to/sccache")
