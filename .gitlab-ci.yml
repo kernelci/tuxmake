@@ -16,7 +16,7 @@ variables:
   only:
     - branches@Linaro/tuxmake
   tags:
-    - arm64
+    - arm64-dind
 
 stages:
   - build-ci-images
