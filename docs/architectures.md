@@ -18,6 +18,7 @@ arm          | *armhf*     | 32-bit ARM V7/hardfloat  | yes      | yes
 armv5        | *armel*     | 32-bit ARM V5            | yes      | yes
 hexagon      |             | Qualcomm Hexagon (DSP6)  | yes²     | no
 i386         |             | 32-bit X86               | yes      | yes
+loongarch    |             | 64-bit LoongArch         | no       | no
 m68k         |             | 32-bit Motorola          | yes      | yes
 mips         |             | 32-bit MIPS              | yes      | yes
 openrisc     |             | OpenRISC                 | no       | no
