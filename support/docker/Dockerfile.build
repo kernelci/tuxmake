@@ -19,6 +19,9 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
         if [ "${INSTALL_OPTIONS}" = "-t llvm-toolchain-bullseye" ]; then \
             INSTALL_OPTIONS="-t llvm-toolchain"; \
             CLANG_VERSION=""; \
+        elif [ "${INSTALL_OPTIONS}" = "-t llvm-toolchain-bookworm" ]; then \
+            INSTALL_OPTIONS="-t llvm-toolchain"; \
+            CLANG_VERSION=""; \
         else \
             CLANG_VERSION="-$(echo ${INSTALL_OPTIONS}|awk -F'-' '{print $NF}')"; \
             INSTALL_OPTIONS="-t llvm-toolchain${CLANG_VERSION}"; \
