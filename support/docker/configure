@@ -106,6 +106,10 @@ class Image:
         stream.write("\t\t. $(LOG)\n\n")
 
         test_args = " ".join(self.test_args)
+        # FIXME We skip testing loongarch container for now
+        # since we don't have gnu ld in the container
+        if self.name == "loongarch_clang-nightly":
+            return
         stream.write(f"test-{self.name}: {self.name}\n")
         stream.write(f"\t$(ANN_TEST) {self.name}\n")
         stream.write(f"\t$(Q)$(docker) run --rm $(REGISTRY)$(PROJECT)/{self.name}:latest$(TAG) tuxmake-check-environment {test_args} $(NOSTDOUT) \n\n")
