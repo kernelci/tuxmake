@@ -109,6 +109,8 @@ class Image:
         # FIXME We skip testing loongarch container for now
         # since we don't have gnu ld in the container
         if self.name == "loongarch_clang-nightly":
+            stream.write(f"test-{self.name}: {self.name}\n")
+            stream.write(f"\t$(ANN_TEST) Skip {self.name}\n")
             return
         stream.write(f"test-{self.name}: {self.name}\n")
         stream.write(f"\t$(ANN_TEST) {self.name}\n")
