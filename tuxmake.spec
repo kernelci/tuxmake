@@ -1,5 +1,5 @@
 Name:      tuxmake
-Version:   1.19.0
+Version:   1.20.0
 Release:   0%{?dist}
 Summary:   Thin wrapper to build Linux kernels
 License:   Expat
