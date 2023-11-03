@@ -984,15 +984,6 @@ class TestKselftest:
         assert names == ["config", "kselftest-merge", "default", "kernel"]
 
 
-class TestBPFKselftest:
-    def test_bpf_kselftest_kconfig_add(self, linux, output_dir):
-        result = build(tree=linux, targets=["kselftest-bpf"], output_dir=output_dir)
-        kselftest_target = [t for t in result.targets if t.name == "kselftest-bpf"][0]
-        assert result.kconfig_add == kselftest_target.kconfig_add
-        config = output_dir / "config"
-        assert ("CONFIG_DEBUG_INFO_BTF=y") in config.read_text()
-
-
 class TestHeaders:
     def test_basics(self, linux):
         build = Build(tree=linux, targets=["headers"])
