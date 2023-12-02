@@ -15,6 +15,7 @@ from tuxmake.config import ConfigurableObject, split, splitmap, splitlistmap
 from tuxmake.exceptions import RuntimePreparationFailed
 from tuxmake.exceptions import ImageRequired
 from tuxmake.exceptions import InvalidRuntimeError
+from tuxmake.exceptions import RuntimeNotFoundError
 from tuxmake.toolchain import Toolchain
 from tuxmake.arch import native_arch
 from tuxmake.utils import quote_command_line
@@ -191,6 +192,16 @@ class Runtime(ConfigurableObject):
         Initializes the runtime object. Must be called before actually running
         any commands with `run_cmd`.
         """
+        name = str(self)
+        try:
+            if name != "null":
+                # Call runtime --version to see if runtime is installed
+                runtime = name.split("-")[0] if "local" in name else name
+                cmd = [runtime, "--version"]
+                subprocess.run(cmd, stdout=subprocess.DEVNULL)
+        except FileNotFoundError:
+            raise RuntimeNotFoundError(name)
+
         if self.output_dir:
             self.output_dir.mkdir(parents=True, exist_ok=True)
 

@@ -66,6 +66,13 @@ class InvalidRuntimeError(TuxMakeUserError):
     msg = "Invalid runtime: {name}"
 
 
+class RuntimeNotFoundError(TuxMakeUserError):
+    msg = (
+        "Runtime not installed: {name}\n"
+        "See https://docs.tuxmake.org/runtimes/ to know more about runtimes."
+    )
+
+
 class UnsupportedArchitectureToolchainCombination(TuxMakeUserError):
     msg = "Unsupported architecture/toolchain combination: {name}"
 

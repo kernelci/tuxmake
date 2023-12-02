@@ -5,6 +5,7 @@ import pytest
 from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.exceptions import RuntimePreparationFailed
+from tuxmake.exceptions import RuntimeNotFoundError
 from tuxmake.runtime import Runtime
 from tuxmake.runtime import NullRuntime
 from tuxmake.runtime import DockerRuntime
@@ -128,7 +129,22 @@ class TestGetImage:
         assert runtime.get_image() == "myimage"
 
 
+@pytest.fixture()
+def version_check(mocker):
+    return mocker.patch("subprocess.run")
+
+
 class TestDockerRuntime(TestContainerRuntime):
+    def test_docker_not_installed(self, get_image, mocker):
+        get_image.return_value = "tuxmake/theimage"
+        mocker.patch(
+            "subprocess.run",
+            side_effect=FileNotFoundError(),
+        )
+        with pytest.raises(RuntimeNotFoundError) as exc:
+            DockerRuntime().prepare()
+        assert "docker" in str(exc)
+
     def test_get_metadata(self, get_image, mocker):
         get_image.return_value = "tuxmake/theimage"
         mocker.patch(
@@ -139,13 +155,13 @@ class TestDockerRuntime(TestContainerRuntime):
         assert metadata["image_name"] == "tuxmake/theimage"
         assert metadata["image_digest"] == "tuxmake/theimage@sha256:deadbeef"
 
-    def test_prepare(self, get_image, mocker):
+    def test_prepare(self, get_image, mocker, version_check):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")
         DockerRuntime().prepare()
         check_call.assert_called_with(["docker", "pull", "myimage"])
 
-    def test_prepare_pull_only_once_a_day(self, get_image, mocker):
+    def test_prepare_pull_only_once_a_day(self, get_image, mocker, version_check):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")
         now = 1614000983
@@ -310,6 +326,7 @@ class TestDockerRuntimeOfflineAvailable(FakeGetImage):
         )
         mocker.patch("tuxmake.runtime.ContainerRuntime.prepare_image")
         r = DockerRuntime()
+        mocker.patch("tuxmake.runtime.Runtime.prepare")
         r.prepare()
         return r
 
@@ -330,7 +347,7 @@ class TestDockerRuntimeOfflineAvailable(FakeGetImage):
 
 
 class TestDockerLocalRuntime(TestContainerRuntime):
-    def test_prepare_checks_local_image(self, get_image, mocker):
+    def test_prepare_checks_local_image(self, get_image, mocker, version_check):
         get_image.return_value = "mylocalimage"
         check_call = mocker.patch("subprocess.check_call")
         runtime = DockerLocalRuntime()
@@ -342,7 +359,7 @@ class TestDockerLocalRuntime(TestContainerRuntime):
             stderr=subprocess.DEVNULL,
         )
 
-    def test_prepare_image_not_found(self, get_image, mocker):
+    def test_prepare_image_not_found(self, get_image, mocker, version_check):
         get_image.return_value = "foobar"
         mocker.patch(
             "subprocess.check_call",
@@ -362,7 +379,17 @@ class TestDockerLocalRuntime(TestContainerRuntime):
 
 
 class TestPodmanRuntime(TestContainerRuntime):
-    def test_prepare(self, get_image, mocker):
+    def test_podman_not_installed(self, get_image, mocker):
+        get_image.return_value = "tuxmake/theimage"
+        mocker.patch(
+            "subprocess.run",
+            side_effect=FileNotFoundError(),
+        )
+        with pytest.raises(RuntimeNotFoundError) as exc:
+            PodmanRuntime().prepare()
+        assert "podman" in str(exc)
+
+    def test_prepare(self, get_image, mocker, version_check):
         get_image.return_value = "myimage"
         check_call = mocker.patch("subprocess.check_call")
         PodmanRuntime().prepare()
@@ -406,7 +433,7 @@ class TestPodmanRuntime(TestContainerRuntime):
 
 
 class TestPodmanLocalRuntime(TestContainerRuntime):
-    def test_prepare_checks_local_image(self, get_image, mocker):
+    def test_prepare_checks_local_image(self, get_image, mocker, version_check):
         get_image.return_value = "mylocalimage"
         check_call = mocker.patch("subprocess.check_call")
         runtime = PodmanLocalRuntime()
@@ -418,7 +445,7 @@ class TestPodmanLocalRuntime(TestContainerRuntime):
             stderr=subprocess.DEVNULL,
         )
 
-    def test_prepare_image_not_found(self, get_image, mocker):
+    def test_prepare_image_not_found(self, get_image, mocker, version_check):
         get_image.return_value = "foobar"
         mocker.patch(
             "subprocess.check_call",
