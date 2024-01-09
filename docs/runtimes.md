@@ -41,12 +41,16 @@ If you want to provide your own images, take into consideration that:
   that already contain the base tools and can be reused. Look for
   `tuxmake/base-*` [on Dockerhub](https://hub.docker.com/u/tuxmake).
 
-
 By default, the docker runtime will determine which image to use for your build
 based on the selection of target architecture and toolchain that you picked.
 You can override the image to use, the registry to get images from, or which
 image tags to use via environment variables. See the "ENVIRONMENT VARIABLES"
 section in the [command line documentation](cli.md#environment-variables).
+
+The docker runtime, and all other container runtimes, will expose the source
+directory inside the container overlayed by a copy-on-write filesystem.
+Therefore, writes to the source directory will not affect the real source
+directory.
 
 ## docker-local
 
@@ -59,7 +63,6 @@ already have an image.
 
 The podman runtime works exactly like the docker runtime, but calling `podman`
 instead of `docker`.
-
 
 ## podman-local
 
