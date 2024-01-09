@@ -142,17 +142,17 @@ test_ccache() {
 }
 
 test_output_dir() {
-  run tuxmake --output-dir=output/ config
+  run tuxmake --output-dir=${tmpdir}/output config
   assertEquals "$rc" 0
-  assertTrue 'test -f output/config'
-  assertTrue 'test -f output/build.log'
+  assertTrue 'test -f ${tmpdir}/output/config'
+  assertTrue 'test -f ${tmpdir}/output/build.log'
 }
 
 test_reuse_output_dir() {
-  mkdir output
-  run tuxmake --output-dir=output config
+  mkdir ${tmpdir}/output
+  run tuxmake --output-dir=${tmpdir}/output config
   assertEquals 0 "$rc"
-  assertTrue 'config copied to output dir' 'test -f output/config'
+  assertTrue 'config copied to output dir' 'test -f ${tmpdir}/output/config'
 }
 
 test_build_dir() {
