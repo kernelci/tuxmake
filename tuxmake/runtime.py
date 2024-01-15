@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import shlex
 import subprocess
 import sys
@@ -522,23 +523,25 @@ class ContainerRuntime(Runtime):
             subprocess.check_output([self.command, "--version"]).decode("utf-8").strip()
         )
         image_name = self.get_image()
-        image_digest = (
+        image_info = (
             subprocess.check_output(
                 [
                     self.command,
                     "image",
                     "inspect",
-                    "--format={{index .RepoDigests 0}}",
+                    "--format={{json .RepoDigests}}||{{json .RepoTags}}",
                     image_name,
-                ],
+                ]
             )
             .decode("utf-8")
             .strip()
         )
+        digests, tags = map(json.loads, image_info.split("||"))
         return {
             "version": version,
             "image_name": image_name,
-            "image_digest": image_digest,
+            "image_digest": digests[0] if digests else None,
+            "image_tag": tags[0] if tags else None,
         }
 
 
