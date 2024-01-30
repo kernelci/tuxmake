@@ -537,11 +537,17 @@ class ContainerRuntime(Runtime):
             .strip()
         )
         digests, tags = map(json.loads, image_info.split("||"))
+        image_tag = None
+        for tag in tags:
+            if tag.split(":")[-1] != "latest":
+                image_tag = tag
+                break
+
         return {
             "version": version,
             "image_name": image_name,
             "image_digest": digests[0] if digests else None,
-            "image_tag": tags[0] if tags else None,
+            "image_tag": image_tag,
         }
 
 

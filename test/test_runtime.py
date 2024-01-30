@@ -149,12 +149,12 @@ class TestDockerRuntime(TestContainerRuntime):
         get_image.return_value = "tuxmake/theimage"
         mocker.patch(
             "subprocess.check_output",
-            return_value=b'["tuxmake/theimage@sha256:deadbeef"]||["tuxmake:latest"]\n',
+            return_value=b'["tuxmake/theimage@sha256:deadbeef"]||["tuxmake:latest", "tuxmake:test-tag"]\n',
         )
         metadata = DockerRuntime().get_metadata()
         assert metadata["image_name"] == "tuxmake/theimage"
         assert metadata["image_digest"] == "tuxmake/theimage@sha256:deadbeef"
-        assert metadata["image_tag"] == "tuxmake:latest"
+        assert metadata["image_tag"] == "tuxmake:test-tag"
 
     def test_prepare(self, get_image, mocker, version_check):
         get_image.return_value = "myimage"
