@@ -36,7 +36,7 @@ RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
 RUN if [ -f /root/tmp_install_options ]; then \
         INSTALL_OPTIONS=$(cat /root/tmp_install_options); \
     fi; \
-    if [ "${HOSTARCH}" = loongarch64 ] || [ "${HOSTARCH}" = riscv ]; then \
+    if [ "${HOSTARCH}" = loongarch64 ] || [ "${HOSTARCH}" = riscv64 ]; then \
         allow_failure=true;  \
     else  \
         allow_failure=false; \
