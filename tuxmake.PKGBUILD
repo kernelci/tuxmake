@@ -1,5 +1,5 @@
 pkgname=tuxmake
-pkgver=1.21.4
+pkgver=1.21.5
 pkgrel=1
 pkgdesc='Thin wrapper to build Linux kernels'
 url='https://tuxmake.org/'
