@@ -396,7 +396,9 @@ class ContainerRuntime(Runtime):
                     cross_config["rebuild"] = image.rebuild_targets.get(
                         target, image.rebuild
                     )
-                    cross_config["skip_build"] = target in image.target_skip
+                    cross_config["skip_build"] = (
+                        True if image.skip_build else target in image.target_skip
+                    )
                     cross_image = Image(
                         name=f"{target}_{image.name}", group=group, **cross_config
                     )
