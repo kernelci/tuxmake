@@ -53,6 +53,7 @@ class Image:
         self.group = re.sub(r"-", "_", image_data.group)
         self.extra_apt_repo = image_data.extra_apt_repo
         self.extra_apt_repo_key = image_data.extra_apt_repo_key
+        self.tc_full_version = image_data.tc_full_version  # specify korg llvm full version like 18.1.0-rc3
         self.args = []
         self.test_args = [self.name]
 
@@ -244,6 +245,23 @@ class ClangAndroidBuildImage(ClangBuildImage):
 class CrossClangAndroidBuildImage(CrossClangBuildImage):
     pass
 
+
+class KorgBuildMixin:
+    kind = "clang-korg"
+
+    def emit(self):
+        super().emit()
+        self.arg("TC_FULL_VERSION", self.tc_full_version)
+        self.arg("HOSTARCH", native_arch.name)
+        if native_arch.name == "arm64":
+            self.arg("HOSTARCH", "aarch64")
+
+
+class KorgClangBuildImage(KorgBuildMixin, ClangBuildImage):
+    pass
+
+class CrossKorgClangBuildImage(KorgBuildMixin, CrossClangBuildImage):
+    pass
 
 class ArcImage(Image):
     kind = "arc"
