@@ -344,6 +344,7 @@ class Image:
         install_options="",
         extra_apt_repo=None,
         extra_apt_repo_key=None,
+        tc_full_version=None,
     ):
         self.name = name
         self.kind = kind
@@ -362,6 +363,7 @@ class Image:
         self.rebuild_targets = splitmap(rebuild_targets)
         self.extra_apt_repo = extra_apt_repo
         self.extra_apt_repo_key = extra_apt_repo_key
+        self.tc_full_version = tc_full_version
 
 
 class ContainerRuntime(Runtime):

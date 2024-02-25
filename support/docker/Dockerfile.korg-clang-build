@@ -1,0 +1,17 @@
+ARG BASE
+FROM ${BASE}
+
+ARG TC_FULL_VERSION
+ARG HOSTARCH
+
+RUN wget --progress=dot:giga https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-${TC_FULL_VERSION}-${HOSTARCH}.tar.gz && \
+    tar xaf llvm-${TC_FULL_VERSION}-${HOSTARCH}.tar.gz -C /usr/local && \
+    rm -f llvm-${TC_FULL_VERSION}-${HOSTARCH}.tar.gz
+
+ENV PATH="$PATH:/usr/local/llvm-${TC_FULL_VERSION}-${HOSTARCH}/bin"
+
+RUN apt-get update -q=2 && \
+    gccversion=$(apt-cache policy gcc | sed -e '/Candidate:/!d; s/\s*Candidate:\s*.*://; s/\..*//') && \
+    apt-get install -q=2 -y libc6 libgcc-s1 libicu67 liblzma5 libstdc++6 libxml2 libzstd1 zlib1g libc6-dev linux-libc-dev libgcc-${gccversion}-dev libstdc++-${gccversion}-dev
+
+# vim: ft=dockerfile

@@ -45,3 +45,17 @@ to build the kernel with [Rust support](https://github.com/Rust-for-Linux).
 This toolchain does a full LLVM build for C code (i.e. `LLVM=1`), and also
 includes the tools required to build the kernel with
 [Rust support](https://github.com/Rust-for-Linux).
+
+## korgclang
+
+This toolchain uses `clang` as compiler, but the GNU binutils tools for
+assembling and linking. Specify `korgclang-N` for specific
+versions. The toolchain binaries are obtained from
+[kernel.org](https://mirrors.edge.kernel.org/pub/tools/llvm/).
+
+## korgllvm
+
+This toolchain does a full LLVM build, i.e. one with `LLVM=1`: compile with
+clang, and assemble/link with the LLVM tools. Specify `korgllvm-N` for
+requesting specific LLVM versions. The toolchain binaries are obtained
+from [kernel.org](https://mirrors.edge.kernel.org/pub/tools/llvm/).
