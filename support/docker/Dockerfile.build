@@ -135,6 +135,7 @@ RUN set -x; \
         libzstd-dev \
         linux-libc-dev \
         linux-libc-dev-${arch}-cross \
+        libopencsd-dev \
         && \
     if dpkg --compare-versions "${debianversion}" ge 12; then \
         apt-get install  \
@@ -186,6 +187,7 @@ RUN set -x; \
         libtraceevent-dev:${arch} \
         $(test "${arch}" != "s390x" && echo libunwind-dev:${arch}) \
         libzstd-dev:${arch} \
+        libopencsd-dev:${arch} \
         systemtap-sdt-dev:${arch} || \
          ${allow_failure} && \
     rm -rf binutils-dev*.deb /tmp/binutils-dev
