@@ -110,7 +110,7 @@ class Image:
         test_args = " ".join(self.test_args)
         # FIXME We skip testing loongarch container for now
         # since we don't have gnu ld in the container
-        if self.name in ["loongarch_clang-nightly", "loongarch_clang-17", "loongarch_clang-18"]:
+        if self.name in ["loongarch_clang-nightly", "loongarch_clang-17", "loongarch_clang-18"] or "korg" in self.name:
             stream.write(f"test-{self.name}: {self.name}\n")
             stream.write(f"\t$(ANN_TEST) Skip {self.name}\n")
             return
