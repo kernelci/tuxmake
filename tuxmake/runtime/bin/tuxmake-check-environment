@@ -145,7 +145,7 @@ sub check_rust() {
 }
 
 sub check_toolchain_image() {
-  my ($arch, $compiler, $version);
+  my ($arch, $compiler, $version, $is_korg);
   if ($image =~ /^(.*)_(.*)$/) {
     $arch = $1;
     $compiler = $2;
@@ -161,6 +161,10 @@ sub check_toolchain_image() {
   }
   if ($compiler eq "llvm") {
     $compiler = "clang"
+  }
+  if ( $compiler eq "korg-clang" || $compiler eq "korg-llvm" ) {
+    $compiler = "clang";
+    $is_korg = 1;
   }
   my @compilers = ($compiler);
 
@@ -208,7 +212,11 @@ sub check_toolchain_image() {
 
     if ($compiler =~ /clang/) {
       check_program("ld.lld");
-      check_program("llvm-as");
+      if ($is_korg) {
+        skip("llvm-as");
+      } else {
+        check_program("llvm-as");
+      }
     }
   }
 }
