@@ -261,8 +261,11 @@ class KorgClangBuildImage(KorgBuildMixin, ClangBuildImage):
     pass
 
 
-class CrossKorgClangBuildImage(KorgBuildMixin, CrossClangBuildImage):
-    pass
+class CrossKorgClangBuildImage(KorgBuildMixin, CrossBuildMixin, ClangBuildImage):
+    extra_lists = ["crossbuild"]
+
+    def get_packages(self):
+        return super().get_packages()
 
 
 class ArcImage(Image):
