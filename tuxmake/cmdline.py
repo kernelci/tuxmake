@@ -127,12 +127,12 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
     )
     buildenv.add_argument(
         "--image-registry",
-        help="Explicit image registry to use for container-based runtimes. Implies --runtime=docker if no runtime is explicit specified. (default: none, meaning to just use docker.io).",
+        help="Explicit image registry to use for container-based runtimes. Implies --runtime=docker if no runtime is specified explicitly. (default: none, meaning to just use docker.io).",
     )
     buildenv.add_argument(
         "-i",
         "--image",
-        help="Image to build with, for container-based runtimes (docker, podman etc). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. Implies --runtime=docker if no runtime is explicit specified. (default: tuxmake-provided images).",
+        help="Image to build with, for container-based runtimes (docker, podman etc). {toolchain} and {arch} get replaced by the names of the toolchain and architecture selected for the build. Implies --runtime=docker if no runtime is specified explicitly. (default: tuxmake-provided images).",
     )
     buildenv.add_argument("--docker-image", help="Alias for --image (deprecated).")
     buildenv.add_argument(
