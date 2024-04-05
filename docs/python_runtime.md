@@ -11,9 +11,9 @@ from tuxmake.runtime import Runtime
 
 runtime = Runtime.get(os.environ.get("RUNTIME", "podman")
 runtime.set_image(os.environ.get("IMAGE", "debian"))
-runtim.prepare()
+runtime.prepare()
 runtime.run_cmd(["date"])
-runtim.cleanup()
+runtime.cleanup()
 ```
 
 ## The `Runtime` class

@@ -339,7 +339,7 @@ class TestInterruptedBuild:
     def interrupted(self, mocker, Popen):
         process = mocker.MagicMock()
         Popen.return_value = process
-        process.communicate.side_effect = KeyboardInterrupt()
+        process.wait.side_effect = KeyboardInterrupt()
         return process
 
     def test_ctrl_c(self, linux, interrupted):
@@ -721,7 +721,7 @@ class TestCompilerWrappers:
         mocker.patch("tuxmake.wrapper.Wrapper.prepare_runtime")
         b.prepare()
         cache_dir = b.wrapper.environment["CCACHE_DIR"]
-        assert (cache_dir, cache_dir) in b.runtime.volumes
+        assert (cache_dir, cache_dir, False, False) in b.runtime.volumes
 
     def test_ccache_gcc_v(self, linux, Popen):
         b = Build(tree=linux, targets=["config"], toolchain="gcc-10", wrapper="ccache")

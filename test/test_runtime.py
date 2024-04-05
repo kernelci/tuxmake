@@ -56,6 +56,7 @@ class TestRuntime:
             "tuxmake.runtime.Runtime.get_command_line", return_value=["/bin/bash"]
         )
         runtime = NullRuntime()
+        runtime.prepare()
         runtime.run_cmd(["/bin/bash"], interactive=True)
         kwargs = Popen.call_args[1]
         get_command_line.assert_called_with(
@@ -228,14 +229,14 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.output_dir = tmp_path
         runtime.start_container()
         cmd = spawn_container.call_args[0][0]
-        assert f"--volume={tmp_path}:{tmp_path}" in cmd
+        assert f"--volume={tmp_path}:{tmp_path}:rw" in cmd
 
     def test_source_dir(self, linux, tmp_path, spawn_container):
         runtime = DockerRuntime()
         runtime.source_dir = tmp_path
         runtime.start_container()
         cmd = spawn_container.call_args[0][0]
-        assert f"--volume={tmp_path}:{tmp_path}" in cmd
+        assert f"--volume={tmp_path}:{tmp_path}:rw" in cmd
 
     def test_volume(self, linux, spawn_container):
         runtime = DockerRuntime()
@@ -243,7 +244,7 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.add_volume(path)
         runtime.start_container()
         cmd = spawn_container.call_args[0][0]
-        assert f"--volume={path}:{path}" in cmd
+        assert f"--volume={path}:{path}:rw" in cmd
 
     def test_TUXMAKE_DOCKER_RUN(self, monkeypatch, spawn_container):
         monkeypatch.setenv(
@@ -420,6 +421,14 @@ class TestPodmanRuntime(TestContainerRuntime):
     def test_str(self):
         assert str(PodmanRuntime()) == "podman"
 
+    def test_volume_as_readonly(self, linux, spawn_container):
+        runtime = PodmanRuntime()
+        path = "/path/to/something"
+        runtime.add_volume(path, ro=True)
+        runtime.start_container()
+        cmd = spawn_container.call_args[0][0]
+        assert f"--volume={path}:{path}:ro,z" in cmd
+
     def test_TUXMAKE_PODMAN_RUN(self, monkeypatch, spawn_container):
         monkeypatch.setenv(
             "TUXMAKE_PODMAN_RUN", "--hostname=foobar --env=FOO='bar baz'"
@@ -433,7 +442,7 @@ class TestPodmanRuntime(TestContainerRuntime):
         PodmanRuntime().start_container()
         cmd = spawn_container.call_args[0][0]
         volumes = [o for o in cmd if o.startswith("--volume=")]
-        assert all([v.endswith(":z") or v.endswith(":O") for v in volumes])
+        assert all([v.endswith(",z") or v.endswith(":O") for v in volumes])
 
     def test_logging_level(self, spawn_container):
         PodmanRuntime().start_container()

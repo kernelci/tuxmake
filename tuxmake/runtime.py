@@ -5,9 +5,10 @@ import shlex
 import subprocess
 import sys
 import time
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional, TextIO
+from typing import Callable, Optional, TextIO, Union
 
 
 from tuxmake import cache
@@ -71,6 +72,11 @@ class Runtime(ConfigurableObject):
       an empty dict.
     * **caps**: additional capabilities needed by the container ran by this runtime.
       Type: `list` with `str`; defaults to an empty list.
+    * **network**: name of the network created by the runtime(docker|podman) to be
+      used in the container.
+    * **allow_user_opts**: flag to enable/disable user options for container runtime.
+      Type: `bool`; defaults to `False`.
+
     """
 
     basedir = "runtime"
@@ -108,7 +114,7 @@ class Runtime(ConfigurableObject):
         self.__image__ = None
         self.__user__ = None
         self.__group__ = None
-        self.__logger__: Optional[subprocess.Popen] = None
+        self.__start_time__ = datetime.now()
 
         self.basename: str = "run"
         self.quiet: bool = False
@@ -116,6 +122,10 @@ class Runtime(ConfigurableObject):
         self.output_dir: Optional[Path] = None
         self.environment: dict = {}
         self.caps: Optional[list] = []
+        self.network = None
+        self.allow_user_opts: bool = True
+
+        self.init_logging()
 
     def __init_config__(self):
         self.toolchains = Toolchain.supported()
@@ -177,12 +187,15 @@ class Runtime(ConfigurableObject):
     def get_command_prefix(self, interactive):
         return []
 
-    def add_volume(self, source, dest=None):
+    def add_volume(self, source, dest=None, ro=False, device=False):
         """
         Ensures that the directory or file **source** is available for commands
-        run as **dest**. For container runtimes, this meand bind-mounting
+        run as **dest**. For container runtimes, this means bind-mounting
         **source** as **dest** inside the container. All volumes must be added
         before `prepare()` is called.
+        * **ro**: bind-mount with read only. Type: `bool`; defaults to `False`.
+        * **device**: flag to bind-mount volume as device. Type: `bool`;
+          defaults to `False`.
 
         This is a noop for non-container runtimes.
         """
@@ -206,6 +219,8 @@ class Runtime(ConfigurableObject):
         if self.output_dir:
             self.output_dir.mkdir(parents=True, exist_ok=True)
 
+        self.init_logging()
+
     def get_go_offline_command(self):
         return self.bindir / "tuxmake-run-offline"
 
@@ -219,42 +234,39 @@ class Runtime(ConfigurableObject):
         """
         return {}
 
-    @property
-    def logger(self):
-        if not self.__logger__:
-            if self.quiet:
-                stdout = subprocess.DEVNULL
-            else:
-                stdout = sys.stdout
-            if self.output_dir:
-                log = self.output_dir / f"{self.basename}.log"
-                debug_log = self.output_dir / f"{self.basename}-debug.log"
-            else:
-                log = debug_log = Path("/dev/null")
-            self.__logger__ = subprocess.Popen(
-                [
-                    str(Runtime.bindir / "tuxmake-logger"),
-                    str(log),
-                    str(debug_log),
-                ],
-                stdin=subprocess.PIPE,
-                stdout=stdout,
-            )
-        return self.__logger__
+    def init_logging(self):
+        if self.output_dir:
+            log = self.output_dir / f"{self.basename}.log"
+            debug_log = self.output_dir / f"{self.basename}-debug.log"
+        else:
+            log = debug_log = Path("/dev/null")
+
+        self.log_file = log.open("w")
+        self.debug_logfile = debug_log.open("w")
 
     def log(self, *stuff):
         """
         Logs **stuff** to both the console and to any log files in use.
         """
-        subprocess.call(["echo"] + list(stuff), stdout=self.logger.stdin)
+        for item in stuff:
+            item = (item.rstrip("\n")) + "\n"
+            if not self.quiet:
+                sys.stdout.write(item)
+            self.log_file.write(item)
+            elapsed_time = (datetime.now() - self.__start_time__).seconds
+            hours = elapsed_time // 3600
+            minutes = (elapsed_time % 3600) // 60
+            seconds = elapsed_time % 60
+            ts = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
+            self.debug_logfile.write(f"{ts} {item}")
 
     def cleanup(self):
         """
         Cleans up and returns resources used during execution. You must call
         this methods after you are done with the runtime object.
         """
-        self.logger.communicate()
-        self.logger.terminate()
+        self.log_file.close()
+        self.debug_logfile.close()
 
     def run_cmd(
         self,
@@ -264,6 +276,7 @@ class Runtime(ConfigurableObject):
         expect_failure: bool = False,
         stdout: Optional[TextIO] = None,
         echo: bool = True,
+        logger: Optional[Callable] = None,
     ):
         """
         Runs a command in the desired runtime. Returns True if the command
@@ -280,19 +293,31 @@ class Runtime(ConfigurableObject):
           method, i.e. returns True if the command fails, False if it succeeds.
         * **stdout**: a TextIO object to where the `stdout` of the called
           command will be directed.
+        * **echo**: flag to log the command which is being run. Type: `bool`.
+          Defaults to `True`.
+        * **logger**: Optional callable function to be called for each line of
+          command output.
 
         If the command in interrupted in some way (by a TERM signal, or by the
         user typing control-C), an instance of `Terminated` is raised.
         """
         final_cmd = self.get_command_line(cmd, interactive=interactive, offline=offline)
 
+        if not logger:
+            logger = self.log
+        private_stdout: Union[TextIO, int, None]
+
         if interactive:
-            stdout = stderr = stdin = None
+            private_stdout = stderr = stdin = None
+
         else:
+            if stdout:
+                private_stdout = stdout
+            else:
+                private_stdout = subprocess.PIPE
+            stderr = subprocess.STDOUT
             stdin = subprocess.DEVNULL
-            stderr = self.logger.stdin
-            if not stdout:
-                stdout = self.logger.stdin
+
         if echo:
             self.log(quote_command_line(cmd))
 
@@ -307,11 +332,16 @@ class Runtime(ConfigurableObject):
             cwd=self.source_dir,
             env=env,
             stdin=stdin,
-            stdout=stdout,
+            stdout=private_stdout,
             stderr=stderr,
+            universal_newlines=True,
         )
         try:
-            process.communicate()
+            self.start_time = datetime.now()
+            if process.stdout and not interactive:
+                for line in process.stdout:
+                    logger(line)
+            process.wait()
             if expect_failure:
                 return process.returncode != 0
             else:
@@ -419,8 +449,8 @@ class ContainerRuntime(Runtime):
             self.__volumes__ = []
         return self.__volumes__
 
-    def add_volume(self, source, dest=None):
-        self.volumes.append((source, dest or source))
+    def add_volume(self, source, dest=None, ro=False, device=False):
+        self.volumes.append((source, dest or source, ro, device))
 
     @lru_cache(None)
     def is_supported(self, arch, toolchain):
@@ -463,7 +493,8 @@ class ContainerRuntime(Runtime):
         env = (f"--env={k}={v}" for k, v in self.environment.items())
         caps = (f"--cap-add={cap}" for cap in self.caps)
 
-        user_opts = self.get_user_opts()
+        user_opts = self.get_user_opts() if self.allow_user_opts else []
+        network = [f"--network={self.network}"] if self.network else []
         extra_opts = self.__get_extra_opts__()
         cmd = [
             self.command,
@@ -475,6 +506,7 @@ class ContainerRuntime(Runtime):
             *env,
             *caps,
             *user_opts,
+            *network,
             *self.get_volume_opts(),
             f"--workdir={self.source_dir}",
             *self.get_logging_opts(),
@@ -518,7 +550,10 @@ class ContainerRuntime(Runtime):
         if self.output_dir and self.source_dir != self.output_dir:
             volumes.append(self.volume_opt(self.output_dir, self.output_dir))
         volumes.append(self.volume_opt(super().bindir, self.bindir))
-        volumes += [self.volume_opt(s, d) for s, d in self.volumes]
+        volumes += [
+            self.volume_opt(s, d, ro=ro, device=device)
+            for s, d, ro, device in self.volumes
+        ]
 
         return volumes
 
@@ -589,7 +624,7 @@ class DockerRuntime(ContainerRuntime):
     def get_logging_opts(self):
         return []
 
-    def volume_opt(self, source, target, overlay=False):
+    def volume_opt(self, source, target, overlay=False, ro=False, device=False):
         if overlay and self.output_dir:
             self.overlay_dir = self.output_dir / "overlay"
             self.overlay_dir.mkdir()
@@ -608,7 +643,9 @@ class DockerRuntime(ContainerRuntime):
                 ]
             )
         else:
-            return f"--volume={source}:{target}"
+            option = "device" if device else "volume"
+            mode = "ro" if ro else "rw"
+            return f"--{option}={source}:{target}:{mode}"
 
     def cleanup(self):
         if self.overlay_dir:
@@ -627,12 +664,17 @@ class PodmanRuntime(ContainerRuntime):
     def get_logging_opts(self):
         return ["--log-level=ERROR"]
 
-    def volume_opt(self, source, target, overlay=False):
-        v = f"--volume={source}:{target}"
+    def volume_opt(self, source, target, overlay=False, ro=False, device=False):
+        option = "device" if device else "volume"
+        mode = "ro" if ro else "rw"
+        v = f"--{option}={source}:{target}"
         if overlay:
             v += ":O"
         else:
-            v += ":z"
+            v += f":{mode}"
+            if not device:
+                v += ",z"
+
         return v
 
 
