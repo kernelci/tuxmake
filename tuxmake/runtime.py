@@ -591,9 +591,9 @@ class DockerRuntime(ContainerRuntime):
 
     def volume_opt(self, source, target, overlay=False):
         if overlay and self.output_dir:
-            self.overlay_dir = self.output_dir / "overlay"
+            self.overlay_dir = "/tmp/overlay"
             self.overlay_dir.mkdir()
-            upperdir = self.overlay_dir / "uppperdir"
+            upperdir = self.overlay_dir / "upperdir"
             upperdir.mkdir(parents=True)
             workdir = self.overlay_dir / "workdir"
             workdir.mkdir(parents=True)
