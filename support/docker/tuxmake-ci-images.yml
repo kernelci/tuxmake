@@ -72,6 +72,19 @@ ci-debian-11-arm64:
 ci-debian-11:
   extends: .publish-ci-image
 
+ci-debian-12-amd64:
+  extends: .build-ci-image-amd64
+  variables:
+    BASE: docker.io/library/debian:bookworm-slim
+
+ci-debian-12-arm64:
+  extends: .build-ci-image-arm64
+  variables:
+    BASE: docker.io/library/debian:bookworm-slim
+
+ci-debian-12:
+  extends: .publish-ci-image
+
 ci-ubuntu-18.04-amd64:
   extends: .build-ci-image-amd64
   variables:

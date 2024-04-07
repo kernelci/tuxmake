@@ -36,6 +36,10 @@ stages:
   script:
     - make unit-tests
 
+unit-tests-python3.11:
+  extends: .unit-tests
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
+
 unit-tests-python3.10:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-22.04
@@ -55,6 +59,10 @@ unit-tests-python3.7:
 unit-tests-python3.6:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
+
+unit-tests-python3.11-arm64:
+  extends: [.unit-tests, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
 
 unit-tests-python3.10-arm64:
   extends: [.unit-tests, .arm64]
@@ -113,6 +121,22 @@ docker-build-tests:
   script:
     - make integration-tests TMV=1
 
+.integration-break-system-packages:
+  extends: .integration
+  before_script:
+    - git status
+    - rm -rf dist/
+    - flit --debug build
+    - python3 -m pip install dist/*.whl --break-system-packages
+
+integration-python3.11:
+  extends: .integration-break-system-packages
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
+
+integration-python3.10:
+  extends: .integration
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-22.04
+
 integration-python3.9:
   extends: .integration
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
@@ -128,6 +152,14 @@ integration-python3.7:
 integration-python3.6:
   extends: .integration
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
+
+integration-python3.11-arm64:
+  extends: [.integration-break-system-packages, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
+
+integration-python3.10-arm64:
+  extends: [.integration, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-22.04
 
 integration-python3.9-arm64:
   extends: [.integration, .arm64]
