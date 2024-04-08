@@ -589,6 +589,10 @@ class ContainerRuntime(Runtime):
             "image_tag": image_tag,
         }
 
+    @property
+    def skip_overlayfs(self):
+        return os.getenv("SKIP_OVERLAYFS", "false").lower() == "true"
+
 
 class DockerRuntime(ContainerRuntime):
     name = "docker"
@@ -625,7 +629,7 @@ class DockerRuntime(ContainerRuntime):
         return []
 
     def volume_opt(self, source, target, overlay=False, ro=False, device=False):
-        if overlay and self.output_dir:
+        if overlay and self.output_dir and not self.skip_overlayfs:
             self.overlay_dir = self.output_dir / "overlay"
             self.overlay_dir.mkdir()
             upperdir = self.overlay_dir / "uppperdir"
@@ -668,7 +672,7 @@ class PodmanRuntime(ContainerRuntime):
         option = "device" if device else "volume"
         mode = "ro" if ro else "rw"
         v = f"--{option}={source}:{target}"
-        if overlay:
+        if overlay and not self.skip_overlayfs:
             v += ":O"
         else:
             v += f":{mode}"
