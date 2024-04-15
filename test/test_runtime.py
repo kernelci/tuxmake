@@ -315,6 +315,20 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime.cleanup()
         assert not overlay.exists()
 
+    def test_volume_opt_with_skip_overlayfs(self, monkeypatch, tmp_path):
+        overlay = ro = True
+        # case: without 'skip_overlayfs'
+        runtime = DockerRuntime()
+        runtime.output_dir = tmp_path
+        volume_opt = runtime.volume_opt("src", "tgt", overlay=overlay, ro=ro)
+        assert "--mount=type=volume" in volume_opt
+
+        # case: with 'skip_overlayfs'
+        monkeypatch.setenv("SKIP_OVERLAYFS", "true")
+        runtime = DockerRuntime()
+        volume_opt = runtime.volume_opt("src", "tgt", overlay, ro)
+        assert volume_opt == "--volume=src:tgt:ro"
+
 
 class TestDockerRuntimeSpawnContainer(FakeGetImage):
     def test_spawn_container(self, mocker, container_id):
@@ -448,6 +462,19 @@ class TestPodmanRuntime(TestContainerRuntime):
         PodmanRuntime().start_container()
         cmd = spawn_container.call_args[0][0]
         assert "--log-level=ERROR" in cmd
+
+    def test_volume_opt_with_skip_overlayfs(self, monkeypatch):
+        overlay = ro = True
+        # case: without 'skip_overlayfs'
+        runtime = PodmanRuntime()
+        volume_opt = runtime.volume_opt("src", "tgt", overlay=overlay, ro=ro)
+        assert volume_opt == "--volume=src:tgt:O"
+
+        # case: with 'skip_overlayfs'
+        monkeypatch.setenv("SKIP_OVERLAYFS", "true")
+        runtime = PodmanRuntime()
+        volume_opt = runtime.volume_opt("src", "tgt", overlay, ro)
+        assert volume_opt == "--volume=src:tgt:ro,z"
 
 
 class TestPodmanLocalRuntime(TestContainerRuntime):
