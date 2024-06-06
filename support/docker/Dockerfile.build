@@ -132,6 +132,7 @@ RUN set -x; \
         libssl-dev \
         libtraceevent-dev \
         $(test "${arch}" != "s390x" && echo libunwind-dev ) \
+        liburing-dev \
         libzstd-dev \
         linux-libc-dev \
         linux-libc-dev-${arch}-cross \
@@ -186,6 +187,7 @@ RUN set -x; \
         libssl-dev:${arch} \
         libtraceevent-dev:${arch} \
         $(test "${arch}" != "s390x" && echo libunwind-dev:${arch}) \
+        liburing-dev:${arch} \
         libzstd-dev:${arch} \
         libopencsd-dev:${arch} \
         systemtap-sdt-dev:${arch} || \
