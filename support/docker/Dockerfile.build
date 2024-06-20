@@ -240,7 +240,7 @@ RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
     && rm -rf /root/.cargo
 
 # Compile and install pahole until 1.25 version is available
-RUN apt-get install -qy cmake=3.29.5-1 libdw-dev && \
+RUN apt-get install -qy cmake libdw-dev && \
     git clone --depth=1 https://git.kernel.org/pub/scm/devel/pahole/pahole.git -b v1.25 && \
     cd pahole && \
     mkdir build && \
