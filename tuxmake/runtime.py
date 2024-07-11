@@ -375,6 +375,7 @@ class Image:
         extra_apt_repo=None,
         extra_apt_repo_key=None,
         tc_full_version=None,
+        boot_test=False,
     ):
         self.name = name
         self.kind = kind
@@ -394,6 +395,7 @@ class Image:
         self.extra_apt_repo = extra_apt_repo
         self.extra_apt_repo_key = extra_apt_repo_key
         self.tc_full_version = tc_full_version
+        self.boot_test = boot_test
 
 
 class ContainerRuntime(Runtime):

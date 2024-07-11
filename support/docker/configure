@@ -60,6 +60,11 @@ class Image:
 
         if version := re.match(r"^.*-([0-9]+)$", self.name):
             self.arg("TOOLCHAIN_VERSION", version[1])
+        # process boot_test flag
+        self.boot_test = image_data.boot_test
+        if isinstance(self.boot_test, str):
+            self.boot_test = True if self.boot_test.lower() == "true" else False
+
 
     @property
     def dependency(self):
@@ -116,7 +121,10 @@ class Image:
             return
         stream.write(f"test-{self.name}: {self.name}\n")
         stream.write(f"\t$(ANN_TEST) {self.name}\n")
-        stream.write(f"\t$(Q)$(docker) run --rm $(REGISTRY)$(PROJECT)/{self.name}:latest$(TAG) tuxmake-check-environment {test_args} $(NOSTDOUT) \n\n")
+        stream.write(f"\t$(Q)$(docker) run --rm $(REGISTRY)$(PROJECT)/{self.name}:latest$(TAG) tuxmake-check-environment {test_args} $(NOSTDOUT) \n")
+        if self.boot_test:
+            stream.write(f"\t$(Q)sh ./test_container.sh $(REGISTRY)$(PROJECT)/{self.name}:latest$(TAG) $(NOSTDOUT) \n\n")
+
 
 
 class BaseImage(Image):
