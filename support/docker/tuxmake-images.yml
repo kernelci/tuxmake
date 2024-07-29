@@ -1041,7 +1041,7 @@ docker-images-korg_clang_19_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_19_all"
-    tags: []
+    tags: [x86_64-dind]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_19_all")'
