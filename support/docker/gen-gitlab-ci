@@ -93,7 +93,7 @@ for group, rebuild in groups:
         if host == "arm64":
             tag = "arm64-dind"
         else:
-            tag = "x86-dind"
+            tag = ""
         if group == "base":
             stage = "build-base"
         else:
