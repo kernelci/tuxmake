@@ -31,7 +31,7 @@ stages:
         - apk add make python3
         - cd support/docker/
         - ./configure
-        - 'docker login --username="${DOCKER_USERNAME}" --password-stdin < "${DOCKER_PASSWORD_FILE}"'
+        - echo "$DEPLOYMENTS_REGISTRY_PASSWORD" | docker login registry.deployments.linaro.org --username $DEPLOYMENTS_REGISTRY_USERNAME --password-stdin
 """
 
 PUBLISH_JOB = """
