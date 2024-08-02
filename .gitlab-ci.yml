@@ -12,7 +12,7 @@ build:
       - docker:dind
   image: docker:20.10-dind
   tags:
-    - arm64-dind
+    - saas-linux-medium-arm64
   script:
       - docker info
       - docker run ubuntu:latest 
