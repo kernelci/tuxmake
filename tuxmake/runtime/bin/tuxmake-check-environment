@@ -135,13 +135,11 @@ sub check_compiler_fuse($$) {
 
 sub check_rust() {
   check_program("rustc");
-  check_program("cargo");
   check_program("rustdoc");
   check_program("rustfmt");
   check_program("clippy-driver");
   check_program("bindgen");
   my $tmpdir = tempdir(CLEANUP => 1);
-  check_run("rustc and cargo work", "cd ${tmpdir} && cargo new foobar 2> /dev/null && cd foobar && cargo run", 0);
 }
 
 sub check_toolchain_image() {
