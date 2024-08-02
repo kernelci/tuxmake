@@ -227,7 +227,7 @@ class CrossGccBuildImage(CrossBuildMixin, GccBuildImage):
 
     def __init__(self, image_data):
         super().__init__(image_data)
-        self.pkgname = re.sub(r".*_(gcc.*)$", "\g<1>", self.name)
+        self.pkgname = re.sub(r".*_(gcc.*)$", r"\g<1>", self.name)
 
     def get_packages(self):
         extra_packages = []
