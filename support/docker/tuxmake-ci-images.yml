@@ -42,7 +42,7 @@
 .build-ci-image-arm64:
   extends: .build-ci-image
   tags:
-    - arm64-dind
+    - saas-linux-medium-arm64
   variables:
     ARCH: arm64
 
