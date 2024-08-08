@@ -241,8 +241,8 @@ class Runtime(ConfigurableObject):
         else:
             log = debug_log = Path("/dev/null")
 
-        self.log_file = log.open("w")
-        self.debug_logfile = debug_log.open("w")
+        self.log_file = log.open("wb", buffering=0)
+        self.debug_logfile = debug_log.open("wb", buffering=0)
 
     def log(self, *stuff):
         """
@@ -252,13 +252,13 @@ class Runtime(ConfigurableObject):
             item = (item.rstrip("\n")) + "\n"
             if not self.quiet:
                 sys.stdout.write(item)
-            self.log_file.write(item)
+            self.log_file.write(item.encode("utf-8"))
             elapsed_time = (datetime.now() - self.__start_time__).seconds
             hours = elapsed_time // 3600
             minutes = (elapsed_time % 3600) // 60
             seconds = elapsed_time % 60
             ts = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
-            self.debug_logfile.write(f"{ts} {item}")
+            self.debug_logfile.write(f"{ts} {item}".encode("utf-8"))
 
     def cleanup(self):
         """
