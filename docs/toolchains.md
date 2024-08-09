@@ -59,3 +59,10 @@ This toolchain does a full LLVM build, i.e. one with `LLVM=1`: compile with
 clang, and assemble/link with the LLVM tools. Specify `korg-llvm-N` for
 requesting specific LLVM versions. The toolchain binaries are obtained
 from [kernel.org](https://mirrors.edge.kernel.org/pub/tools/llvm/).
+
+## korg-gcc
+
+This toolchain uses `gcc` as compiler, but the GNU binutils tools for
+assembling and linking. Specify `korg-gcc-N` for specific
+versions. The toolchain binaries are obtained from
+[kernel.org](https://mirrors.edge.kernel.org/pub/tools/crosstool/).

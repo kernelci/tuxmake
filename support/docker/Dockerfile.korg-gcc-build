@@ -1,0 +1,49 @@
+ARG BASE
+FROM ${BASE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG TC_FULL_VERSION
+ARG BUILD_HOST_ARCH
+ARG HOSTARCH
+ARG SUFFIX
+ARG INSTALL_OPTIONS
+ARG PACKAGES
+COPY sha256sum /sha256sum
+
+RUN wget --progress=dot:giga https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/${BUILD_HOST_ARCH}/${TC_FULL_VERSION}/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz && \
+    sha256sum -c sha256sum/korg_gcc_${BUILD_HOST_ARCH}-${TC_FULL_VERSION}.sha256sum --ignore-missing && \
+    rm -rf sha256sum && \
+    tar zxf ${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz -C /usr/local && \
+    rm -f ${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz
+
+# TODO: This is a hack and makes things tied to Debian 12 where the default gcc
+# is gcc-12. We should handle this better.
+RUN ln -sf /usr/bin/gcc-12 /usr/bin/gcc
+
+ENV PATH="/usr/local/gcc-${TC_FULL_VERSION}-nolibc/${HOSTARCH}-${SUFFIX}/bin:$PATH"
+
+# Install basic toolchain packages. Which toolchain exactly is defined by the
+# $PACKAGES build argument
+RUN if [ -f /root/tmp_install_options ]; then \
+        INSTALL_OPTIONS=$(cat /root/tmp_install_options); \
+    fi; \
+    # NOTE: Install loongarch64 binutils package from debian unstable since
+    #       it is not yet available in debian stable or backports.
+    if [ "${HOSTARCH}" = loongarch64 ]; then \
+       echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
+       apt-get update -q=2 && \
+       apt-get install -q=2 -y --no-install-recommends \
+       --option=debug::pkgProblemResolver=yes \
+       -t unstable $PACKAGES; \
+    else  \
+       apt-get update -q && \
+       apt-get install \
+       --assume-yes \
+       --no-install-recommends \
+       --option=debug::pkgProblemResolver=yes \
+       ${INSTALL_OPTIONS} \
+       $PACKAGES; \
+    fi;
+
+# vim: ft=dockerfile

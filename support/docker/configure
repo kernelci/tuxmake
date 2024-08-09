@@ -274,6 +274,32 @@ class CrossKorgClangBuildImage(KorgBuildMixin, CrossClangBuildImage):
     pass
 
 
+class KorgGccBuildImage(KorgBuildMixin, GccBuildImage):
+    kind = "korg-gcc-build"
+
+    def emit(self):
+        super().emit()
+        self.arg("HOSTARCH", "x86_64" if self.arch is None else self.arch)
+        if native_arch.name == "amd64":
+            self.arg("BUILD_HOST_ARCH", "x86_64")
+        if self.arch == "arm64":
+            self.arg("HOSTARCH", "aarch64")
+        self.arg("SUFFIX", "linux-gnueabi") if self.arch == "arm" else self.arg("SUFFIX", "linux")
+
+
+class CrossKorgGccBuildImage(KorgBuildMixin, CrossGccBuildImage):
+    kind = "korg-gcc-build"
+
+    def emit(self):
+        super().emit()
+        self.arg("HOSTARCH", "x86_64" if self.arch is None else self.arch)
+        if native_arch.name == "amd64":
+            self.arg("BUILD_HOST_ARCH", "x86_64")
+        if self.arch == "arm64":
+            self.arg("HOSTARCH", "aarch64")
+        self.arg("SUFFIX", "linux-gnueabi") if self.arch == "arm" else self.arg("SUFFIX", "linux")
+
+
 class ArcImage(Image):
     kind = "arc"
     extra_lists = ["crossbuild", "arc"]
