@@ -91,7 +91,7 @@ for group, rebuild in groups:
         else:
             needs = "['docker-images-base-multiarch']"
         if host == "arm64":
-            tag = "saas-linux-medium-arm64"
+            tag = "arm64-dind"
         else:
             tag = ""
         if group == "base":
