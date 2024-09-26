@@ -37,6 +37,7 @@ RUN apt-get update \
         docutils-common \
         dwarves \
         flex \
+        gawk \
         gettext \
         git \
         gzip \
