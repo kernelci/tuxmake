@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 import json
 import importlib
 from pathlib import Path
+import shlex
 import shutil
 from tuxmake.config import ConfigurableObject
+from tuxmake.config import split_commands
 from tuxmake.exceptions import UnsupportedMetadata
 from tuxmake.exceptions import UnsupportedMetadataType
 
@@ -59,13 +61,9 @@ class MetadataCollector:
 
     def collect(self):
         build = self.build
-        compiler = build.toolchain.compiler(
-            build.target_arch, build.makevars.get("CROSS_COMPILE", None)
-        )
         metadata_input_data = {
             handler.name: {
-                key: build.format_cmd_part(cmd.replace("{compiler}", compiler))
-                for key, cmd in handler.commands.items()
+                key: expand_cmds(cmds, build) for key, cmds in handler.commands.items()
             }
             for handler in self.handlers
         }
@@ -113,6 +111,28 @@ class MetadataCollector:
             metadata[handler][item] = extractor.get()
 
 
+def expand_cmds(cmds, build):
+    makevars = build.makevars
+    compiler = build.toolchain.compiler(
+        build.target_arch, makevars.get("CROSS_COMPILE", None)
+    )
+    expanded = []
+    for src_cmd in cmds:
+        cmd = []
+        for part in src_cmd:
+            cmd += build.expand_cmd_part(part.replace("{compiler}", compiler), makevars)
+        expanded.append(cmd)
+    final = " && ".join([" ".join([quote(p) for p in cmd]) for cmd in expanded])
+    return final
+
+
+def quote(s):
+    if s in ["|", "||", "2>/dev/null", "2>", ">"]:
+        return s
+    else:
+        return shlex.quote(s)
+
+
 def linelist(s):
     return s.splitlines()
 
@@ -148,7 +168,9 @@ class Metadata(ConfigurableObject):
                 self.types[k] = eval(t)
         except KeyError:
             pass  # no types, assume everything is str
-        self.commands = dict(self.config["commands"])
+        self.commands = {
+            name: split_commands(cmd) for name, cmd in self.config["commands"].items()
+        }
         try:
             self.extractor_classes = {
                 name: get_object(_class)
