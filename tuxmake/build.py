@@ -429,6 +429,8 @@ class Build:
                 + [f"--jobs={self.jobs}", f"O={self.build_dir}"]
                 + self.make_args(makevars)
             )
+        elif part == "{mmake}":
+            return ["make"] + self.make_args(makevars)
         elif part == "{tar_caf}":
             return [
                 "tar",
