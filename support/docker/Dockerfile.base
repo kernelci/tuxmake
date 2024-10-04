@@ -9,8 +9,8 @@ RUN export VERSION_ID=0 && . /etc/os-release \
     && if [ "${VERSION_CODENAME}" = "" ]; then exit; fi \
     && echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" > /etc/apt/sources.list.d/backports.list \
     && if [ "${VERSION_ID}" -eq 10 ]; then echo "deb http://archive.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list; fi \
-    && if [ "${VERSION_ID}" -eq 11 ]; then echo "deb http://snapshot.debian.org/archive/debian/20221013T214821Z/ bullseye-backports main" > /etc/apt/sources.list.d/backports-snapshot.list && echo "Acquire::Check-Valid-Until no;" > /etc/apt/apt.conf.d/99novalidity; fi \
-    && if [ "${VERSION_ID}" -le 11 ]; then echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-proposed-updates main" > /etc/apt/sources.list.d/proposed-updates.list; fi \
+    && if [ "${VERSION_ID}" -eq 11 ]; then echo "deb https://snapshot.debian.org/archive/debian/20241003T023044Z/ bullseye-backports main" > /etc/apt/sources.list.d/backports-snapshot.list && echo "Acquire::Check-Valid-Until no;" > /etc/apt/apt.conf.d/99novalidity; fi \
+    && if [ "${VERSION_ID}" -le 12 ]; then echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-proposed-updates main" > /etc/apt/sources.list.d/proposed-updates.list; fi \
     && pinning=/srv/tuxmake-conf/pinning-${VERSION_CODENAME} \
     && if [ -f "${pinning}" ]; then cp "${pinning}" /etc/apt/preferences.d/; fi
 
