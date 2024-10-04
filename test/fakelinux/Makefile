@@ -133,6 +133,7 @@ modules_install: $(O)/modules
 	mkdir -p $(INSTALL_MOD_PATH)/lib/modules
 	cp -r $(O)/modules/lib/modules/$(VERSION) $(INSTALL_MOD_PATH)/lib/modules/
 
+modpost: $(O)/modules
 
 ########################################################################
 # dtbs
