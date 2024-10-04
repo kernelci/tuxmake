@@ -82,7 +82,8 @@ class TestModules:
         return Target("modules", build)
 
     def test_install_modules(self, modules):
-        assert modules.commands[1][0:2] == ["{make}", "modules_install"]
+        assert modules.commands[1][0:3] == ["{make}", "modpost", "modules"]
+        assert modules.commands[2][0:2] == ["{make}", "modules_install"]
 
     def test_strip_modules(self, modules):
         assert modules.makevars["INSTALL_MOD_STRIP"] == "1"
