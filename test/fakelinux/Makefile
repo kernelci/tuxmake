@@ -2,7 +2,7 @@ SRC = $(CURDIR)
 O ?= $(CURDIR)
 ARCH ?= $(shell basename $$(readlink -f $(SRC)/arch/$$(uname -m).mk) .mk)
 VERSION := $(shell uname -r)
-RELEASE := $(VERSION)+
+KERNELRELEASE := $(VERSION)
 
 ifeq ($(LLVM), )
 HOSTCC = gcc
@@ -46,7 +46,7 @@ kernelversion:
 
 kernelrelease:
 	$(call maybefail,kernelrelease)
-	@echo $(RELEASE)
+	@echo $(KERNELRELEASE)
 
 define maybefail
 	@if [ "$(filter $(1),$(FAIL))" = "$(1)" ]; then echo "error: target $(1) failed" >&2; exit 1; fi
@@ -192,7 +192,6 @@ kselftest-merge: config
 ########################################################################
 # targz-pkg: very loosely based on linux/scripts/package/buildtar
 ########################################################################
-KERNELRELEASE = 5.13.0-rc3
 tmpdir = $(O)/tar-install
 tarball = $(O)/linux-$(KERNELRELEASE)-$(ARCHDIRNAME).tar.gz
 dirs = boot
