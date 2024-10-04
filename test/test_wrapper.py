@@ -19,7 +19,8 @@ class Test_ccache:
         ccache = Wrapper("ccache")
         assert ccache.environment["CCACHE_DIR"] == "/ccache"
 
-    def test_prepare_host(self, home):
+    def test_prepare_host(self, home, monkeypatch):
+        monkeypatch.delenv("CCACHE_DIR", raising=False)
         Wrapper("ccache").prepare_host()
         assert (home / ".ccache").exists()
 
