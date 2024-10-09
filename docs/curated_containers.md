@@ -24,6 +24,22 @@ The container builds run on a regular schedule.
 The full set of TuxMake's containers can be found at
 [hub.docker.com/u/tuxmake](https://hub.docker.com/u/tuxmake).
 
+---
+**NOTE**
+
+Debian 11 (bullseye) has reached LTS and henceforth only the following architectures will be officially supported:
+
+>  x86_64, arm64, i386, arm
+
+Hence, the [TuxMake containers](https://hub.docker.com/u/tuxmake) will
+not be updated from 8th October, 2024 for *gcc-9, gcc-10, clang-11,
+clang-12, clang-13 and clang-14* going forward for the targets such as
+*armv5, mips, riscv, arc, parisc, powerpc, s390, sh and sparc*
+excluding the ones mentioned above. Though the existing containers can
+be used in its current form.
+
+---
+
 ## Fedora
 
 [CKI project](https://cki-project.org) maintains Fedora containers for use with
