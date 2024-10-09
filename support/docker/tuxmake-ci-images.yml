@@ -123,3 +123,16 @@ ci-ubuntu-22.04-arm64:
 
 ci-ubuntu-22.04:
   extends: .publish-ci-image
+
+ci-ubuntu-24.04-amd64:
+  extends: .build-ci-image-amd64
+  variables:
+    BASE: docker.io/library/ubuntu:24.04
+
+ci-ubuntu-24.04-arm64:
+  extends: .build-ci-image-arm64
+  variables:
+    BASE: docker.io/library/ubuntu:24.04
+
+ci-ubuntu-24.04:
+  extends: .publish-ci-image
