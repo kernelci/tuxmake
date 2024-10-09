@@ -3,7 +3,7 @@ include:
   - '/support/docker/tuxmake-ci-images.yml'
 
 image:
-  name: $CI_REGISTRY/linaro/tuxmake/ci-debian-11
+  name: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
 
 variables:
   LANG: C.UTF-8
