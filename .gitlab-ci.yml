@@ -36,6 +36,10 @@ stages:
   script:
     - make unit-tests
 
+unit-tests-python3.12:
+  extends: .unit-tests
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-24.04
+
 unit-tests-python3.11:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
@@ -59,6 +63,10 @@ unit-tests-python3.7:
 unit-tests-python3.6:
   extends: .unit-tests
   image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-18.04
+
+unit-tests-python3.12-arm64:
+  extends: [.unit-tests, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-24.04
 
 unit-tests-python3.11-arm64:
   extends: [.unit-tests, .arm64]
@@ -131,6 +139,10 @@ docker-build-tests:
 
 integration-python3.11:
   extends: .integration-break-system-packages
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-24.04
+
+integration-python3.11:
+  extends: .integration-break-system-packages
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-12
 
 integration-python3.10:
@@ -152,6 +164,10 @@ integration-python3.7:
 integration-python3.6:
   extends: .integration
   image: $CI_REGISTRY/linaro/tuxmake/ci-debian-10
+
+integration-python3.12-arm64:
+  extends: [.integration-break-system-packages, .arm64]
+  image: $CI_REGISTRY/linaro/tuxmake/ci-ubuntu-24.04
 
 integration-python3.11-arm64:
   extends: [.integration-break-system-packages, .arm64]
