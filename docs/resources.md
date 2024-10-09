@@ -15,3 +15,7 @@ limited to articles and talks.
 
 - [LVC21-106: Consistent and Portable Linux Builds with TuxMake](https://connect.linaro.org/resources/lvc21/lvc21-106/). **Video**, talk at Linaro Virtual Connect 2021.
 
+## September 2023
+
+- [TuxMake with Debian](https://saimei.ftp.acc.umu.se/pub/debian-meetings/2023/DebConf23/debconf23-256-tuxmake-with-debian.av1.webm). **Video**,
+  talk at DebConf23 (webm, 123MB).
