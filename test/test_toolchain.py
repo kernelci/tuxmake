@@ -16,9 +16,22 @@ def arm64():
     return Architecture("arm64")
 
 
+@pytest.fixture
+def korg_gcc():
+    return Toolchain("korg-gcc")
+
+
 class TestGcc:
     def test_image(self, gcc, arm64):
         assert gcc.get_image(arm64) == "tuxmake/arm64_gcc"
+
+
+class TestKorgGcc:
+    def test_image(self, korg_gcc, arm64):
+        assert korg_gcc.get_image(arm64) == "tuxmake/korg-gcc"
+
+    def test_suffix(self, korg_gcc):
+        assert korg_gcc.suffix() == "linux"
 
 
 @pytest.fixture

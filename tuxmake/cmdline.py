@@ -43,6 +43,12 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         default=".",
         help="Tree to build (default: .).",
     )
+    build_input.add_argument(
+        "--korg-toolchains-directory",
+        dest="korg_toolchains_dir",
+        default=None,
+        help="Directory in which kernel.org toolchain archives reside.",
+    )
 
     build_output = parser.add_argument_group("Output options")
     build_output.add_argument(

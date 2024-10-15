@@ -274,6 +274,15 @@ class CrossKorgClangBuildImage(KorgBuildMixin, CrossClangBuildImage):
     pass
 
 
+class KorgGccBuildImage(Image):
+    kind = "korg-gcc-build"
+
+
+class CrossKorgGccBuildImage(Image):
+    kind = "korg-gcc-build"
+    extra_lists = ["crossbuild"]
+
+
 class ArcImage(Image):
     kind = "arc"
     extra_lists = ["crossbuild", "arc"]

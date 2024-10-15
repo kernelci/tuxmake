@@ -14,7 +14,7 @@ from tuxmake.logging import set_debug, debug
 from tuxmake.arch import Architecture, native_arch
 from tuxmake.toolchain import Toolchain, NoExplicitToolchain
 from tuxmake.wrapper import Wrapper
-from tuxmake.output import get_new_output_dir
+from tuxmake.output import get_new_output_dir, get_default_korg_toolchains_dir
 from tuxmake.target import Compression
 from tuxmake.target import default_compression
 from tuxmake.target import create_target
@@ -22,6 +22,7 @@ from tuxmake.runtime import Runtime
 from tuxmake.runtime import Terminated
 from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import EnvironmentCheckFailed
+from tuxmake.exceptions import KorgGccPreparationFailed
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 from tuxmake.exceptions import UnsupportedMakeVariable
@@ -106,6 +107,8 @@ class Build:
     - **build_dir**: directory where the build will be performed. Defaults to
       a temporary directory under `output_dir`. An existing directory can be
       specified to do an incremental build on top of a previous one.
+    - **korg_toolchains_dir**: directory where the kernel.org toolchain
+      tarballs will be cached. Defaults to `~/.cache/tuxmake/korg_toolchains`.
     - **target_arch**: target architecture name (`str`). Defaults to the native
       architecture of the hosts where tuxmake is running.
     - **toolchain**: toolchain to use in the build (`str`). Defaults to whatever Linux
@@ -155,6 +158,7 @@ class Build:
         tree=".",
         output_dir=None,
         build_dir=None,
+        korg_toolchains_dir=None,
         target_arch=None,
         toolchain=None,
         wrapper=None,
@@ -179,6 +183,8 @@ class Build:
         self.__output_dir_input__ = output_dir
         self.__build_dir__ = None
         self.__build_dir_input__ = build_dir
+        self.__korg_toolchains_dir__ = None
+        self.__korg_toolchains_dir_input__ = korg_toolchains_dir
         if self.__build_dir_input__:
             self.clean_build_tree = False
         else:
@@ -187,6 +193,11 @@ class Build:
 
         self.target_arch = target_arch and Architecture(target_arch) or native_arch
         self.toolchain = toolchain and Toolchain(toolchain) or NoExplicitToolchain()
+        self.prepare_korg_gcc = False
+        self.korg_gcc_cross_prefix = None
+        if self.toolchain.name.startswith("korg-gcc"):
+            self.prepare_korg_gcc = True
+
         self.wrapper = wrapper and Wrapper(wrapper) or Wrapper("none")
 
         self.timestamp = get_directory_timestamp(self.source_tree)
@@ -229,6 +240,7 @@ class Build:
 
         self.runtime = Runtime.get(runtime)
         self.runtime.set_image(get_image(self))
+
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"
@@ -305,6 +317,8 @@ class Build:
         self.runtime.source_dir = self.source_tree
         self.runtime.output_dir = self.output_dir
         self.runtime.add_volume(self.build_dir)
+        if self.prepare_korg_gcc:
+            self.runtime.add_volume(self.korg_toolchains_dir)
         if self.wrapper.path:
             self.runtime.add_volume(
                 str(self.wrapper.path), f"/usr/local/bin/{self.wrapper.name}"
@@ -349,6 +363,18 @@ class Build:
             self.__build_dir__ = self.output_dir / "build"
             self.__build_dir__.mkdir()
         return self.__build_dir__
+
+    @property
+    def korg_toolchains_dir(self):
+        if self.__korg_toolchains_dir__:
+            return self.__korg_toolchains_dir__
+
+        if self.__korg_toolchains_dir_input__ is None:
+            self.__korg_toolchains_dir__ = get_default_korg_toolchains_dir()
+        else:
+            self.__korg_toolchains_dir__ = Path(self.__korg_toolchains_dir_input__)
+        self.__korg_toolchains_dir__.mkdir(parents=True, exist_ok=True)
+        return self.__korg_toolchains_dir__
 
     @property
     def environment(self):
@@ -463,6 +489,8 @@ class Build:
         # we want to override target makevars with user provided make_variables
         expanded_makevars = {k: self.format_cmd_part(v) for k, v in makevars.items()}
         expanded_makevars.update(self.makevars)
+        if self.korg_gcc_cross_prefix:
+            expanded_makevars["CROSS_COMPILE"] = self.korg_gcc_cross_prefix
         return [f"{k}={v}" for k, v in expanded_makevars.items() if v]
 
     @property
@@ -633,6 +661,38 @@ class Build:
         if not result:
             raise EnvironmentCheckFailed()
 
+    def prepare_korg_gcc_toolchain(self):
+        suffix = self.toolchain.suffix()
+        tc_full_version = self.runtime.get_toolchain_full_version(self.toolchain.name)
+        # TODO: Find a better way to avoid the following conditional checks
+        target_arch = self.target_arch.name
+        if self.target_arch.name == "arm":
+            suffix = f"{suffix}-gnueabi"
+        elif self.target_arch.name == "arm64":
+            target_arch = "aarch64"
+        elif self.target_arch.name == "openrisc":
+            target_arch = "or1k"
+        elif self.target_arch.name.startswith("parisc"):
+            target_arch = "hppa"
+        else:
+            target_arch = self.target_arch.name
+
+        # Calculate the cross compile tool prefix
+        # TODO: Consider adding cross tools to the PATH and simplifying this
+        self.korg_gcc_cross_prefix = f"{str(self.build_dir)}/gcc-{tc_full_version}-nolibc/{target_arch}-{suffix}/bin/{target_arch}-{suffix}-"
+
+        # Run the korg gcc script to download the toolchain archive if required
+        cmd = [str(self.runtime.get_prepare_korg_gcc_command())]
+        cmd.append(native_arch.name)
+        cmd.append(self.runtime.get_toolchain_full_version(self.toolchain.name))
+        cmd.append(target_arch)
+        cmd.append(suffix)
+        cmd.append(str(self.korg_toolchains_dir))
+        cmd.append(str(self.build_dir))
+        result = self.run_cmd(cmd)
+        if not result:
+            raise KorgGccPreparationFailed()
+
     def run(self):
         """
         Performs the build. After this method completes, the results of the
@@ -650,6 +710,9 @@ class Build:
 
             with self.measure_duration("Preparation", metadata="prepare"):
                 self.prepare()
+                if self.prepare_korg_gcc:
+                    self.prepare_korg_gcc_toolchain()
+
             prepared = True
             self.log(quote_command_line(self.cmdline.reproduce(self)))
 

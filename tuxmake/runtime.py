@@ -135,6 +135,9 @@ class Runtime(ConfigurableObject):
             raise ImageRequired()
         return self.__image__
 
+    def get_toolchain_full_version(self, toolchain):
+        return self.config[toolchain]["tc_full_version"]
+
     def set_image(self, image):
         """
         Sets the container image to use. This has effect only on container
@@ -226,6 +229,9 @@ class Runtime(ConfigurableObject):
 
     def get_check_environment_command(self):
         return self.bindir / "tuxmake-check-environment"
+
+    def get_prepare_korg_gcc_command(self):
+        return self.bindir / "tuxmake-prepare-korg-gcc"
 
     def get_metadata(self):
         """

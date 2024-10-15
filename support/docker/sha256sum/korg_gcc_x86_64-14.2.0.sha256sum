@@ -1,0 +1,70 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+f8501a0a334fcb483a3e0211ec8cc2d88c4d08be29c5be40bb7be9d99facb0a8  x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar.gz
+53deb48c660f1453ca79fa224d44de1145c8c5377d90040934af063d1b726b29  x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar.xz
+8f6ab27944387fe11cdde31657605783dec8e23d507575b11b9340efc359e605  x86_64-gcc-14.2.0-nolibc-alpha-linux.tar.gz
+9196ae48b81ed58a07968ea6b343e0231ee42f4d4b3805e15b25cfba20a186b5  x86_64-gcc-14.2.0-nolibc-alpha-linux.tar.xz
+38ebb95a391583e53bf52000e4247d63f3b82f6ddde16e31e6bf2a36b11e7a84  x86_64-gcc-14.2.0-nolibc-arc-linux.tar.gz
+a03494a07812b9abd705644e3c8ba6d82a07cae452c58d36e8a500362f4fdfb6  x86_64-gcc-14.2.0-nolibc-arc-linux.tar.xz
+ab25c6b38623ac89870677763a0fe372a642311e13c3e11ec1d738edee5e9a96  x86_64-gcc-14.2.0-nolibc-arm-linux-gnueabi.tar.gz
+11db633415164c2b99b1616b67cdc2ebdbe7a57e19f88734e2104dc8449c2642  x86_64-gcc-14.2.0-nolibc-arm-linux-gnueabi.tar.xz
+cadd521d3d04fe50b57b51fa4a0421dc8a039ec9b2bc1cade209aa8218c6f514  x86_64-gcc-14.2.0-nolibc-csky-linux.tar.gz
+16e520b3e31b27acc0aec6bac692e7365a8f78eeca7ac788c0df0241fb862824  x86_64-gcc-14.2.0-nolibc-csky-linux.tar.xz
+528c989493d96e8df8922ae3d8724fc93ae0fbd009a6ff9387ae271c7624ccc0  x86_64-gcc-14.2.0-nolibc-hppa-linux.tar.gz
+6e39da86d51ff2a466c84d2519f6099730d6afd672b2930d4077470c710a4ddb  x86_64-gcc-14.2.0-nolibc-hppa-linux.tar.xz
+28a8782e7cd63a2993925d9f9a3bc521c43acd01db4d773e6d33f1966092bb0a  x86_64-gcc-14.2.0-nolibc-i386-linux.tar.gz
+8797ceb7970a7a6c1b7d43409a140593447af446724416d0112886a44b448e80  x86_64-gcc-14.2.0-nolibc-i386-linux.tar.xz
+a89f1a7db96cd432f00af35d19786637a8df4b0bfb5d26e225d4fe5090d9496a  x86_64-gcc-14.2.0-nolibc-loongarch64-linux.tar.gz
+b8af395fbcd704c225b5cec6714ca2a680e8c8851d76cf850bec069e4b2dcadc  x86_64-gcc-14.2.0-nolibc-loongarch64-linux.tar.xz
+07cb6332f14c6e0334c017470bf9e69ee3bb51a6729e290e6c87941364a66737  x86_64-gcc-14.2.0-nolibc-m68k-linux.tar.gz
+c3142b1fe8a31cc866bb3d1c7ccf6754b46acd3ff7fc9a6dd8fe95d08047faab  x86_64-gcc-14.2.0-nolibc-m68k-linux.tar.xz
+e0733e79b3b6ce417ff32908a4ddff0b50a9dd43a67ea857a7f6a1b0908da9cf  x86_64-gcc-14.2.0-nolibc-microblaze-linux.tar.gz
+ee244ad729bbeadad53f43f2181f20995d6c59e491467bde8add0c84c9e624e4  x86_64-gcc-14.2.0-nolibc-microblaze-linux.tar.xz
+040a9ea19e559fe581952c01135fa56ecdd0033b85187273194f3af0ceb22628  x86_64-gcc-14.2.0-nolibc-mips-linux.tar.gz
+3285497bcef6e503100cbedc07a4db527a43908709ddc9e975e51ecfd02a7c6d  x86_64-gcc-14.2.0-nolibc-mips-linux.tar.xz
+5b61e6d0d3e2026f677ed9062f67c7e1549681c9257f9b19a9696d4a935063bf  x86_64-gcc-14.2.0-nolibc-mips64-linux.tar.gz
+9f54da789570a57d1db30ae82ddfdf947ee41a74a3128278b861cc596d9a7967  x86_64-gcc-14.2.0-nolibc-mips64-linux.tar.xz
+34b1a0c22dba32f8cd33d1120838ce258569bedd49c4db94fd1be0c22c7208d6  x86_64-gcc-14.2.0-nolibc-nios2-linux.tar.gz
+f1381c65039312c0ddb8161332728afa63b1dad5c72dfa4fe254416302b888a5  x86_64-gcc-14.2.0-nolibc-nios2-linux.tar.xz
+b40cb30ed896d5d012738e73452215631c3cd4a6e55cbf0c0023a0ae92504cd4  x86_64-gcc-14.2.0-nolibc-or1k-linux.tar.gz
+ffe0f55890700d7d4e2e99de2415c6b45430a1caf765f2316bb94787c4e212f7  x86_64-gcc-14.2.0-nolibc-or1k-linux.tar.xz
+ca2c6692bec595dc0ecc77cabaa1e985d6a98f523a12c544d2f126e4f6c974ea  x86_64-gcc-14.2.0-nolibc-powerpc-linux.tar.gz
+8acdde0f5cb77caadb87e265baa1d63c6bbda53140f1519a0adddda17d5182e8  x86_64-gcc-14.2.0-nolibc-powerpc-linux.tar.xz
+8d51b15094ef72952254a507dbdab0bf7d06bea7541e00a70b9cef858bd6f3a8  x86_64-gcc-14.2.0-nolibc-powerpc64-linux.tar.gz
+97ba02a3917c56c760fe8622023acf11a3bc081282eaae5eea8a8ee51d7ba884  x86_64-gcc-14.2.0-nolibc-powerpc64-linux.tar.xz
+a78daff9221785bdd023aac3a169ab0492413c2c0f1ca7ebfcb4584719a83bd2  x86_64-gcc-14.2.0-nolibc-riscv32-linux.tar.gz
+0e22e6982e42f40039ea32c2de45a49fb58800db2dc83f7838591f2c7fc8bea9  x86_64-gcc-14.2.0-nolibc-riscv32-linux.tar.xz
+a4e979314afee9a8a4829e0d813cf95c62ea0a4a3f44faab232364badbb21d80  x86_64-gcc-14.2.0-nolibc-riscv64-linux.tar.gz
+8c8d2fc9744a498e790fd19f887e6445ceb2b4f8237977e449e9d5c6fc17e42f  x86_64-gcc-14.2.0-nolibc-riscv64-linux.tar.xz
+e5dba79e4e1fb377e46e52b8086d816916b17816fff8d0b9386eb7d289daf468  x86_64-gcc-14.2.0-nolibc-s390-linux.tar.gz
+8b0b55e28d6275a2cb06f06bd8ec3ec84f91c6047fbb544cba502201f6d97cd2  x86_64-gcc-14.2.0-nolibc-s390-linux.tar.xz
+dae4835b40cc08bf92cb2d1daf36927168a66907b30bceee83bfd90a8891eaf3  x86_64-gcc-14.2.0-nolibc-sh2-linux.tar.gz
+103c363fd843f25d502ed649a05f9ea2dc4d1a37ed86bb0f09ac64e89198b647  x86_64-gcc-14.2.0-nolibc-sh2-linux.tar.xz
+e91c1f565662c8ce0dc16ed55393d6000a48244cca5280927b416295a48441dc  x86_64-gcc-14.2.0-nolibc-sh4-linux.tar.gz
+48ce9a2bf598eaa9e9a801fd8d38df76e209491ed409efdfec22f7d7b8146155  x86_64-gcc-14.2.0-nolibc-sh4-linux.tar.xz
+232e50cab96ce2ae00e7ec557980fefb406cdaefa3171160e4da2374b253911c  x86_64-gcc-14.2.0-nolibc-sparc-linux.tar.gz
+ffa2c4417cdaed2ebe357615c8dfb0a3540e233ea79c87ce293a1220ffccfcd2  x86_64-gcc-14.2.0-nolibc-sparc-linux.tar.xz
+1ead28ee3b82fee5ffe3a7b7693c53a819b74b0d19d564997c743a5ac526222b  x86_64-gcc-14.2.0-nolibc-sparc64-linux.tar.gz
+33a33dbb476a796afc5ebd66f84c9e2b9bb784b09cf94a5d94f8bf4e59d160be  x86_64-gcc-14.2.0-nolibc-sparc64-linux.tar.xz
+59184e1e3d0f57633c6bd9984ac74a1d92c1b1d56271614a4cc4a9ad09f57c17  x86_64-gcc-14.2.0-nolibc-x86_64-linux.tar.gz
+957587ca339d9e98f8ec33464b83aca0cfadd3ccf6df82700ae7da6878d81414  x86_64-gcc-14.2.0-nolibc-x86_64-linux.tar.xz
+4706e295c4c5a10b8ed53a7807003f2634a37029d89100c5668550d35016e6dc  x86_64-gcc-14.2.0-nolibc-xtensa-linux.tar.gz
+0c4e7985a7742f0e1bac94b7315dc8745f415cc54c36c50aa01568bc221f37f7  x86_64-gcc-14.2.0-nolibc-xtensa-linux.tar.xz
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBCAAGBQJmsM4PAAoJEGMtOgZYnaaxyX8QAJHWvs6DWCuQZbO/Lk/UUbm7
+6pYVdxYvH/+KhFJhEFGLU76zgzSCiaeZgvbdKnoltWNRoKDQFaKwUlttknXqGytg
+3FMA55+o4pZ4WvedQyb4BIAgHXGiMhMCptA8n0ZfxNKYw2nGx3O9kgFgnMb3R5r8
+t12P86acbheVnkctqft2Lls0au8wDulh1haF7A8t9dgVq9bJRqULz8sL3TLHvEiW
+zp5BLdMTDWv6mAaJhRoAIas32kFwe2UU0nYyGshfS5DMv/CDE6es9Zepk2sbSy9L
+SgeACIVlvWBnKqI9cjZRWJ2oVI/ZBsWJWajLsEq6ZG8VnJjXXHc0Fuxd+D+PdtDs
+K9w6skd2foMy9SFSgGrKO3RWo5taIGXBbLOefaZVR/SyBPbzyCngssCkrJCVNLnv
+5TnMtsSC6aWC+/yuWsLiSs2M8BwuX27on1oTDPdcNLnPVtt5eFprmU/rR51ozSD9
+xkMyw994QF76mTICfUd8XMcsY9Vri7uxz0P/Bnf6gECfX5uwfaR7Qm4PZa9gy34d
+/xidt3kkrqvDZ05ACrplD4cr5Zvewhg1STaX5bE5TSPDdY65M+k+Jwz4JerDlRtg
+xy4DfBPrF1j0yEFc71OH96XwwJ3cmkooT4s0iPrGd3prMFWWcwhPV1/k2a4eVcXI
+nOFIm6GM/jUOwLtluoP8
+=/5D1
+-----END PGP SIGNATURE-----

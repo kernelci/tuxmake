@@ -105,3 +105,7 @@ class EnvironmentCheckFailed(TuxMakeUserError):
 
 class UnsupportedCompression(TuxMakeUserError):
     msg = "Unsupported compression type: {name}"
+
+
+class KorgGccPreparationFailed(TuxMakeUserError):
+    msg = "Korg GCC preparation failed"

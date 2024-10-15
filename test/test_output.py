@@ -2,6 +2,7 @@ import pytest
 
 from tuxmake.output import get_default_output_basedir
 from tuxmake.output import get_new_output_dir
+from tuxmake.output import get_default_korg_toolchains_dir
 
 
 def test_default_output_basedir_xdg_cache_home(mocker, tmp_path):
@@ -43,3 +44,16 @@ def test_get_new_output_dir_race_condition(basedir, mocker):
         side_effect=[None, FileExistsError("BOOM"), None],
     )
     assert get_new_output_dir().name == "2"
+
+
+def test_default_korg_toolchains_xdg_cache_home(mocker, monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path))
+    assert get_default_korg_toolchains_dir() == (
+        tmp_path / "tuxmake" / "korg_toolchains"
+    )
+
+
+def test_default_korg_toolchains_dir(mocker, home):
+    assert get_default_korg_toolchains_dir() == (
+        home / ".cache/tuxmake/korg_toolchains"
+    )

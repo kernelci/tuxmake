@@ -48,6 +48,9 @@ class Toolchain(ConfigurableObject):
             CROSS_COMPILE=cross_compile,
         )
 
+    def suffix(self):
+        return self.config["metadata"].get("suffix")
+
 
 class NoExplicitToolchain(Toolchain):
     def __init__(self):
