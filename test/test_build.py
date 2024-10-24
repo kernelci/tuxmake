@@ -43,6 +43,13 @@ def collect_metadata(mocker):
     return mocker.patch("tuxmake.build.Build.collect_metadata")
 
 
+@pytest.fixture
+def run_cmd(mocker):
+    rcmd = mocker.patch("tuxmake.build.Build.run_cmd")
+    rcmd.return_value.returncode = 0
+    return rcmd
+
+
 def args(called):
     return called.call_args[0][0]
 
@@ -492,6 +499,27 @@ class TestToolchain:
         b.build(b.targets[0])
         cmdline = args(Popen)
         assert all(["CC=" not in arg for arg in cmdline])
+        assert "CROSS_COMPILE=aarch64-linux-gnu-" in cmdline
+
+    def test_korg_gcc_14(self, linux, Popen):
+        b = Build(tree=linux, targets=["config"], toolchain="korg-gcc-14")
+        b.prepare()
+        assert b.prepare_korg_gcc is True
+        b.build(b.targets[0])
+        cmdline = args(Popen)
+        assert "HOSTCC=gcc" in cmdline
+
+    def test_korg_gcc_14_cross(self, linux, Popen):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-14",
+            target_arch="arm64",
+            runtime="docker",
+        )
+        b.build(b.targets[0])
+        cmdline = args(Popen)
+        assert "HOSTCC=gcc" in cmdline
         assert "CROSS_COMPILE=aarch64-linux-gnu-" in cmdline
 
     def test_clang(self, linux, Popen):
@@ -996,12 +1024,6 @@ class TestCheckEnvironment:
     def get_command_output(self, mocker):
         return mocker.patch("tuxmake.build.Build.get_command_output")
 
-    @pytest.fixture
-    def run_cmd(self, mocker):
-        rcmd = mocker.patch("tuxmake.build.Build.run_cmd")
-        rcmd.return_value.returncode = 0
-        return rcmd
-
     def test_basics(self, linux, get_command_output, run_cmd):
         build = Build(tree=linux, target_arch="arm64")
         ccc = "arm-linux-gnu-"
@@ -1146,3 +1168,125 @@ class TestBinDebPkg:
         assert list(build.output_dir.glob("*.deb")) != []
         assert list(build.output_dir.glob("*.changes")) == []
         assert list(build.output_dir.glob("*.buildinfo")) == []
+
+
+class TestKorgGCC:
+    @pytest.fixture
+    def tc_version(self, mocker):
+        tc_ver = mocker.patch("tuxmake.runtime.Runtime.get_toolchain_full_version")
+        tc_ver.return_value = "14.2.0"
+        return tc_ver.return_value
+
+    def test_arm64(self, linux, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-13",
+            target_arch="arm64",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        assert (
+            b.korg_gcc_cross_prefix
+            == f"{b.build_dir}/gcc-{tc_version}-nolibc/aarch64-linux/bin/aarch64-linux-"
+        )
+
+    def test_arm(self, linux, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-12",
+            target_arch="arm",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        assert (
+            b.korg_gcc_cross_prefix
+            == f"{b.build_dir}/gcc-{tc_version}-nolibc/arm-linux-gnueabi/bin/arm-linux-gnueabi-"
+        )
+
+    def test_openrisc(self, linux, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-11",
+            target_arch="openrisc",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        assert (
+            b.korg_gcc_cross_prefix
+            == f"{b.build_dir}/gcc-{tc_version}-nolibc/or1k-linux/bin/or1k-linux-"
+        )
+
+    def test_parisc(self, linux, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-10",
+            target_arch="parisc",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        assert (
+            b.korg_gcc_cross_prefix
+            == f"{b.build_dir}/gcc-{tc_version}-nolibc/hppa-linux/bin/hppa-linux-"
+        )
+
+    def test_x86_64(self, linux, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc-9",
+            target_arch="x86_64",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        assert (
+            b.korg_gcc_cross_prefix
+            == f"{b.build_dir}/gcc-{tc_version}-nolibc/x86_64-linux/bin/x86_64-linux-"
+        )
+
+    def test_prepare_korg_gcc_toolchain_called(self, mocker, linux):
+        mocker.patch("tuxmake.build.Build.prepare_korg_gcc_toolchain")
+        b = Build(tree=linux, toolchain="korg-gcc", target_arch="arm64")
+        b.run()
+        assert b.prepare_korg_gcc_toolchain.call_count == 1
+
+    def test_prepare_korg_gcc_toolchain_fail(self, linux, run_cmd):
+        run_cmd.return_value = False
+        b = Build(
+            tree=linux,
+            targets=["config"],
+            toolchain="korg-gcc",
+            target_arch="x86_64",
+            runtime="docker",
+        )
+        with pytest.raises(tuxmake.exceptions.KorgGccPreparationFailed):
+            b.prepare_korg_gcc_toolchain()
+
+    def test_korg_gcc_cross_prefix(self, linux, Popen, run_cmd, tc_version):
+        b = Build(
+            tree=linux,
+            toolchain="korg-gcc-12",
+            target_arch="x86_64",
+            runtime="docker",
+        )
+        b.prepare_korg_gcc_toolchain()
+        b.get_dynamic_makevars()
+        b.build(b.targets[0])
+        args = b.expand_cmd_part(b.targets[0].commands[0][0], b.makevars)
+        assert f"CROSS_COMPILE={b.korg_gcc_cross_prefix}" in args
+
+    def test_korg_toolchains_dir(self, linux, run_cmd, tmp_path):
+        b = Build(
+            tree=linux,
+            toolchain="korg-gcc",
+            target_arch="x86_64",
+            runtime="docker",
+            korg_toolchains_dir=tmp_path,
+        )
+        assert b.korg_toolchains_dir == tmp_path
+        # Access korg_toolchains_dir once again and assert
+        b.prepare_korg_gcc_toolchain()
+        assert b.korg_toolchains_dir == tmp_path

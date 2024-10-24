@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+import subprocess
+from tuxmake.runtime import DockerRuntime
+
+
+DOWNLOAD_BASE = "https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/"
+OUTPUT_DIR = "sha256sum/"
+host_archs = ["arm64", "x86_64"]
+
+
+def run_cmd(cmd, verbose=False, *args, **kwargs):
+
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True
+    )
+    std_out, std_err = process.communicate()
+    if verbose:
+        print(std_out.strip(), std_err)
+
+
+versions = []
+runtime = DockerRuntime()
+for tc in runtime.toolchains:
+    if tc.startswith("korg-gcc-"):
+        versions.append(runtime.get_toolchain_full_version(tc))
+
+for ha in host_archs:
+    for v in versions:
+        run_cmd(
+            f"wget -nc -c -t 10 --retry-connrefused -nd -np -r -O {OUTPUT_DIR}korg_gcc_{ha}-{v}.sha256sum -e robots=off -A asc {DOWNLOAD_BASE}/{ha}/{v}/sha256sums.asc",
+            verbose=True,
+        )

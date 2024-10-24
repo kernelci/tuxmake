@@ -300,6 +300,7 @@ class TestDockerRuntime(TestContainerRuntime):
         assert "gcc" in toolchains
         assert "clang" in toolchains
         assert "llvm" in toolchains
+        assert "korg-gcc" in toolchains
 
     def test_listed_as_supported(self):
         assert "docker" in Runtime.supported()
@@ -328,6 +329,14 @@ class TestDockerRuntime(TestContainerRuntime):
         runtime = DockerRuntime()
         volume_opt = runtime.volume_opt("src", "tgt", overlay, ro)
         assert volume_opt == "--volume=src:tgt:ro"
+
+    def test_korg_gcc_toolchain_full_version(self):
+        version = DockerRuntime().get_toolchain_full_version("korg-gcc-14")
+        assert version == "14.2.0"
+
+    def test_prepare_korg_gcc_command(self):
+        cmd = DockerRuntime().get_prepare_korg_gcc_command()
+        assert str(cmd) == "/tuxmake/tuxmake-prepare-korg-gcc"
 
 
 class TestDockerRuntimeSpawnContainer(FakeGetImage):

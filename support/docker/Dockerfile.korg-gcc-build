@@ -1,0 +1,23 @@
+ARG BASE
+FROM ${BASE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG INSTALL_OPTIONS
+ARG PACKAGES
+COPY sha256sum /sha256sum
+
+# Install additional packages specified in $PACKAGES build argument
+RUN if [ -f /root/tmp_install_options ]; then \
+        INSTALL_OPTIONS=$(cat /root/tmp_install_options); \
+    fi; \
+    apt-get update -q && \
+    apt-get install -q --assume-yes \
+    --no-install-recommends \
+    --option=debug::pkgProblemResolver=yes \
+    ${INSTALL_OPTIONS} \
+    $PACKAGES \
+    gcc \
+    pigz; \
+
+# vim: ft=dockerfile

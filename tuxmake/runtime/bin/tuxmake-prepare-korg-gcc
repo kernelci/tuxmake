@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# An example script invocation looks like the following:
+# $ ./tuxmake-prepare-korg-gcc x86_64 14.2.0 aarch64 linux /home/stylesen/.cache/tuxmake/korg_toolchains /home/stylesen/.cache/tuxmake/builds/0/build
+
+set -eu
+
+BUILD_HOST_ARCH=$1
+TC_FULL_VERSION=$2
+HOSTARCH=$3
+SUFFIX=$4
+TOOLCHAIN_CACHE=$5
+BUILD_DIR=$6
+
+# Map HOSTARCH to target ARCH
+if [ "$HOSTARCH" = "aarch64" ]; then
+    ARCH=arm64
+else
+    ARCH=$HOSTARCH
+fi
+
+# Download the toolchain tarball, if it does not exist
+TC_ARCHIVE=$TOOLCHAIN_CACHE/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz
+test -f $TC_ARCHIVE && echo "File '${TC_ARCHIVE}' exists; not retrieving." || wget -t 10 --retry-connrefused --progress=dot:giga https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/${BUILD_HOST_ARCH}/${TC_FULL_VERSION}/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz -O ${TC_ARCHIVE}
+
+# Verify toolchain tarballs
+cd $TOOLCHAIN_CACHE
+SHA256SUM=`grep -F "${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz" /sha256sum/korg_gcc_${BUILD_HOST_ARCH}-${TC_FULL_VERSION}.sha256sum`
+echo $SHA256SUM | sha256sum -c --status || { echo "tarball verification failed!" ; exit 1; }
+cd -
+echo "tarball verification success ..."
+
+# Extract the tar ball to build directory
+pigz -dck $TOOLCHAIN_CACHE/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz | tar -C $BUILD_DIR/ -xf -

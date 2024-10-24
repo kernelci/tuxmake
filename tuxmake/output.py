@@ -21,3 +21,7 @@ def get_new_output_dir():
         except FileExistsError:
             new += 1
     return new_dir
+
+
+def get_default_korg_toolchains_dir():
+    return xdg.cache_dir() / "korg_toolchains"
