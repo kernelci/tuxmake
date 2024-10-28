@@ -150,6 +150,7 @@ def main(*origargv):
             "check_environment",
             "color",
             "docker_image",
+            "download_all_korg_gcc_toolchains",
             "image",
             "image_registry",
             "shell",
@@ -159,6 +160,12 @@ def main(*origargv):
         ]
     }
     try:
+        if options.download_all_korg_gcc_toolchains:
+            with tempfile.TemporaryDirectory() as _tmpdir:
+                tmpdir = pathlib.Path(_tmpdir)
+                build = Build(**build_args, build_dir=tmpdir, output_dir=tmpdir)
+                build.download_all_korg_gcc_toolchains()
+            return
         if options.check_environment:
             with tempfile.TemporaryDirectory() as _tmpdir:
                 tmpdir = pathlib.Path(_tmpdir)

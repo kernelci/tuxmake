@@ -47,7 +47,7 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         "--korg-toolchains-directory",
         dest="korg_toolchains_dir",
         default=None,
-        help="Directory in which kernel.org toolchain archives reside.",
+        help="Directory in which kernel.org toolchain archives reside. Defaults to ~/.cache/tuxmake/korg_toolchains",
     )
 
     build_output = parser.add_argument_group("Output options")
@@ -71,6 +71,11 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         type=str,
         default=None,
         help=f"Compression type to use in compressed artifacts (default: {defaults.compression}; supported: {', '.join(supported.compression)})",
+    )
+    build_output.add_argument(
+        "--download-all-korg-gcc-toolchains",
+        action="store_true",
+        help="Download the latest version of all gcc toolchain archives from kernel.org. Makes use of --korg-toolchains-directory when specified, else uses ~/.cache/tuxmake/korg_toolchains to save the downloaded archive files.",
     )
 
     target = parser.add_argument_group("Build output options")

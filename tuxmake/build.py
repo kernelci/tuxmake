@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from concurrent import futures
 from collections import OrderedDict
 from pathlib import Path
 import json
@@ -18,11 +19,12 @@ from tuxmake.output import get_new_output_dir, get_default_korg_toolchains_dir
 from tuxmake.target import Compression
 from tuxmake.target import default_compression
 from tuxmake.target import create_target
-from tuxmake.runtime import Runtime
+from tuxmake.runtime import Runtime, DockerRuntime
 from tuxmake.runtime import Terminated
 from tuxmake.metadata import MetadataCollector
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import KorgGccPreparationFailed
+from tuxmake.exceptions import KorgGccDownloadAllToolchainFailed
 from tuxmake.exceptions import UnrecognizedSourceTree
 from tuxmake.exceptions import UnsupportedArchitectureToolchainCombination
 from tuxmake.exceptions import UnsupportedMakeVariable
@@ -692,6 +694,24 @@ class Build:
         result = self.run_cmd(cmd)
         if not result:
             raise KorgGccPreparationFailed()
+
+    def _download_all_korg_gcc_toolchains(self, version):
+        cmd = [str(self.runtime.get_download_all_korg_gcc_command())]
+        cmd.append(str(self.korg_toolchains_dir))
+        cmd.append(version)
+        result = self.run_cmd(cmd)
+        if not result:
+            raise KorgGccDownloadAllToolchainFailed()
+
+    def download_all_korg_gcc_toolchains(self):
+        self.runtime.prepare()
+        versions = []
+        runtime = DockerRuntime()
+        for tc in runtime.toolchains:
+            if tc.startswith("korg-gcc-"):
+                versions.append(runtime.get_toolchain_full_version(tc))
+        with futures.ThreadPoolExecutor() as executor:
+            executor.map(self._download_all_korg_gcc_toolchains, versions)
 
     def run(self):
         """

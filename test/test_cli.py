@@ -482,3 +482,10 @@ class TestCheckEnvironment:
         tuxmake("--check-environment")
         build.check_environment.assert_called()
         build.run.assert_not_called()
+
+
+class TestKorgGccDownloadAll:
+    def test_download_all_korg_gcc_toolchains(self, build):
+        tuxmake("--download-all-korg-gcc-toolchains")
+        build.download_all_korg_gcc_toolchains.assert_called()
+        build.run.assert_not_called()

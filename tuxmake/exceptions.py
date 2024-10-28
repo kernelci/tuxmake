@@ -109,3 +109,7 @@ class UnsupportedCompression(TuxMakeUserError):
 
 class KorgGccPreparationFailed(TuxMakeUserError):
     msg = "Korg GCC preparation failed"
+
+
+class KorgGccDownloadAllToolchainFailed(TuxMakeUserError):
+    msg = "Korg GCC download all toochains failed"

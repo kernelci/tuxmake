@@ -233,6 +233,9 @@ class Runtime(ConfigurableObject):
     def get_prepare_korg_gcc_command(self):
         return self.bindir / "tuxmake-prepare-korg-gcc"
 
+    def get_download_all_korg_gcc_command(self):
+        return self.bindir / "tuxmake-download-all-korg-toolchains"
+
     def get_metadata(self):
         """
         Extracts metadata about the runtime (e.g. docker version, image name

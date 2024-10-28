@@ -1290,3 +1290,29 @@ class TestKorgGCC:
         # Access korg_toolchains_dir once again and assert
         b.prepare_korg_gcc_toolchain()
         assert b.korg_toolchains_dir == tmp_path
+
+
+class TestKorgGccDownloadAll:
+    @pytest.fixture
+    def get_command_output(self, mocker):
+        return mocker.patch("tuxmake.build.Build.get_command_output")
+
+    def test_basics(self, linux, get_command_output, run_cmd):
+        build = Build()
+        build.download_all_korg_gcc_toolchains()
+        cmdline = args(run_cmd)
+        assert cmdline[0].endswith("/tuxmake-download-all-korg-toolchains")
+        assert cmdline[1].endswith("/korg_toolchains")
+
+    def test_with_korg_cache_dir(self, linux, get_command_output, run_cmd, tmp_path):
+        build = Build(korg_toolchains_dir=str(tmp_path))
+        build.download_all_korg_gcc_toolchains()
+        cmdline = args(run_cmd)
+        assert cmdline[0].endswith("/tuxmake-download-all-korg-toolchains")
+        assert cmdline[1].endswith(f"{tmp_path}")
+
+    def test_fails(self, linux, run_cmd):
+        run_cmd.return_value = False
+        build = Build()
+        with pytest.raises(tuxmake.exceptions.KorgGccDownloadAllToolchainFailed):
+            build._download_all_korg_gcc_toolchains("14.2.0")

@@ -338,6 +338,10 @@ class TestDockerRuntime(TestContainerRuntime):
         cmd = DockerRuntime().get_prepare_korg_gcc_command()
         assert str(cmd) == "/tuxmake/tuxmake-prepare-korg-gcc"
 
+    def test_download_all_korg_gcc_command(self):
+        cmd = DockerRuntime().get_download_all_korg_gcc_command()
+        assert str(cmd) == "/tuxmake/tuxmake-download-all-korg-toolchains"
+
 
 class TestDockerRuntimeSpawnContainer(FakeGetImage):
     def test_spawn_container(self, mocker, container_id):
