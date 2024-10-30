@@ -698,6 +698,7 @@ class Build:
     def _download_all_korg_gcc_toolchains(self, version):
         cmd = [str(self.runtime.get_download_all_korg_gcc_command())]
         cmd.append(str(self.korg_toolchains_dir))
+        cmd.append(native_arch.name)
         cmd.append(version)
         result = self.run_cmd(cmd)
         if not result:

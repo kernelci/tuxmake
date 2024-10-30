@@ -4,13 +4,11 @@ set -eu
 
 DOWNLOAD_BASE="https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin"
 OUTPUT_DIR=$1
-VERSION=$2
+HOST_ARCH=$2
+VERSION=$3
 
 # create the OUTPUT_DIR, if it does not exist
 mkdir -p $OUTPUT_DIR
 
 echo "kernel.org gcc toolchain ${VERSION}, download in progress ..."
-for ha in "arm64" "x86_64" ;
-  do
-    wget --quiet -nc -c -t 10 --retry-connrefused -nd -np -r -P ${OUTPUT_DIR} -e robots=off -A gz ${DOWNLOAD_BASE}/${ha}/${VERSION}/
-  done
+wget --quiet -nc -c -t 10 --retry-connrefused -nd -np -r -P ${OUTPUT_DIR} -e robots=off -A gz ${DOWNLOAD_BASE}/${HOST_ARCH}/${VERSION}/
