@@ -711,7 +711,17 @@ class Build:
             if tc.startswith("korg-gcc-"):
                 versions.append(runtime.get_toolchain_full_version(tc))
         with futures.ThreadPoolExecutor() as executor:
-            executor.map(self._download_all_korg_gcc_toolchains, versions)
+            thread_count = 0
+            for __ in executor.map(self._download_all_korg_gcc_toolchains, versions):
+                if len(versions) > 0:
+                    thread_count += 1
+                    print(
+                        f"Processed: {round((thread_count/len(versions))*100)}%",
+                        end="\r",
+                        flush=True,
+                    )
+        count = len(os.listdir(str(self.korg_toolchains_dir)))
+        print(f"\nDownloaded {count} kernel.org gcc toolchain archives.")
 
     def run(self):
         """
