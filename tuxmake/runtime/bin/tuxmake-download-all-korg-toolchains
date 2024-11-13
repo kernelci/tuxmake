@@ -12,3 +12,4 @@ mkdir -p $OUTPUT_DIR
 
 echo "kernel.org gcc toolchain ${VERSION}, download in progress ..."
 wget --quiet -nc -c -t 10 --retry-connrefused -nd -np -r -P ${OUTPUT_DIR} -e robots=off -A gz ${DOWNLOAD_BASE}/${HOST_ARCH}/${VERSION}/
+wget --quiet -nc -c -t 10 --retry-connrefused -nd -np -r -P ${OUTPUT_DIR}/signatures -e robots=off -A sign ${DOWNLOAD_BASE}/${HOST_ARCH}/${VERSION}/
