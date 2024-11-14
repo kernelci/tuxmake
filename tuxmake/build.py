@@ -491,8 +491,6 @@ class Build:
         # we want to override target makevars with user provided make_variables
         expanded_makevars = {k: self.format_cmd_part(v) for k, v in makevars.items()}
         expanded_makevars.update(self.makevars)
-        if self.korg_gcc_cross_prefix:
-            expanded_makevars["CROSS_COMPILE"] = self.korg_gcc_cross_prefix
         return [f"{k}={v}" for k, v in expanded_makevars.items() if v]
 
     @property
@@ -500,6 +498,8 @@ class Build:
         mvars = {}
         mvars.update(self.target_arch.makevars)
         mvars.update(self.toolchain.expand_makevars(self.target_arch))
+        if self.korg_gcc_cross_prefix:
+            mvars["CROSS_COMPILE"] = self.korg_gcc_cross_prefix
         mvars.update(self.make_variables)
         mvars.update(self.wrapper.wrap(mvars))
         return mvars
