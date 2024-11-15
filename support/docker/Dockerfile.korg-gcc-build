@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG INSTALL_OPTIONS
 ARG PACKAGES
-COPY sha256sum /sha256sum
+COPY public_key/korg-gcc /
 
 # Install additional packages specified in $PACKAGES build argument
 RUN if [ -f /root/tmp_install_options ]; then \
@@ -18,6 +18,6 @@ RUN if [ -f /root/tmp_install_options ]; then \
     ${INSTALL_OPTIONS} \
     $PACKAGES \
     gcc \
-    pigz; \
+    pigz;
 
 # vim: ft=dockerfile

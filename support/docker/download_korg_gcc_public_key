@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+
+
+OUTPUT_DIR = "public_key/korg-gcc/"
+
+
+def run_cmd(cmd, verbose=False, *args, **kwargs):
+
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True
+    )
+    std_out, std_err = process.communicate()
+    if verbose:
+        print(std_out.strip(), std_err)
+
+
+# Get Arnd's public key
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+try:
+    run_cmd("gpg --no-default-keyring --keyring /tmp/keyring.gpg --keyserver keyserver.ubuntu.com --recv-key 0x60AB47FFC9095227")
+    run_cmd(f"gpg --no-default-keyring --keyring /tmp/keyring.gpg --output {OUTPUT_DIR}arnd.gpg --export")
+    print("Arnd's public key retrieved.")
+except Exception:
+    raise
