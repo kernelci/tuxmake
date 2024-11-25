@@ -1151,6 +1151,45 @@ docker-images-korg_clang_19_all-multiarch:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_19_all")'
 
 
+docker-images-korg_clang_all-amd64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-amd64"
+    script:
+        - "make publish-korg_clang_all"
+    tags: []
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_all")'
+
+
+docker-images-korg_clang_all-arm64:
+    stage: build
+    extends: .docker
+    variables:
+        TAG: "-arm64"
+    script:
+        - "make publish-korg_clang_all"
+    tags: [saas-linux-medium-arm64]
+    needs: ['docker-images-base-multiarch']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_all")'
+
+
+docker-images-korg_clang_all-multiarch:
+    stage: publish
+    extends: .docker
+    variables:
+        DOCKER_CLI_EXPERIMENTAL: "enabled"
+        ARCH_TAGS: "-amd64 -arm64"
+    script:
+        - "make publish-multiarch-korg_clang_all"
+    needs: ['docker-images-korg_clang_all-amd64', 'docker-images-korg_clang_all-arm64']
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_all")'
+
+
 docker-images-korg_gcc_all-amd64:
     stage: build
     extends: .docker
