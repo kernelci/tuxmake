@@ -2,7 +2,7 @@
 
 ## Source code
 
-The tuxmake source code it available in the 
+The tuxmake source code is available in the
 [tuxmake gitlab repository](https://gitlab.com/Linaro/tuxmake). To clone the
 repository, run:
 
