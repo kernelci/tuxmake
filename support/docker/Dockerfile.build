@@ -11,6 +11,8 @@ ARG HOSTARCH
 ARG EXTRA_APT_REPO_KEY
 ARG EXTRA_APT_REPO
 
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
+
 RUN if [ -f /etc/apt/sources.list.d/extra.list ]; then exit; fi; \
     if [ -n "${EXTRA_APT_REPO_KEY}" ]; then \
 	apt install --reinstall --assume-yes --no-install-recommends --option=debug::pkgProblemResolver=yes ca-certificates && update-ca-certificates && wget -O /etc/apt/trusted.gpg.d/extra.asc "${EXTRA_APT_REPO_KEY}"; \
