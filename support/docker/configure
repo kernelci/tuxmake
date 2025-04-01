@@ -105,6 +105,7 @@ class Image:
             stream.write(f"{self.name}: log\n")
         stream.write(f"\t$(ANN_BUILD) {self.name}\n")
         stream.write("\t$(Q)$(docker) build \\\n")
+        stream.write(f"\t\t--network host \\\n")
         for k, v in self.args:
             stream.write(f"\t\t--build-arg={k}={v} \\\n")
         stream.write(f"\t\t{self.build_args} $(docker_build_args) \\\n")
