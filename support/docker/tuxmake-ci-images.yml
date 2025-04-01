@@ -11,7 +11,7 @@
   services:
       - name: docker:20.10-dind
   script:
-    - 'docker build --build-arg=BASE=$BASE -t $CI_REGISTRY/linaro/tuxmake/$CI_JOB_NAME -f support/docker/Dockerfile.ci .'
+    - 'docker build --network host --build-arg=BASE=$BASE -t $CI_REGISTRY/linaro/tuxmake/$CI_JOB_NAME -f support/docker/Dockerfile.ci .'
     - 'docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY'
     - 'docker push $CI_REGISTRY/linaro/tuxmake/$CI_JOB_NAME'
 
