@@ -45,6 +45,7 @@ RUN apt-get update \
         jq \
         kmod \
         libssl-dev \
+        libdw-dev \
         libelf-dev \
         lz4 \
         lzop \
