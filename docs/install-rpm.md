@@ -27,3 +27,20 @@ enabled=1
 
 Upgrades will be available in the same repository, so you can get them using
 the same procedure you already use to get other updates for your system.
+
+## Troubleshooting
+
+If trying to do a build fails with the following error:
+
+```
+Writing manifest to image destination
+a75ea7279dcf278b65f20bd8c7fe97c48c994463c1818fa388da938c681a315d
+Error: lsetxattr /usr/share/tuxmake/tuxmake/runtime/bin: operation not permitted
+E: Runtime preparation failed: failed to pull remote image docker.io/tuxmake/arm64_clang-20
+```
+
+Then, add the following rule to SELinux:
+
+```
+sudo chcon -Rt container_file_t /usr/share/tuxmake
+```
