@@ -10,7 +10,7 @@ GetOptions(
   "optional-compile-fatal" => \$optional_compile_fatal,
 ) or exit(1);
 
-my $LATEST_CLANG_NIGHTLY = "21";
+my $LATEST_CLANG_NIGHTLY = "22";
 
 my $image = shift;
 my $cross_compile = shift;
