@@ -42,9 +42,9 @@ test_gcc() {
     assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="gcc g++"'
 }
 
-test_gcc_9() {
-    get_build_args gcc-9
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base-debian' 'PACKAGES="gcc-9 g++-9"'
+test_gcc_11() {
+    get_build_args gcc-11
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base-debian' 'PACKAGES="gcc-11 g++-11"'
 }
 
 test_arm64_gcc() {
@@ -70,9 +70,9 @@ test_arm64_clang() {
         'PACKAGES="clang clang-tidy llvm lld binutils-arm-linux-gnueabihf binutils-aarch64-linux-gnu"'
 }
 
-test_clang_11() {
-    get_build_args clang-11
-    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-11 clang-tidy-11 llvm-11 lld-11"'
+test_clang_13() {
+    get_build_args clang-13
+    assertArg 'BASE=$(REGISTRY)$(PROJECT)/base' 'PACKAGES="clang-13 clang-tidy-13 llvm-13 lld-13"'
 }
 
 test_gcc_all_includes_only_gcc_images_not_gcc_N() {
