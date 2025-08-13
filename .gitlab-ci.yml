@@ -267,8 +267,7 @@ pkg:
     - "echo 'build ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build"
     - su build -c "git config --global --add safe.directory ${CI_PROJECT_DIR}; make pkg"
     - pacman -U --noconfirm dist/*.pkg.tar.zst
-    - su build -c "git clone https://aur.archlinux.org/shunit2.git && cd shunit2 && makepkg --noconfirm -irs"
-    - pacman -S --noconfirm aarch64-linux-gnu-gcc ccache clang diffoscope libfaketime lld llvm socat
+    - pacman -S --noconfirm aarch64-linux-gnu-gcc ccache clang diffoscope libfaketime lld llvm socat shunit2
     - for binary in as ld; do ln -sv /usr/bin/$binary /usr/bin/x86_64-linux-gnu-$binary; done
     - make integration-tests
   artifacts:
