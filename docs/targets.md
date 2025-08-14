@@ -145,3 +145,38 @@ This target builds the cpupower program and libraries, from
 This target builds the perf tool, from `tools/perf`. The resulting artifact is
 a tarball named `perf.tar.gz` that can be extracted in a rootfs to provide
 `perf`, `trace`, and it plugins.
+
+## decode-stacktrace
+
+Decode kernel stack traces from boot logs using the kernel's
+`scripts/decode_stacktrace.sh`.  This target is designed to work both inside
+and outside containers and handles common pitfalls automatically.
+
+### What it does
+- Fetches the required inputs (`vmlinux` and a boot log with the stack trace)
+  from **local paths or HTTP/HTTPS URLs**.
+- If `vmlinux` is provided as a compressed `vmlinux.xz`, it
+  **auto‑decompresses** it for you.
+- Performs the decode step and writes a **`decoded-stacktrace.txt`** artifact
+  in the output directory.
+- Downloads happen on the **host side**.
+- Shows **progress** while downloading large files.
+
+### Inputs
+Provide the sources via environment variables (either local file paths or URLs):
+
+- `TUXMAKE_VMLINUX_SOURCE` — path or URL to `vmlinux` (or `vmlinux.xz`)
+- `TUXMAKE_BOOTLOG_SOURCE` — path or URL to a boot log containing the stack
+  trace (e.g. `dmesg`/serial log)
+
+> Tip: For best results, the `vmlinux` must match the exact kernel that
+> produced the stack trace. Enabling debug info (`CONFIG_DEBUG_INFO_*` options)
+> yields file names and line numbers in the decoded output.
+
+### Example
+```
+tuxmake --runtime podman --target-arch arm64 --toolchain clang-20 \
+  -e TUXMAKE_VMLINUX_SOURCE=https://example.com/vmlinux.xz \
+  -e TUXMAKE_BOOTLOG_SOURCE=https://example.com/boot.log \
+  decode-stacktrace
+```

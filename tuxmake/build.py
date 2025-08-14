@@ -22,6 +22,7 @@ from tuxmake.target import create_target
 from tuxmake.runtime import Runtime, DockerRuntime
 from tuxmake.runtime import Terminated
 from tuxmake.metadata import MetadataCollector
+from tuxmake.exceptions import DecodeStacktraceMissingVariable
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import KorgGccPreparationFailed
 from tuxmake.exceptions import KorgGccDownloadAllToolchainFailed
@@ -33,6 +34,7 @@ from tuxmake.cmdline import CommandLine
 from tuxmake.build_utils import defaults
 from tuxmake.utils import quote_command_line
 from tuxmake.utils import get_directory_timestamp
+from tuxmake.utils import prepare_file_from_source
 
 
 class BuildInfo:
@@ -300,6 +302,28 @@ class Build:
             t for t in self.targets if not self.__ordering_only_targets__[t.name]
         ]
 
+    def prepare_target_files(self):
+        for target in self.targets:
+            if target.name == "decode-stacktrace":
+                self.prepare_decode_stacktrace_files()
+
+    def prepare_decode_stacktrace_files(self):
+        vmlinux_src = self.environment.get("TUXMAKE_VMLINUX_SOURCE")
+        bootlog_src = self.environment.get("TUXMAKE_BOOTLOG_SOURCE")
+
+        if not vmlinux_src:
+            raise DecodeStacktraceMissingVariable("TUXMAKE_VMLINUX_SOURCE")
+        if not bootlog_src:
+            raise DecodeStacktraceMissingVariable("TUXMAKE_BOOTLOG_SOURCE")
+
+        self.log(f"Preparing decode_stacktrace files in {self.build_dir}")
+
+        vmlinux_path = self.build_dir / "vmlinux"
+        prepare_file_from_source(vmlinux_src, vmlinux_path, self.log)
+
+        bootlog_path = self.build_dir / "boot_log.txt"
+        prepare_file_from_source(bootlog_src, bootlog_path, self.log)
+
     def extend_kconfig(self):
         for target in self.targets:
             self.kconfig_add.extend(target.kconfig_add)
@@ -331,6 +355,10 @@ class Build:
         for k, v in wenv.items():
             if k.endswith("_DIR"):
                 self.runtime.add_volume(v)
+
+        # Prepare files for targets that need them
+        self.prepare_target_files()
+
         self.runtime.prepare()
         self.wrapper.prepare_runtime(self)
 

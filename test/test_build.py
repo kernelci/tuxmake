@@ -18,6 +18,8 @@ from tuxmake.build import DEFAULT_CONTAINER_REGISTRY
 from tuxmake.target import Command
 from tuxmake.target import default_compression
 import tuxmake.exceptions
+from tuxmake.exceptions import DecodeStacktraceMissingVariable
+from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
@@ -1316,3 +1318,97 @@ class TestKorgGccDownloadAll:
         build = Build()
         with pytest.raises(tuxmake.exceptions.KorgGccDownloadAllToolchainFailed):
             build._download_all_korg_gcc_toolchains("14.2.0")
+
+
+class TestDecodeStacktrace:
+    def test_prepare_target_files_with_decode_stacktrace(self, linux, tmp_path):
+        build = Build(
+            tree=linux,
+            targets=["kernel"],
+            environment={
+                "TUXMAKE_VMLINUX_SOURCE": "test_vmlinux",
+                "TUXMAKE_BOOTLOG_SOURCE": "test_bootlog.txt",
+            },
+        )
+
+        mock_target = MagicMock()
+        mock_target.name = "decode-stacktrace"
+        build.targets = [mock_target]
+
+        build._Build__build_dir__ = tmp_path / "build"
+        build._Build__build_dir__.mkdir()
+
+        with patch("tuxmake.build.prepare_file_from_source") as mock_prepare:
+            build.prepare_target_files()
+
+            assert mock_prepare.call_count == 2
+
+            calls = mock_prepare.call_args_list
+            assert calls[0][0][0] == "test_vmlinux"
+            assert "vmlinux" in str(calls[0][0][1])
+
+            assert calls[1][0][0] == "test_bootlog.txt"
+            assert "boot_log.txt" in str(calls[1][0][1])
+
+    def test_prepare_target_files_skips_other_targets(self, linux, tmp_path):
+        with patch("tuxmake.build.prepare_file_from_source") as mock_prepare:
+            build = Build(tree=linux, targets=["kernel", "modules"])
+
+            mock_target1 = MagicMock()
+            mock_target1.name = "kernel"
+            mock_target2 = MagicMock()
+            mock_target2.name = "modules"
+            build.targets = [mock_target1, mock_target2]
+
+            build.prepare_target_files()
+
+            mock_prepare.assert_not_called()
+
+    def test_prepare_decode_stacktrace_files_missing_environment(self, linux, tmp_path):
+        with patch("tuxmake.build.prepare_file_from_source") as mock_prepare:
+            build = Build(tree=linux, targets=["kernel"])
+            with pytest.raises(
+                DecodeStacktraceMissingVariable, match="TUXMAKE_VMLINUX_SOURCE"
+            ):
+                build.prepare_decode_stacktrace_files()
+
+            mock_prepare.assert_not_called()
+
+    def test_prepare_decode_stacktrace_files_missing_bootlog(self, linux, tmp_path):
+        with patch("tuxmake.build.prepare_file_from_source") as mock_prepare:
+            build = Build(
+                tree=linux,
+                targets=["kernel"],
+                environment={
+                    "TUXMAKE_VMLINUX_SOURCE": "https://example.com/vmlinux.xz"
+                },
+            )
+            with pytest.raises(
+                DecodeStacktraceMissingVariable, match="TUXMAKE_BOOTLOG_SOURCE"
+            ):
+                build.prepare_decode_stacktrace_files()
+
+            mock_prepare.assert_not_called()
+
+    def test_prepare_decode_stacktrace_files_success(self, linux, tmp_path):
+        with patch("tuxmake.build.prepare_file_from_source") as mock_prepare:
+            build = Build(
+                environment={
+                    "TUXMAKE_VMLINUX_SOURCE": "https://example.com/vmlinux.xz",
+                    "TUXMAKE_BOOTLOG_SOURCE": "/path/to/bootlog.txt",
+                }
+            )
+
+            build.prepare_decode_stacktrace_files()
+
+            assert mock_prepare.call_count == 2
+
+            calls = mock_prepare.call_args_list
+
+            vmlinux_call = calls[0]
+            assert vmlinux_call[0][0] == "https://example.com/vmlinux.xz"
+            assert "vmlinux" in str(vmlinux_call[0][1])
+
+            bootlog_call = calls[1]
+            assert bootlog_call[0][0] == "/path/to/bootlog.txt"
+            assert "boot_log.txt" in str(bootlog_call[0][1])

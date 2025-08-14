@@ -113,3 +113,7 @@ class KorgGccPreparationFailed(TuxMakeUserError):
 
 class KorgGccDownloadAllToolchainFailed(TuxMakeUserError):
     msg = "Korg GCC download all toochains failed"
+
+
+class DecodeStacktraceMissingVariable(TuxMakeUserError):
+    msg = "Missing environment variable: {name}"
