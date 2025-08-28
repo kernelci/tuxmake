@@ -24,6 +24,7 @@ TC_ARCHIVE=$TOOLCHAIN_CACHE/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${H
 test -f $TC_ARCHIVE && echo "File '${TC_ARCHIVE}' exists; not retrieving." || wget -t 10 --retry-connrefused --progress=dot:giga https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/${BUILD_HOST_ARCH}/${TC_FULL_VERSION}/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.gz -O ${TC_ARCHIVE}
 
 # Download the toolchain signature, if it does not exist
+mkdir -p $TOOLCHAIN_CACHE/signatures
 TC_SIGN=$TOOLCHAIN_CACHE/signatures/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.sign
 test -f $TC_SIGN && echo "File '${TC_SIGN}' exists; not retrieving." || wget -t 10 --retry-connrefused --progress=dot:giga https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/${BUILD_HOST_ARCH}/${TC_FULL_VERSION}/${BUILD_HOST_ARCH}-gcc-${TC_FULL_VERSION}-nolibc-${HOSTARCH}-${SUFFIX}.tar.sign -O ${TC_SIGN}
 
