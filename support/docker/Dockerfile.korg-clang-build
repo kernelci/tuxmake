@@ -19,7 +19,7 @@ ENV PATH="$PATH:/usr/local/llvm-${TC_FULL_VERSION}-${BUILD_HOST_ARCH}/bin"
 
 RUN apt-get update -q=2 && \
     gccversion=$(apt-cache policy gcc | sed -e '/Candidate:/!d; s/\s*Candidate:\s*.*://; s/\..*//') && \
-    apt-get install -q=2 -y libc6 libgcc-s1 libicu72 liblzma5 libstdc++6 libxml2 libzstd1 zlib1g libc6-dev linux-libc-dev libgcc-${gccversion}-dev libstdc++-${gccversion}-dev
+    apt-get install -q=2 -y libc6 libgcc-s1 libicu76 liblzma5 libstdc++6 libxml2 libzstd1 zlib1g libc6-dev linux-libc-dev libgcc-${gccversion}-dev libstdc++-${gccversion}-dev
 
 # Install basic toolchain packages. Which toolchain exactly is defined by the
 # $PACKAGES build argument
