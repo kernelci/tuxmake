@@ -93,7 +93,7 @@ for group, rebuild in groups:
         if host == "arm64":
             tag = "saas-linux-medium-arm64"
         else:
-            tag = ""
+            tag = "saas-linux-medium-amd64"
         if group == "base":
             stage = "build-base"
         else:

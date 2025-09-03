@@ -27,7 +27,7 @@ docker-images-base-amd64:
         TAG: "-amd64"
     script:
         - "make publish-base"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: []
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "base")'
@@ -66,7 +66,7 @@ docker-images-clang_11_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_11_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_11_all")'
@@ -105,7 +105,7 @@ docker-images-clang_12_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_12_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_12_all")'
@@ -144,7 +144,7 @@ docker-images-clang_13_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_13_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_13_all")'
@@ -183,7 +183,7 @@ docker-images-clang_14_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_14_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_14_all")'
@@ -222,7 +222,7 @@ docker-images-clang_15_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_15_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_15_all")'
@@ -261,7 +261,7 @@ docker-images-clang_16_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_16_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_16_all")'
@@ -300,7 +300,7 @@ docker-images-clang_17_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_17_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_17_all")'
@@ -339,7 +339,7 @@ docker-images-clang_18_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_18_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_18_all")'
@@ -378,7 +378,7 @@ docker-images-clang_19_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_19_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_19_all")'
@@ -417,7 +417,7 @@ docker-images-clang_20_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_20_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_20_all")'
@@ -456,7 +456,7 @@ docker-images-clang_21_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_21_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_21_all")'
@@ -495,7 +495,7 @@ docker-images-clang_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_all")'
@@ -534,7 +534,7 @@ docker-images-clang_android_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_android_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "clang_android_all")'
@@ -573,7 +573,7 @@ docker-images-clang_nightly_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-clang_nightly_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: []
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "daily" || $TUXMAKE_DOCKER_IMAGES == "clang_nightly_all")'
@@ -612,7 +612,7 @@ docker-images-gcc_11_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_11_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_11_all")'
@@ -651,7 +651,7 @@ docker-images-gcc_12_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_12_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_12_all")'
@@ -690,7 +690,7 @@ docker-images-gcc_13_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_13_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_13_all")'
@@ -729,7 +729,7 @@ docker-images-gcc_14_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_14_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_14_all")'
@@ -768,7 +768,7 @@ docker-images-gcc_15_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_15_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_15_all")'
@@ -807,7 +807,7 @@ docker-images-gcc_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-gcc_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "gcc_all")'
@@ -846,7 +846,7 @@ docker-images-korg_clang_11_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_11_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_11_all")'
@@ -885,7 +885,7 @@ docker-images-korg_clang_12_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_12_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_12_all")'
@@ -924,7 +924,7 @@ docker-images-korg_clang_13_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_13_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_13_all")'
@@ -963,7 +963,7 @@ docker-images-korg_clang_14_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_14_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_14_all")'
@@ -1002,7 +1002,7 @@ docker-images-korg_clang_15_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_15_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_15_all")'
@@ -1041,7 +1041,7 @@ docker-images-korg_clang_16_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_16_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_16_all")'
@@ -1080,7 +1080,7 @@ docker-images-korg_clang_17_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_17_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_17_all")'
@@ -1119,7 +1119,7 @@ docker-images-korg_clang_18_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_18_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_18_all")'
@@ -1158,7 +1158,7 @@ docker-images-korg_clang_19_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_19_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_19_all")'
@@ -1197,7 +1197,7 @@ docker-images-korg_clang_20_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_20_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_20_all")'
@@ -1236,7 +1236,7 @@ docker-images-korg_clang_21_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_21_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_21_all")'
@@ -1275,7 +1275,7 @@ docker-images-korg_clang_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_clang_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_clang_all")'
@@ -1314,7 +1314,7 @@ docker-images-korg_gcc_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-korg_gcc_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "korg_gcc_all")'
@@ -1353,7 +1353,7 @@ docker-images-rust_all-amd64:
         TAG: "-amd64"
     script:
         - "make publish-rust_all"
-    tags: []
+    tags: [saas-linux-medium-amd64]
     needs: ['docker-images-base-multiarch']
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule" && ($TUXMAKE_DOCKER_IMAGES == "monthly" || $TUXMAKE_DOCKER_IMAGES == "rust_all")'
