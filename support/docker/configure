@@ -288,20 +288,34 @@ class ArcImage(Image):
     kind = "arc"
     extra_lists = ["crossbuild", "arc"]
     releases = {
-        'arc_gcc-8': (
-            ('RELEASE', 'arc-2019.03-release'),
-            ('TARBALL', 'arc_gnu_2019.03_prebuilt_elf32_le_linux_install.tar.gz'),
-            ('GCC_VERSION', '8'),
-            ('GCC_VERSION_FULL', '8.3.1'),
+        'arc_gcc-12': (
+            ('RELEASE', 'arc-2022.09-release'),
+            ('TARBALL', 'arc_gnu_2022.09_prebuilt_elf32_le_linux_install.tar.gz'),
+            ('GCC_VERSION', '12'),
+            ('GCC_VERSION_FULL', '12.2')
         ),
-        'arc_gcc-9': (
-            ('RELEASE', 'arc-2020.03-release'),
-            ('TARBALL', 'arc_gnu_2020.03_prebuilt_elf32_le_linux_install.tar.gz'),
-            ('GCC_VERSION', '9'),
-            ('GCC_VERSION_FULL', '9.3.1'),
+        'arc_gcc-13': (
+            ('RELEASE', 'arc-2023.09-release'),
+            ('TARBALL', 'arc_gnu_2023.09_prebuilt_elf32_le_linux_install.tar.bz2'),
+            ('GCC_VERSION', '13'),
+            ('GCC_VERSION_FULL', '13.1')
         ),
+        'arc_gcc-14': (
+            ('RELEASE', 'arc-2024.12-release'),
+            ('TARBALL', 'arc_gnu_2024.12_prebuilt_elf32_le_linux_install.tar.xz'),
+            ('GCC_VERSION', '14'),
+            ('GCC_VERSION_FULL', '14.2')
+        ),
+        'arc_gcc-15': (
+            ('RELEASE', 'arc-2025.09-release'),
+            ('TARBALL', 'arc_gnu_2025.09_prebuilt_elf32_le_linux_install.tar.xz'),
+            ('GCC_VERSION', '15'),
+            ('GCC_VERSION_FULL', '15.2')
+        ),
+
+
     }
-    releases['arc_gcc'] = releases['arc_gcc-9']
+    releases['arc_gcc'] = releases['arc_gcc-15']
 
     def emit(self):
         super().emit()
