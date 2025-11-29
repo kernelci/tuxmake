@@ -63,6 +63,7 @@ RUN apt-get update \
         python3-jsonschema \
         python3-pip \
         python3-yaml \
+        rpm \
         rsync \
         socat \
         sparse \

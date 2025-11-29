@@ -95,6 +95,11 @@ files.
 Builds Debian binary packages out of the built kernel, and copy the `*.deb`
 files to the output directory.
 
+## binrpm-pkg
+
+Builds RPM binary packages out of the built kernel, and copy the `*.rpm`
+files to the output directory.
+
 ## xipkernel
 
 Builds the XIP Kernel image, named `xipImage`, which is then copied into the

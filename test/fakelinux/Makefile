@@ -216,6 +216,11 @@ bindeb-pkg: all
 	touch $(O)/../linux-libc-dev_$(KERNELRELEASE)-1_$(ARCH).buildinfo
 	touch $(O)/../linux-libc-dev_$(KERNELRELEASE)-1_$(ARCH).changes
 
+binrpm-pkg: all
+	mkdir -p $(O)/rpmbuild/RPMS
+	touch $(O)/rpmbuild/RPMS/kernel-$(KERNELRELEASE).$(ARCH).rpm
+	touch $(O)/rpmbuild/RPMS/kernel-devel-$(KERNELRELEASE).$(ARCH).rpm
+
 
 ########################################################################
 # cleaning

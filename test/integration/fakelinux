@@ -261,6 +261,12 @@ test_bindeb_pkg() {
   assertTrue "test -f $XDG_CACHE_HOME/tuxmake/builds/1/linux-image-*.deb"
 }
 
+test_binrpm_pkg() {
+  run tuxmake binrpm-pkg
+  assertEquals 0 "${rc}"
+  assertTrue "test -f $XDG_CACHE_HOME/tuxmake/builds/1/kernel-[0-9]*.rpm"
+}
+
 test_linux32() {
   # This test checks that on 64-bit architectures that support 32-bit
   # compatibility mode (e.g. x86_64, aarch64), we can still use tuxmake when
