@@ -31,9 +31,11 @@ RUN apt-get update \
         bc \
         bison \
         bsdmainutils \
+        build-essential \
         bzip2 \
         ccache \
         cpio \
+        debhelper \
         dpkg-dev \
         docutils-common \
         dwarves \

@@ -237,4 +237,26 @@ RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
 RUN if command -v clang >/dev/null; then export CC=clang; fi && \
     pip3 install --break-system-packages dtschema
 
+# Create fake packages to satisfy Debian package build dependencies
+# The actual cross-compiler binaries are already installed with versioned names
+ARG HOSTARCH
+RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
+    apt-get install -qy equivs && \
+    if [ "${HOSTARCH}" = armeabihf ]; then \
+        arch=armhf; \
+    elif [ "${HOSTARCH}" = "armeabi" ]; then \
+        arch=armel; \
+    else \
+        arch=$(dpkg-architecture --host-type=${HOSTARCH}-linux-gnu --query=DEB_HOST_ARCH 2>/dev/null || echo ${HOSTARCH}); \
+    fi; \
+    host_gnu=$(dpkg-architecture -a "${arch}" -q DEB_HOST_GNU_TYPE 2>/dev/null | sed 's/_/-/g'); \
+    if [ -z "${host_gnu}" ]; then exit; fi; \
+    mkdir -p /tmp/equivs && \
+    cd /tmp/equivs && \
+    printf "Section: misc\nPriority: optional\nStandards-Version: 3.9.2\nPackage: gcc-${host_gnu}\nVersion: 999.0\nMaintainer: tuxmake\nDescription: Fake package to satisfy gcc-${host_gnu} dependency\n The actual cross-compiler is already installed with a versioned name.\n" > gcc-${host_gnu} && \
+    equivs-build gcc-${host_gnu} && \
+    dpkg -i gcc-${host_gnu}_*.deb && \
+    cd / && \
+    rm -rf /tmp/equivs
+
 # vim: ft=dockerfile
