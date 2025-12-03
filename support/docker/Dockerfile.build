@@ -229,6 +229,9 @@ RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
         rustc rust-src bindgen rustfmt rust-clippy \
         rustc:${arch} rust-src:${arch} bindgen:${arch} rustfmt:${arch} rust-clippy:${arch}
 
+# Install dtschema for dtbs_check
+RUN pip3 install dtschema --break-system-packages
+
 # Compile and install pahole v1.31
 RUN apt-get install -qy cmake libdw-dev && \
     git clone --depth=1 https://git.kernel.org/pub/scm/devel/pahole/pahole.git -b v1.31 && \
