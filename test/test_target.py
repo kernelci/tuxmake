@@ -2,7 +2,7 @@ import pytest
 
 import tuxmake.exceptions
 from tuxmake.arch import Native
-from tuxmake.target import Compression, Target, Config
+from tuxmake.target import Compression, Target, Config, Kselftest, create_target
 
 
 @pytest.fixture
@@ -145,6 +145,34 @@ class TestBinDebPkg:
         assert len(artifacts) == 4
         filenames = [f for f, _ in artifacts]
         assert "linux-headers-6.5.0+_6.5.0-11329-g708283abf896-2_arm64.deb" in filenames
+
+
+class TestKselftest:
+    def test_llvm_set_for_clang_toolchain(self, build):
+        build.toolchain.name = "clang-20"
+        kselftest = Kselftest("kselftest", build)
+        assert kselftest.makevars.get("LLVM") == "1"
+
+    def test_llvm_set_for_llvm_toolchain(self, build):
+        build.toolchain.name = "llvm"
+        kselftest = Kselftest("kselftest", build)
+        assert kselftest.makevars.get("LLVM") == "1"
+
+    def test_llvm_not_set_for_gcc_toolchain(self, build):
+        build.toolchain.name = "gcc-13"
+        kselftest = Kselftest("kselftest", build)
+        assert "LLVM" not in kselftest.makevars
+
+    def test_kselftest_bpf_llvm_set_for_clang(self, build):
+        build.toolchain.name = "clang-20"
+        kselftest_bpf = Kselftest("kselftest-bpf", build)
+        assert kselftest_bpf.makevars.get("LLVM") == "1"
+
+    def test_target_factory_returns_kselftest_class(self, build):
+        build.toolchain.name = "clang-20"
+        kselftest = create_target("kselftest", build)
+        assert isinstance(kselftest, Kselftest)
+        assert kselftest.makevars.get("LLVM") == "1"
 
 
 class TestCompression:

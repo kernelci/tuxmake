@@ -283,7 +283,23 @@ class Kernel(Target):
             self.artifacts["vmlinux"] = "vmlinux"
 
 
-__special_targets__ = {"config": Config, "kernel": Kernel}
+class Kselftest(Target):
+    def __init_config__(self):
+        super().__init_config__()
+        if self._is_clang_toolchain():
+            self.makevars.setdefault("LLVM", "1")
+
+    def _is_clang_toolchain(self):
+        tc_name = self.build.toolchain.name
+        return "clang" in tc_name or "llvm" in tc_name
+
+
+__special_targets__ = {
+    "config": Config,
+    "kernel": Kernel,
+    "kselftest": Kselftest,
+    "kselftest-bpf": Kselftest,
+}
 
 
 def create_target(name, build, compression=default_compression):
