@@ -49,6 +49,7 @@ RUN apt-get update \
         libdw-dev \
         libelf-dev \
         libxxhash-dev \
+        binutils-dev \
         lz4 \
         lzop \
         make \
