@@ -3,23 +3,23 @@
 ## Source code
 
 The tuxmake source code is available in the
-[tuxmake gitlab repository](https://gitlab.com/Linaro/tuxmake). To clone the
+[tuxmake GitHub repository](https://github.com/kernelci/tuxmake). To clone the
 repository, run:
 
 ```console
-git clone git@gitlab.com:Linaro/tuxmake.git
+git clone git@github.com:kernelci/tuxmake.git
 ```
 
-or if you don't (want to) have a gitlab account:
+or if you don't (want to) have a GitHub account:
 
 ```console
-git clone https://gitlab.com/Linaro/tuxmake.git
+git clone https://github.com/kernelci/tuxmake.git
 ```
 
 ## Issue tracker
 
-The tuxmake issue tracker is also on Gitlab:
-<https://gitlab.com/Linaro/tuxmake/-/issues>.
+The tuxmake issue tracker is also on GitHub:
+<https://github.com/kernelci/tuxmake/issues>.
 
 ## Development dependencies
 
