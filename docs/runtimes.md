@@ -28,7 +28,7 @@ hit the network every time, looking for updated images.
 
 If you want more details on the contents of the images provided by the TuxMake
 team, and how they are generated, see the corresponding
-[README file](https://gitlab.com/Linaro/tuxmake/-/blob/master/support/docker/README.md)
+[README file](https://github.com/kernelci/tuxmake/blob/master/support/docker/README.md)
 in the TuxMake repository.
 
 If you want to provide your own images, take into consideration that:

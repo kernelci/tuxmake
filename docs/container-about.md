@@ -2,7 +2,7 @@
 provide pristine and shareable environments for building Linux kernels.
 
 The source and build procedure for the containers can be found at in the
-[tuxmake gitlab repository](https://gitlab.com/Linaro/tuxmake).
+[tuxmake GitHub repository](https://github.com/kernelci/tuxmake).
 
 There is a TuxMake container for every supported combination of target
 architecture and toolchain - over 100 in all. The naming structure for

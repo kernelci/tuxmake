@@ -3,23 +3,23 @@
 ## Source code
 
 The tuxmake source code is available in the
-[tuxmake gitlab repository](https://gitlab.com/Linaro/tuxmake). To clone the
+[tuxmake GitHub repository](https://github.com/kernelci/tuxmake). To clone the
 repository, run:
 
 ```console
-git clone git@gitlab.com:Linaro/tuxmake.git
+git clone git@github.com:kernelci/tuxmake.git
 ```
 
-or if you don't (want to) have a gitlab account:
+or if you don't (want to) have a GitHub account:
 
 ```console
-git clone https://gitlab.com/Linaro/tuxmake.git
+git clone https://github.com/kernelci/tuxmake.git
 ```
 
 ## Issue tracker
 
-The tuxmake issue tracker is also on Gitlab:
-<https://gitlab.com/Linaro/tuxmake/-/issues>.
+The tuxmake issue tracker is also on GitHub:
+<https://github.com/kernelci/tuxmake/issues>.
 
 ## Development dependencies
 
@@ -48,9 +48,9 @@ sure all the tests pass before submitting patches.
 
 ## Sending your contributions.
 
-Contributions should be sent as merge requests on the GitLab repository.
+Contributions should be sent as pull requests on the GitHub repository.
 
 If that's too high of a barrier for you to send your patches, you can also send
-them by email to the maintainers. However, we really prefer merge requests
-because the GitLab Continuous Integration will run all the tests against your
+them by email to the maintainers. However, we really prefer pull requests
+because the GitHub CI will run all the tests against your
 changes, and that makes a lot easier for us to evaluate your contribution.
