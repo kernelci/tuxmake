@@ -2,22 +2,17 @@
   <img src="docs/tuxmake_full.svg" alt="TuxMake Logo" width="50%" />
 </div>
 
-[![Pipeline Status](https://gitlab.com/Linaro/tuxmake/badges/master/pipeline.svg)](https://gitlab.com/Linaro/tuxmake/pipelines)
-[![coverage report](https://gitlab.com/Linaro/tuxmake/badges/master/coverage.svg)](https://gitlab.com/Linaro/tuxmake/commits/master)
 [![PyPI version](https://badge.fury.io/py/tuxmake.svg)](https://pypi.org/project/tuxmake/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![PyPI - License](https://img.shields.io/pypi/l/tuxmake)](https://gitlab.com/Linaro/tuxmake/blob/master/LICENSE)
+[![PyPI - License](https://img.shields.io/pypi/l/tuxmake)](https://github.com/kernelci/tuxmake/blob/master/LICENSE)
 
-[Documentation](https://tuxmake.org/) - [Repository](https://gitlab.com/Linaro/tuxmake) - [Issues](https://gitlab.com/Linaro/tuxmake/-/issues)
+[Documentation](https://tuxmake.org/) - [Repository](https://github.com/kernelci/tuxmake) - [Issues](https://github.com/kernelci/tuxmake/issues)
 
 TuxMake, by [Linaro](https://www.linaro.org/), is a command line tool and
 Python library that provides portable and repeatable Linux kernel builds across
 a variety of architectures, toolchains, kernel configurations, and make
 targets. TuxMake is a part of [TuxSuite](https://tuxsuite.com), a suite of
 tools and services to help with Linux kernel development.
-
-[[_TOC_]]
-
 
 # About TuxMake
 

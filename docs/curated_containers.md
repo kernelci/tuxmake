@@ -15,10 +15,10 @@ because they're "just" Debian images with all of the Linux kernel build
 prerequisites built in.
 
 The containers are defined and built from the
-[support/docker](https://gitlab.com/Linaro/tuxmake/-/tree/master/support/docker)
+[support/docker](https://github.com/kernelci/tuxmake/tree/master/support/docker)
 directory in TuxMake's git repository. They are built and published
 automatically using a GitLab Pipeline, as defined in TuxMake's
-[.gitlab-ci.yml](https://gitlab.com/Linaro/tuxmake/-/blob/master/.gitlab-ci.yml).
+[.gitlab-ci.yml](https://github.com/kernelci/tuxmake/blob/master/.gitlab-ci.yml).
 The container builds run on a regular schedule.
 
 The full set of TuxMake's containers can be found at
