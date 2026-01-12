@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+    branches: [master]
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install black flake8
+      - name: Run style check
+        run: make style
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install mypy
+      - name: Run typecheck
+        run: make typecheck
+
+  codespell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install codespell
+        run: pip install codespell
+      - name: Run codespell
+        run: make codespell
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install dependencies
+        run: |
+          pip install -e . --break-system-packages
+          pip install -r requirements-dev.txt --break-system-packages
+      - name: Run unit tests
+        run: make unit-tests
+
+  unit-tests-arm64:
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install dependencies
+        run: |
+          pip install -e . --break-system-packages
+          pip install -r requirements-dev.txt --break-system-packages
+      - name: Run unit tests
+        run: make unit-tests
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install tuxmake
+        run: pip install -e . --break-system-packages
+      - name: Run integration tests
+        run: make integration-tests TMV=1
+
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install mkautodoc mkdocs-material flit pytest docutils
+          pip install -e .
+      - name: Build man page
+        run: make man
+      - name: Build docs
+        run: make doc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: public
+
+  pages:
+    runs-on: ubuntu-latest
+    needs: build-docs
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: public
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
