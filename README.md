@@ -14,6 +14,13 @@ a variety of architectures, toolchains, kernel configurations, and make
 targets. TuxMake is a part of [TuxSuite](https://tuxsuite.com), a suite of
 tools and services to help with Linux kernel development.
 
+## Table of Contents
+- [About TuxMake](#about-tuxmake)
+- [Installing TuxMake](#installing-tuxmake)
+- [Using TuxMake](#using-tuxmake)
+- [Examples](#examples)
+- [Contributing to TuxMake](#contributing-to-tuxmake)
+
 # About TuxMake
 
 Building Linux is easy, right? You just run "make defconfig; make"!
