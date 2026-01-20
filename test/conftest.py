@@ -7,7 +7,6 @@ import shutil
 
 from tuxmake.arch import Architecture
 
-
 if pytest.__version__ < "3.9":
 
     @pytest.fixture()
