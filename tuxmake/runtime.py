@@ -23,7 +23,6 @@ from tuxmake.arch import native_arch
 from tuxmake.utils import quote_command_line
 from tuxmake.utils import retry
 
-
 DEFAULT_RUNTIME = "null"
 DEFAULT_CONTAINER_REGISTRY = "docker.io"
 

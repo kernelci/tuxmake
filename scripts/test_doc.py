@@ -5,7 +5,6 @@ from tuxmake.target import Target
 from tuxmake.toolchain import Toolchain
 from tuxmake.wrapper import Wrapper
 
-
 root = Path(__file__).parent.parent
 
 

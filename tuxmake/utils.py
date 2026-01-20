@@ -8,7 +8,6 @@ import urllib.request
 from pathlib import Path
 from typing import List
 
-
 # Constants for file operations
 KB = 1024
 MB = KB * 1024
