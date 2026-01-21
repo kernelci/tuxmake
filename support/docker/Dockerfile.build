@@ -229,8 +229,12 @@ RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
         rustc rust-src bindgen rustfmt rust-clippy \
         rustc:${arch} rust-src:${arch} bindgen:${arch} rustfmt:${arch} rust-clippy:${arch}
 
-# TODO: Remove jsonschema pin once dt-schema releases a version compatible
-#       with jsonschema >=4.18 (post-commit 7b9c4e8412ea).
-RUN pip install --break-system-packages --ignore-installed 'jsonschema<4.18' dtschema
+# Set CC to clang if available (for clang-only images without gcc).
+# Note: Installing python3-libfdt from apt doesn't help because pip checks
+# package names in its database, not whether the module is importable.
+# The apt package "python3-libfdt" and PyPI package "pylibfdt" have different
+# names, so pip still tries to build pylibfdt from source.
+RUN if command -v clang >/dev/null; then export CC=clang; fi && \
+    pip3 install --break-system-packages --ignore-installed 'jsonschema<4.18' dtschema
 
 # vim: ft=dockerfile
