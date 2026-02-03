@@ -254,7 +254,7 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
     if [ -z "${host_gnu}" ]; then exit; fi; \
     mkdir -p /tmp/equivs && \
     cd /tmp/equivs && \
-    printf "Section: misc\nPriority: optional\nStandards-Version: 3.9.2\nPackage: gcc-${host_gnu}\nVersion: 999.0\nMaintainer: tuxmake\nDescription: Fake package to satisfy gcc-${host_gnu} dependency\n The actual cross-compiler is already installed with a versioned name.\n" > gcc-${host_gnu} && \
+    printf "Section: misc\nPriority: optional\nStandards-Version: 3.9.2\nPackage: gcc-${host_gnu}\nVersion: 999.0\nMaintainer: tuxmake <tuxsuite@linaro.org>\nDescription: Fake package to satisfy gcc-${host_gnu} dependency\n The actual cross-compiler is already installed with a versioned name.\n" > gcc-${host_gnu} && \
     equivs-build gcc-${host_gnu} && \
     dpkg -i gcc-${host_gnu}_*.deb && \
     cd / && \
