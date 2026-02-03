@@ -235,7 +235,8 @@ RUN if [ -z "${INSTALL_RUST}" ]; then exit; fi; \
 # The apt package "python3-libfdt" and PyPI package "pylibfdt" have different
 # names, so pip still tries to build pylibfdt from source.
 RUN if command -v clang >/dev/null; then export CC=clang; fi && \
-    pip3 install --break-system-packages dtschema
+    pip3 install --break-system-packages dtschema 2>/dev/null || \
+    pip3 install dtschema
 
 # Create fake packages to satisfy Debian package build dependencies
 # The actual cross-compiler binaries are already installed with versioned names
