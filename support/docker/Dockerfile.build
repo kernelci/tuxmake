@@ -241,6 +241,7 @@ RUN if command -v clang >/dev/null; then export CC=clang; fi && \
 # The actual cross-compiler binaries are already installed with versioned names
 ARG HOSTARCH
 RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
+    if [ "$(uname -m)" = "${HOSTARCH}" ]; then exit; fi; \
     apt-get install -qy equivs && \
     if [ "${HOSTARCH}" = armeabihf ]; then \
         arch=armhf; \
