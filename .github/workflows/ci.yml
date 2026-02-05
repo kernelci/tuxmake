@@ -6,6 +6,7 @@ on:
     tags: ['v*']
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -113,7 +114,7 @@ jobs:
           path: public
 
   ci-image-debian:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -125,7 +126,9 @@ jobs:
       - name: Check for Dockerfile changes
         id: check
         run: |
-          if git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-debian'; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-debian'; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Log in to Container Registry
@@ -142,7 +145,7 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ github.repository }}:ci-debian
 
   ci-image-fedora:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -154,7 +157,9 @@ jobs:
       - name: Check for Dockerfile changes
         id: check
         run: |
-          if git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-fedora'; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-fedora'; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Log in to Container Registry
@@ -171,7 +176,7 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ github.repository }}:ci-fedora
 
   ci-image-archlinux:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -183,7 +188,9 @@ jobs:
       - name: Check for Dockerfile changes
         id: check
         run: |
-          if git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-archlinux'; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q 'Dockerfile.ci-archlinux'; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Log in to Container Registry
