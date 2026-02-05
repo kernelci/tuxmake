@@ -1,0 +1,31 @@
+FROM archlinux:base-devel
+ARG EXTRA_PACKAGES
+
+COPY Makefile *.PKGBUILD /tuxpkg/
+
+RUN sed -i '/^NoExtract/d' /etc/pacman.conf \
+    && pacman -Syyu --noconfirm glibc \
+    && pacman -S --noconfirm \
+        mypy \
+        python-black \
+        ${EXTRA_PACKAGES} \
+    && echo "C.UTF-8 UTF-8" >/etc/locale.gen \
+    && locale-gen
+
+RUN printf '[tuxpkg]\nSigLevel = Never\nServer = https://linaro.gitlab.io/tuxpkg/packages/\n' > /etc/pacman.d/tuxpkg.conf \
+    && printf '\nInclude = /etc/pacman.d/*.conf\n' >> /etc/pacman.conf \
+    && pacman -Syyu --noconfirm tuxpkg
+
+RUN bash -c 'cd /tuxpkg && source *.PKGBUILD \
+    && pacman -S --noconfirm \
+        "${depends[@]}" \
+        "${makedepends[@]}" \
+        "${checkdepends[@]}"'
+
+RUN useradd -m build \
+    && echo 'build ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build \
+    && chown -R build:build /tuxpkg
+
+RUN tuxpkg --version
+
+# vim: ft=dockerfile
