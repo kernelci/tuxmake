@@ -1,0 +1,12 @@
+FROM fedora
+ARG EXTRA_PACKAGES
+
+COPY Makefile *.spec /tuxpkg/
+RUN dnf install -y make dnf-plugins-core rpm-build ${EXTRA_PACKAGES} \
+    && dnf builddep -y /tuxpkg/*.spec
+
+RUN if [ -f /tuxpkg/tuxpkg.spec ]; then exit; fi; \
+    printf '[tuxpkg]\nname=tuxpkg\ntype=rpm-md\nbaseurl=https://linaro.gitlab.io/tuxpkg/packages/\ngpgcheck=1\ngpgkey=https://linaro.gitlab.io/tuxpkg/packages/repodata/repomd.xml.key\nenabled=1\n' > /etc/yum.repos.d/tuxpkg.repo \
+    && dnf install -y tuxpkg
+
+# vim: ft=dockerfile
