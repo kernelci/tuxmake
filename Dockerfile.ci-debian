@@ -1,0 +1,28 @@
+FROM debian
+ARG EXTRA_PACKAGES
+
+COPY debian/control /tuxpkg/debian/control
+COPY Makefile       /tuxpkg
+
+RUN apt-get update \
+    && apt-get install -qy auto-apt-proxy \
+    && apt-get install -q=2 \
+        black \
+        ca-certificates \
+        codespell \
+        flake8 \
+        mkdocs \
+        mkdocs-material \
+        mypy \
+        ${EXTRA_PACKAGES} \
+    && true
+
+RUN if grep '^Source: tuxpkg' /tuxpkg/debian/control; then exit; fi; \
+    /usr/lib/apt/apt-helper download-file https://linaro.gitlab.io/tuxpkg/packages/signing-key.gpg /etc/apt/trusted.gpg.d/tuxpkg.gpg \
+    && echo 'deb https://linaro.gitlab.io/tuxpkg/packages/ ./' > /etc/apt/sources.list.d/tuxpkg.list \
+    && apt-get update \
+    && apt-get install -q=2 -y tuxpkg \
+    && apt-get build-dep -qy /tuxpkg \
+    && rm -rf /tmp/*
+
+# vim: ft=dockerfile
