@@ -417,11 +417,6 @@ class TestInterruptedBuild:
         assert collect_metadata.call_count == 0
 
 
-clang_version = int(
-    subprocess.check_output(["clang", "-dumpversion"], encoding="utf-8").split(".")[0]
-)
-
-
 class TestArchitecture:
     def test_x86_64(self, linux):
         result = build(tree=linux, target_arch="x86_64")
@@ -472,7 +467,7 @@ class TestArchitecture:
         assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     @pytest.mark.skipif(shutil.which("ld.lld") is None, reason="requires lld")
-    @pytest.mark.skipif(clang_version < 10, reason="requires clang 10+")
+    @pytest.mark.skipif(shutil.which("clang") is None, reason="requires clang")
     def test_hexagon(self, linux):
         result = build(tree=linux, target_arch="hexagon", toolchain="clang")
         assert result.passed
