@@ -467,7 +467,16 @@ class TestArchitecture:
         assert "uImage.gz" in [str(f.name) for f in result.output_dir.glob("*")]
 
     @pytest.mark.skipif(shutil.which("ld.lld") is None, reason="requires lld")
-    @pytest.mark.skipif(shutil.which("clang") is None, reason="requires clang")
+    @pytest.mark.skipif(
+        shutil.which("clang") is None
+        or int(
+            subprocess.check_output(["clang", "-dumpversion"], encoding="utf-8").split(
+                "."
+            )[0]
+        )
+        < 10,
+        reason="requires clang 10+",
+    )
     def test_hexagon(self, linux):
         result = build(tree=linux, target_arch="hexagon", toolchain="clang")
         assert result.passed
