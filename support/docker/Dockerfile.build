@@ -103,6 +103,12 @@ RUN set -x; \
         libc6-dev && \
     : libcap-ng-dev is affected by https://bugs.debian.org/983476 && \
     : systemtap-sdt-dev is not multiarch-ready && \
+    : libfuse-dev was replaced by libfuse3-dev in Debian testing && \
+    if apt-cache show libfuse-dev >/dev/null 2>&1; then \
+        fuse_dev=libfuse-dev; \
+    else \
+        fuse_dev=libfuse3-dev; \
+    fi && \
     debianversion=$(dpkg-query --show base-files | cut -f2) && \
     if dpkg --compare-versions "${debianversion}" lt 11; then exit; fi && \
     apt-get install \
@@ -116,7 +122,7 @@ RUN set -x; \
         libdrm-dev \
         libdw-dev \
         libelf-dev \
-        libfuse-dev \
+        ${fuse_dev} \
         libhugetlbfs-dev \
         libiberty-dev \
         libkeyutils-dev \
@@ -172,7 +178,7 @@ RUN set -x; \
         libdrm-dev:${arch} \
         libdw-dev:${arch} \
         libelf-dev:${arch} \
-        libfuse-dev:${arch} \
+        ${fuse_dev}:${arch} \
         libhugetlbfs-dev:${arch} \
         libiberty-dev:${arch} \
         libkeyutils-dev:${arch} \
