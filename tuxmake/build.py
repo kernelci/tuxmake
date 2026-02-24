@@ -699,8 +699,11 @@ class Build:
     # Map the ones that differ.
     korg_arch_map = {
         "arm64": "aarch64",
+        "loongarch": "loongarch64",
         "openrisc": "or1k",
         "parisc": "hppa",
+        "riscv": "riscv64",
+        "sparc": "sparc64",
     }
 
     def prepare_korg_gcc_toolchain(self):
