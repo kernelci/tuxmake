@@ -695,21 +695,22 @@ class Build:
         if not result:
             raise EnvironmentCheckFailed()
 
+    # Tuxmake arch names do not always match the korg toolchain names.
+    # Map the ones that differ.
+    korg_arch_map = {
+        "arm64": "aarch64",
+        "openrisc": "or1k",
+        "parisc": "hppa",
+    }
+
     def prepare_korg_gcc_toolchain(self):
         suffix = self.toolchain.suffix()
         tc_full_version = self.runtime.get_toolchain_full_version(self.toolchain.name)
-        # TODO: Find a better way to avoid the following conditional checks
-        target_arch = self.target_arch.name
+        target_arch = self.korg_arch_map.get(
+            self.target_arch.name, self.target_arch.name
+        )
         if self.target_arch.name == "arm":
             suffix = f"{suffix}-gnueabi"
-        elif self.target_arch.name == "arm64":
-            target_arch = "aarch64"
-        elif self.target_arch.name == "openrisc":
-            target_arch = "or1k"
-        elif self.target_arch.name.startswith("parisc"):
-            target_arch = "hppa"
-        else:
-            target_arch = self.target_arch.name
 
         # Calculate the cross compile tool prefix
         # TODO: Consider adding cross tools to the PATH and simplifying this
