@@ -63,6 +63,8 @@ def fake_cross_compilers(tmpdir_factory):
             binary = arch.makevars["CROSS_COMPILE"] + tool
             if not shutil.which(binary):
                 missing[binary] = tool
+    if not shutil.which("clang"):
+        missing["clang"] = "true"
     if missing:
         testbin = tmpdir_factory.mktemp("bin")
         for p, real in missing.items():

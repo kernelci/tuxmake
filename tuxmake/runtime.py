@@ -2,6 +2,7 @@ import os
 import re
 import json
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -360,6 +361,10 @@ class Runtime(ConfigurableObject):
 
 class NullRuntime(Runtime):
     name = "null"
+
+    def is_supported(self, arch, toolchain):
+        compiler = toolchain.compiler(arch)
+        return shutil.which(compiler) is not None
 
 
 class Image:

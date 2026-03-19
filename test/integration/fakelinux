@@ -132,6 +132,7 @@ test_dtbs() {
 }
 
 test_dtbs_armv5() {
+  skip_if not program_installed arm-linux-gnueabi-gcc
   run tuxmake --target-arch=armv5 dtbs
   assertTrue "build dtbs on armv5" "grep 'dtbs: PASS' stderr"
 }
