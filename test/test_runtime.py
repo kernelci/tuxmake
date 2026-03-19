@@ -2,6 +2,7 @@ import re
 import subprocess
 import pytest
 
+from tuxmake.arch import Architecture
 from tuxmake.build import Build
 from tuxmake.exceptions import InvalidRuntimeError
 from tuxmake.exceptions import RuntimePreparationFailed
@@ -13,6 +14,7 @@ from tuxmake.runtime import DockerLocalRuntime
 from tuxmake.runtime import PodmanRuntime
 from tuxmake.runtime import PodmanLocalRuntime
 from tuxmake.runtime import Terminated
+from tuxmake.toolchain import Toolchain
 
 
 @pytest.fixture
@@ -81,6 +83,14 @@ class TestRuntime:
         assert runtime.output_dir.exists()
 
 
+class TestRuntimeIsSupported:
+    def test_base_class_returns_true(self):
+        runtime = Runtime.get("docker")
+        arch = Architecture("x86_64")
+        toolchain = Toolchain("gcc")
+        assert Runtime.is_supported(runtime, arch, toolchain) is True
+
+
 class TestNullRuntime:
     def test_get_command_line(self, build):
         assert NullRuntime().get_command_line(
@@ -90,6 +100,20 @@ class TestNullRuntime:
     def test_toolchains(self):
         runtime = NullRuntime()
         assert "gcc" in runtime.toolchains
+
+    def test_is_supported_compiler_found(self, mocker):
+        mocker.patch("shutil.which", return_value="/usr/bin/gcc")
+        runtime = NullRuntime()
+        arch = Architecture("x86_64")
+        toolchain = Toolchain("gcc")
+        assert runtime.is_supported(arch, toolchain) is True
+
+    def test_is_supported_compiler_not_found(self, mocker):
+        mocker.patch("shutil.which", return_value=None)
+        runtime = NullRuntime()
+        arch = Architecture("x86_64")
+        toolchain = Toolchain("gcc")
+        assert runtime.is_supported(arch, toolchain) is False
 
 
 @pytest.fixture

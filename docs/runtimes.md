@@ -16,9 +16,14 @@ The following runtimes are available:
 
 ## null
 
-The default runtime. Assumes you have any necessary toolchain installed on your
-system. If you request a build that requires a (cross) toolchain you don't have
-installed locally, the build will just fail.
+The default runtime. Uses toolchains installed on your system. You need to
+install any required (cross) compilers yourself. For example, to cross-compile
+for arm64 on Debian you would need to install `gcc-aarch64-linux-gnu`.
+
+If a required compiler is not installed, the build will fail.
+
+The support matrix (`tuxmake -p`) checks which compilers are available in your
+`$PATH` and only reports combinations as supported when the compiler is found.
 
 ## docker
 

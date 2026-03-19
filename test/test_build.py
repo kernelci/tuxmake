@@ -889,7 +889,7 @@ class TestParseLog:
 
 class TestUnsupportedToolchainArchitectureCombination:
     def test_exception(self, linux, mocker):
-        mocker.patch("tuxmake.runtime.Runtime.is_supported", return_value=False)
+        mocker.patch("tuxmake.runtime.NullRuntime.is_supported", return_value=False)
         with pytest.raises(
             tuxmake.exceptions.UnsupportedArchitectureToolchainCombination
         ):
