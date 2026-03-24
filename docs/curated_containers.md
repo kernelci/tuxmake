@@ -53,7 +53,6 @@ building the kernel:
 |--------|--------|---------|---------|-------|
 |`gcc`   | yes    | yes     | yes     | yes   |
 |`clang` | yes    | yes     | yes     | yes   |
-|`llvm`  | yes    | yes     | no      | no    |
 
 Building kernel tools is supported on the following:
 
@@ -61,9 +60,8 @@ Building kernel tools is supported on the following:
 |--------|--------|
 |`gcc`   | yes    |
 |`clang` | yes    |
-|`llvm`  | yes    |
 
-Only the versions of `gcc`, `clang`, and `llvm` provided by Fedora and Fedora
+Only the versions of `gcc` and `clang` provided by Fedora and Fedora
 Rawhide are supported.
 
 A stable Fedora image can be used by passing:

@@ -39,5 +39,5 @@ x86_64       | *amd64*     | 64-bit X86               | yes      | yes
 xtensa       |             | 32-bit RISC              | yes³     | no
 
 ¹ `gcc` only  
-² `clang`/`llvm` only  
+² `clang` only
 ³ `korg-gcc` only

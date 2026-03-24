@@ -11,7 +11,7 @@ class Toolchain(ConfigurableObject):
     config_aliases = {"rust": "rustgcc"}
 
     def __init__(self, name):
-        pattern = re.compile(r"((korg-)?(rust|gcc|clang|llvm))-?(.*)")
+        pattern = re.compile(r"((korg-)?(rust|gcc|clang))-?(.*)")
         match = pattern.search(name)
         family = ""
         version = ""

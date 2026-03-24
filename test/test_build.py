@@ -779,35 +779,36 @@ class TestCompilerWrappers:
         b.build(b.targets[0])
         assert "CC=ccache aarch64-linux-gnu-gcc" in args(Popen)
 
-    def test_ccache_llvm(self, linux, Popen):
+    def test_ccache_clang_llvm(self, linux, Popen):
         b = Build(
+            make_variables={"LLVM": "1"},
             tree=linux,
             targets=["config"],
-            toolchain="llvm",
+            toolchain="clang",
             target_arch="arm64",
             wrapper="ccache",
         )
         b.build(b.targets[0])
         assert "CC=ccache clang" in args(Popen)
 
-    def test_ccache_llvm_dir(self, linux, Popen):
+    def test_ccache_clang_llvm_dir(self, linux, Popen):
         b = Build(
             make_variables={"LLVM": "/foo/bar/bin/"},
             tree=linux,
             targets=["config"],
-            toolchain="llvm",
+            toolchain="clang",
             target_arch="arm64",
             wrapper="ccache",
         )
         b.build(b.targets[0])
         assert "CC=ccache /foo/bar/bin/clang" in args(Popen)
 
-    def test_ccache_llvm_ver(self, linux, Popen):
+    def test_ccache_clang_llvm_ver(self, linux, Popen):
         b = Build(
             make_variables={"LLVM": "-15"},
             tree=linux,
             targets=["config"],
-            toolchain="llvm",
+            toolchain="clang",
             target_arch="arm64",
             wrapper="ccache",
         )

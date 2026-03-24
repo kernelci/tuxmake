@@ -54,27 +54,18 @@ def clang():
     return Toolchain("clang")
 
 
-@pytest.fixture
-def llvm():
-    return Toolchain("llvm")
-
-
 class TestGetImage:
-    def test_build_hexagon_on_base_clang_image(self, gcc, clang, llvm):
+    def test_build_hexagon_on_base_clang_image(self, gcc, clang):
         hexagon = Architecture("hexagon")
         assert hexagon.get_image(gcc) is None
         assert hexagon.get_image(clang) == "tuxmake/clang"
-        assert hexagon.get_image(llvm) == "tuxmake/clang"
 
     def test_build_hexagon_on_base_versioned_clang_image(self):
         clang_N = Toolchain("clang-12")
-        llvm_N = Toolchain("llvm-12")
         hexagon = Architecture("hexagon")
         assert hexagon.get_image(clang_N) == "tuxmake/clang-12"
-        assert hexagon.get_image(llvm_N) == "tuxmake/clang-12"
 
-    def test_arm64_defines_no_specific_image(self, gcc, clang, llvm):
+    def test_arm64_defines_no_specific_image(self, gcc, clang):
         arm64 = Architecture("arm64")
         assert arm64.get_image(gcc) is None
         assert arm64.get_image(clang) is None
-        assert arm64.get_image(llvm) is None
