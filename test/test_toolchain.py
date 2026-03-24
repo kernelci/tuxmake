@@ -52,22 +52,6 @@ def test_compiler_name(gcc, arm64):
     assert default.compiler(arm64) == "aarch64-linux-gnu-gcc"
 
 
-class TestLLVM:
-    def test_image_unversioned(self, arm64):
-        llvm = Toolchain("llvm")
-        assert llvm.get_image(arm64) == "tuxmake/arm64_clang"
-
-    def test_image_versioned(self, arm64):
-        llvm = Toolchain("llvm-10")
-        assert llvm.get_image(arm64) == "tuxmake/arm64_clang-10"
-
-    def test_compiler_unversioned(self, arm64):
-        assert Toolchain("llvm").compiler(arm64) == "clang"
-
-    def test_compiler_versioned(self, arm64):
-        assert Toolchain("llvm-10").compiler(arm64) == "clang"
-
-
 @pytest.fixture
 def arc():
     return Architecture("arc")

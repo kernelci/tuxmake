@@ -157,10 +157,7 @@ sub check_toolchain_image() {
       $version = $LATEST_CLANG_NIGHTLY;
     }
   }
-  if ($compiler eq "llvm") {
-    $compiler = "clang"
-  }
-  if ( $compiler eq "korg-clang" || $compiler eq "korg-llvm" ) {
+  if ( $compiler eq "korg-clang" ) {
     $compiler = "clang";
     $is_korg = 1;
   }

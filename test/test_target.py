@@ -186,11 +186,6 @@ class TestKselftest:
         kselftest = Kselftest("kselftest", build)
         assert kselftest.makevars.get("LLVM") == "1"
 
-    def test_llvm_set_for_llvm_toolchain(self, build):
-        build.toolchain.name = "llvm"
-        kselftest = Kselftest("kselftest", build)
-        assert kselftest.makevars.get("LLVM") == "1"
-
     def test_llvm_not_set_for_gcc_toolchain(self, build):
         build.toolchain.name = "gcc-13"
         kselftest = Kselftest("kselftest", build)

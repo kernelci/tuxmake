@@ -291,7 +291,7 @@ class Kselftest(Target):
 
     def _is_clang_toolchain(self):
         tc_name = self.build.toolchain.name
-        return "clang" in tc_name or "llvm" in tc_name
+        return "clang" in tc_name
 
 
 __special_targets__ = {

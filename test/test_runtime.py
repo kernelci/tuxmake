@@ -323,7 +323,6 @@ class TestDockerRuntime(TestContainerRuntime):
         toolchains = DockerRuntime().toolchains
         assert "gcc" in toolchains
         assert "clang" in toolchains
-        assert "llvm" in toolchains
         assert "korg-gcc" in toolchains
 
     def test_listed_as_supported(self):
