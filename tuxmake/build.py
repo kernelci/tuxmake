@@ -22,6 +22,7 @@ from tuxmake.target import create_target
 from tuxmake.runtime import Runtime, DockerRuntime
 from tuxmake.runtime import Terminated
 from tuxmake.metadata import MetadataCollector
+from tuxmake.exceptions import CompilerNotFoundError
 from tuxmake.exceptions import DecodeStacktraceMissingVariable
 from tuxmake.exceptions import EnvironmentCheckFailed
 from tuxmake.exceptions import KorgGccPreparationFailed
@@ -246,6 +247,9 @@ class Build:
         self.runtime.set_image(get_image(self))
 
         if not self.runtime.is_supported(self.target_arch, self.toolchain):
+            if self.runtime.name == "null":
+                compiler = self.toolchain.compiler(self.target_arch)
+                raise CompilerNotFoundError(compiler)
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"
             )

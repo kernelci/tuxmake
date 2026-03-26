@@ -115,5 +115,12 @@ class KorgGccDownloadAllToolchainFailed(TuxMakeUserError):
     msg = "Korg GCC download all toochains failed"
 
 
+class CompilerNotFoundError(TuxMakeUserError):
+    msg = (
+        "Compiler not found: {name}\n"
+        "Install the compiler or use a container-based runtime (e.g. --runtime=docker/podman)"
+    )
+
+
 class DecodeStacktraceMissingVariable(TuxMakeUserError):
     msg = "Missing environment variable: {name}"
