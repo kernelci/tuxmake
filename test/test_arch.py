@@ -39,8 +39,8 @@ class TestSourceArch:
         arch = Architecture("arm64")
         assert arch.source_arch == "arm64"
 
-    def test_source_arch_armv5(self):
-        arch = Architecture("armv5")
+    def test_source_arch_armel(self):
+        arch = Architecture("armel")
         assert arch.source_arch == "arm"
 
 
