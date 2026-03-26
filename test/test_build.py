@@ -1354,12 +1354,12 @@ class TestKorgGCC:
             == f"{b.build_dir}/gcc-{tc_version}-nolibc/aarch64-linux/bin/aarch64-linux-"
         )
 
-    def test_arm(self, linux, run_cmd, tc_version):
+    def test_armel(self, linux, run_cmd, tc_version):
         b = Build(
             tree=linux,
             targets=["config"],
             toolchain="korg-gcc-12",
-            target_arch="arm",
+            target_arch="armel",
             runtime="docker",
         )
         b.prepare_korg_gcc_toolchain()
