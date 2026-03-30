@@ -702,6 +702,7 @@ class Build:
         "loongarch": "loongarch64",
         "openrisc": "or1k",
         "parisc": "hppa",
+        "powerpc": "powerpc64",
         "riscv": "riscv64",
         "sparc": "sparc64",
     }
