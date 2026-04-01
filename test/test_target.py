@@ -202,6 +202,17 @@ class TestKselftest:
         assert isinstance(kselftest, Kselftest)
         assert kselftest.makevars.get("LLVM") == "1"
 
+    def test_exclude_cc_hostcc_for_clang(self, build):
+        build.toolchain.name = "clang-20"
+        kselftest = Kselftest("kselftest", build)
+        assert "CC" in kselftest.exclude_build_makevars
+        assert "HOSTCC" in kselftest.exclude_build_makevars
+
+    def test_no_exclude_for_gcc(self, build):
+        build.toolchain.name = "gcc-13"
+        kselftest = Kselftest("kselftest", build)
+        assert not getattr(kselftest, "exclude_build_makevars", set())
+
 
 class TestCompression:
     def test_invalid_compression(self):
