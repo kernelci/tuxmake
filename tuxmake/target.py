@@ -288,6 +288,11 @@ class Kselftest(Target):
         super().__init_config__()
         if self._is_clang_toolchain():
             self.makevars.setdefault("LLVM", "1")
+            # Let selftests lib.mk set CC from LLVM, ARCH and
+            # CROSS_COMPILE. If CC=clang is on the command line it
+            # overrides lib.mk and the --target= flag is lost, so
+            # cross-compiled binaries end up as host architecture.
+            self.exclude_build_makevars = {"CC", "HOSTCC"}
 
     def _is_clang_toolchain(self):
         tc_name = self.build.toolchain.name

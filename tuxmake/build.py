@@ -437,7 +437,15 @@ class Build:
         finally:
             self.offline = False
 
-    def run_cmd(self, origcmd, stdout=None, interactive=False, echo=True, makevars={}):
+    def run_cmd(
+        self,
+        origcmd,
+        stdout=None,
+        interactive=False,
+        echo=True,
+        makevars={},
+        exclude_build_makevars=set(),
+    ):
         """
         Performs the build.
 
@@ -446,7 +454,7 @@ class Build:
         """
         cmd = []
         for c in origcmd:
-            cmd += self.expand_cmd_part(c, makevars)
+            cmd += self.expand_cmd_part(c, makevars, exclude_build_makevars)
 
         if cmd[0] == "!":
             expect_failure = True
@@ -480,14 +488,14 @@ class Build:
                 self.__durations__[metadata] = duration
             debug(f"{name} finished in {duration} seconds.")
 
-    def expand_cmd_part(self, part, makevars):
+    def expand_cmd_part(self, part, makevars, exclude_build_makevars=set()):
         if part == "{make}":
             return (
                 ["make"]
                 + self.get_silent()
                 + self.keep_going
                 + [f"--jobs={self.jobs}", f"O={self.build_dir}"]
-                + self.make_args(makevars)
+                + self.make_args(makevars, exclude_build_makevars)
             )
         elif part == "{tar_caf}":
             return [
@@ -519,10 +527,13 @@ class Build:
     def log(self, *stuff):
         self.runtime.log(*stuff)
 
-    def make_args(self, makevars):
+    def make_args(self, makevars, exclude_build_makevars=set()):
         # we want to override target makevars with user provided make_variables
         expanded_makevars = {k: self.format_cmd_part(v) for k, v in makevars.items()}
-        expanded_makevars.update(self.makevars)
+        build_makevars = {
+            k: v for k, v in self.makevars.items() if k not in exclude_build_makevars
+        }
+        expanded_makevars.update(build_makevars)
         return [f"{k}={v}" for k, v in expanded_makevars.items() if v]
 
     @property
@@ -575,9 +586,13 @@ class Build:
         target.prepare()
 
         fail = False
+        exclude_keys = getattr(target, "exclude_build_makevars", set())
         for cmd in target.commands:
             if not self.run_cmd(
-                cmd, makevars=target.makevars, interactive=cmd.interactive
+                cmd,
+                makevars=target.makevars,
+                interactive=cmd.interactive,
+                exclude_build_makevars=exclude_keys,
             ):
                 fail = True
                 break
