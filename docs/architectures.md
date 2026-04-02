@@ -27,7 +27,7 @@ mips         |             | 32-bit MIPS              | yes¹ ³   | yes
 nios2        |             | 32-bit RISC              | yes³     | no
 openrisc     |             | OpenRISC                 | no¹ ³    | no
 parisc       |             | 64-bit parisc            | yes¹ ²   | no
-powerpc      |             | 64-bit PowerPC           | yes¹ ² ³ | yes
+powerpc      |             | 64-bit PowerPC (EL)      | yes¹ ² ³ | yes
 riscv        |             | 64-bit RISC-V            | yes¹ ² ³ | no
 s390         | *s390x*     | 64-bit IBM S/390         | yes      | yes
 sh           |             | 32-bit sh4               | yes¹     | no
