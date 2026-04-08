@@ -160,7 +160,7 @@ class Runtime(ConfigurableObject):
         """
         self.__group__ = group
 
-    def is_supported(self, arch, toolchain):
+    def is_supported(self, arch, toolchain, cross_compile=None):
         return True
 
     @property
@@ -362,8 +362,8 @@ class Runtime(ConfigurableObject):
 class NullRuntime(Runtime):
     name = "null"
 
-    def is_supported(self, arch, toolchain):
-        compiler = toolchain.compiler(arch)
+    def is_supported(self, arch, toolchain, cross_compile=None):
+        compiler = toolchain.compiler(arch, cross_compile=cross_compile)
         return shutil.which(compiler) is not None
 
 
@@ -467,8 +467,11 @@ class ContainerRuntime(Runtime):
     def add_volume(self, source, dest=None, ro=False, device=False):
         self.volumes.append((source, dest or source, ro, device))
 
+    def is_supported(self, arch, toolchain, cross_compile=None):
+        return self.__is_supported_cached(arch, toolchain)
+
     @lru_cache(None)
-    def is_supported(self, arch, toolchain):
+    def __is_supported_cached(self, arch, toolchain):
         image_name = arch.get_image(toolchain) or toolchain.get_image(arch)
         image = self.toolchain_images_map.get(image_name)
         if toolchain.name.startswith("korg-gcc"):
