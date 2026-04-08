@@ -263,6 +263,8 @@ RUN if [ -z "${HOSTARCH}" ]; then exit; fi; \
     fi; \
     host_gnu=$(dpkg-architecture -a "${arch}" -q DEB_HOST_GNU_TYPE 2>/dev/null | sed 's/_/-/g'); \
     if [ -z "${host_gnu}" ]; then exit; fi; \
+    : skip if the real package is already installed && \
+    if dpkg -l "gcc-${host_gnu}" 2>/dev/null | grep -q "^ii"; then exit; fi; \
     mkdir -p /tmp/equivs && \
     cd /tmp/equivs && \
     printf "Section: misc\nPriority: optional\nStandards-Version: 3.9.2\nPackage: gcc-${host_gnu}\nVersion: 999.0\nMaintainer: tuxmake <tuxsuite@linaro.org>\nDescription: Fake package to satisfy gcc-${host_gnu} dependency\n The actual cross-compiler is already installed with a versioned name.\n" > gcc-${host_gnu} && \
