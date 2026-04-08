@@ -151,7 +151,11 @@ RUN set -x; \
             --assume-yes \
             --no-install-recommends \
             --option=debug::pkgProblemResolver=yes \
-            pkg-config:${arch}; \
+            pkg-config:${arch} && \
+        : foreign-arch pkg-config may switch the alternatives symlink to a && \
+        : binary that cannot execute on the build host, fix it && \
+        native_triplet=$(dpkg-architecture -q DEB_HOST_MULTIARCH) && \
+        ln -sf /usr/bin/${native_triplet}-pkg-config /usr/local/bin/pkg-config; \
     fi && \
     : This is a horrible hack, but a foreign binutils-dev is not installable && \
     : See https://bugs.debian.org/983540 && \
