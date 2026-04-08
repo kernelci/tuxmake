@@ -111,8 +111,16 @@ sub check_compiler_libc($) {
   check_compile_program("${compiler} can produce binaries using the libc", $compiler, undef, "#include <stdio.h>\n" . $PROGRAM, !$optional_compile_fatal);
 }
 
-my $fuse_program = <<PROGRAM;
+my $fuse_program_fuse2 = <<PROGRAM;
 #include <fuse.h>
+int main(int argc, char *argv[])
+{
+	return fuse_main(argc, argv, NULL);
+}
+PROGRAM
+
+my $fuse_program_fuse3 = <<PROGRAM;
+#include <fuse3/fuse.h>
 int main(int argc, char *argv[])
 {
 	return fuse_main(argc, argv, NULL);
@@ -128,7 +136,19 @@ sub check_compiler_fuse($$) {
     skip("not checking for development packages on Debian < 11");
     return;
   }
-  my $fuse_flags = `${prefix}pkg-config fuse --libs --cflags`;
+  my $fuse_pkg = "fuse";
+  my $fuse_program = $fuse_program_fuse2;
+  # cross pkg-config may be a foreign binary that cannot execute on the build
+  # host, fall back to native pkg-config when that happens
+  my $pc = "${prefix}pkg-config";
+  if ($prefix && system("$pc --version >/dev/null 2>&1") != 0) {
+    $pc = "pkg-config";
+  }
+  if (system("$pc --exists fuse3 2>/dev/null") == 0) {
+    $fuse_pkg = "fuse3";
+    $fuse_program = $fuse_program_fuse3;
+  }
+  my $fuse_flags = `$pc ${fuse_pkg} --libs --cflags 2>/dev/null`;
   chomp $fuse_flags;
   check_compile_program("${compiler} can build against libfuse", ${compiler}, $fuse_flags, $fuse_program, !$optional_compile_fatal);
 }
