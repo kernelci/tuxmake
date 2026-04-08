@@ -246,9 +246,14 @@ class Build:
         self.runtime = Runtime.get(runtime)
         self.runtime.set_image(get_image(self))
 
-        if not self.runtime.is_supported(self.target_arch, self.toolchain):
+        cross_compile = self.make_variables.get("CROSS_COMPILE")
+        if not self.runtime.is_supported(
+            self.target_arch, self.toolchain, cross_compile=cross_compile
+        ):
             if self.runtime.name == "null":
-                compiler = self.toolchain.compiler(self.target_arch)
+                compiler = self.toolchain.compiler(
+                    self.target_arch, cross_compile=cross_compile
+                )
                 raise CompilerNotFoundError(compiler)
             raise UnsupportedArchitectureToolchainCombination(
                 f"{self.target_arch}/{self.toolchain}"

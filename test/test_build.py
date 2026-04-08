@@ -901,6 +901,19 @@ class TestUnsupportedToolchainArchitectureCombination:
         with pytest.raises(tuxmake.exceptions.CompilerNotFoundError):
             Build(tree=linux, target_arch="arc", toolchain="clang")
 
+    def test_null_runtime_cross_compile_override(self, linux, mocker):
+        which = mocker.patch(
+            "shutil.which", return_value="/usr/bin/arm-linux-gnueabi-gcc"
+        )
+        build = Build(
+            tree=linux,
+            target_arch="arm",
+            toolchain="gcc-15",
+            make_variables={"CROSS_COMPILE": "arm-linux-gnueabi-"},
+        )
+        assert build.runtime.name == "null"
+        which.assert_called_with("arm-linux-gnueabi-gcc")
+
 
 class TestDebug:
     def test_no_debug_without_debug_options(self, linux, capfd):
@@ -1153,7 +1166,8 @@ class TestCompression:
 
 
 class TestCustomCrossCompile:
-    def test_CROSS_COMPILE(self, linux, Popen):
+    def test_CROSS_COMPILE(self, linux, Popen, mocker):
+        mocker.patch("shutil.which", return_value="/usr/bin/foo-gcc")
         build = Build(
             tree=linux, target_arch="arm64", make_variables={"CROSS_COMPILE": "foo-"}
         )
