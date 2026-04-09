@@ -914,6 +914,16 @@ class TestUnsupportedToolchainArchitectureCombination:
         assert build.runtime.name == "null"
         which.assert_called_with("arm-linux-gnueabi-gcc")
 
+    def test_null_runtime_cross_compile_not_found(self, linux, mocker):
+        mocker.patch("shutil.which", return_value=None)
+        with pytest.raises(tuxmake.exceptions.CompilerNotFoundError, match="foo-gcc"):
+            Build(
+                tree=linux,
+                target_arch="arm",
+                toolchain="gcc",
+                make_variables={"CROSS_COMPILE": "foo-"},
+            )
+
 
 class TestDebug:
     def test_no_debug_without_debug_options(self, linux, capfd):
