@@ -120,10 +120,11 @@ int main(int argc, char *argv[])
 PROGRAM
 
 my $fuse_program_fuse3 = <<PROGRAM;
+#define FUSE_USE_VERSION 30
 #include <fuse3/fuse.h>
 int main(int argc, char *argv[])
 {
-	return fuse_main(argc, argv, NULL);
+	return fuse_main(argc, argv, NULL, NULL);
 }
 PROGRAM
 
