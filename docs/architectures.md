@@ -30,9 +30,7 @@ parisc       |             | 64-bit parisc            | yes¹ ²   | no
 powerpc      |             | 64-bit PowerPC (EL)      | yes¹ ² ³ | yes
 riscv        |             | 64-bit RISC-V            | yes¹ ² ³ | no
 s390         | *s390x*     | 64-bit IBM S/390         | yes      | yes
-sh           |             | 32-bit sh4               | yes¹     | no
-sh2          |             | 32-bit sh2               | yes³     | no
-sh4          |             | 32-bit sh4               | yes³     | no
+sh           | *sh2*, *sh4*| 32-bit sh4               | yes¹ ³   | no
 sparc        |             | 64-bit Sparc             | yes¹ ² ³ | no
 um           |             | User-Mode Linux          | yes¹ ²   | no
 x86_64       | *amd64*     | 64-bit X86               | yes      | yes

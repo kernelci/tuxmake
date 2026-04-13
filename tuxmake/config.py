@@ -28,10 +28,10 @@ class ConfigurableObject:
     @lru_cache(None)
     def read_config(cls, name: str) -> Tuple[str, ConfigParser]:
         commonconf = Path(__file__).parent / cls.basedir / "common.ini"
+        name = cls.config_aliases.get(name, name)
         conffile = Path(__file__).parent / cls.basedir / f"{name}.ini"
         if not conffile.exists():
             raise cls.exception(name)
-        name = cls.config_aliases.get(conffile.stem, name)
         config = ConfigParser()
         config.read(commonconf)
         config.read(conffile)

@@ -15,6 +15,8 @@ class Architecture(ConfigurableObject):
         "armv8l": "arm",
         "i686": "i386",
         "s390x": "s390",
+        "sh2": "sh",
+        "sh4": "sh",
     }
 
     def __init_config__(self):
