@@ -213,6 +213,11 @@ class TestKselftest:
         kselftest = Kselftest("kselftest", build)
         assert not getattr(kselftest, "exclude_build_makevars", set())
 
+    def test_kdir_set_to_build_dir(self, build):
+        build.toolchain.name = "gcc-14"
+        kselftest = Kselftest("kselftest", build)
+        assert kselftest.makevars.get("KDIR") == "{build_dir}"
+
 
 class TestCompression:
     def test_invalid_compression(self):
