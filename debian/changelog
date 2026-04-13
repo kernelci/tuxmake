@@ -1,3 +1,9 @@
+tuxmake (1.39.0-1) UNRELEASED; urgency=medium
+
+  * Release 1.39.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.39.0
+
+ -- Anders Roxell <anders.roxell@linaro.org>  Mon, 13 Apr 2026 08:59:06 +0200
+
 tuxmake (1.38.0-1) UNRELEASED; urgency=medium
 
   * Release 1.38.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.38.0
