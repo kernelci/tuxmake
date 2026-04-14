@@ -1,6 +1,7 @@
 from datetime import timedelta
 import os
 import pathlib
+import re
 import subprocess
 import shlex
 import sys
@@ -141,6 +142,14 @@ def main(*origargv):
         options.make_variables = dict((arg.split("=") for arg in key_values))
         options.targets = [arg for arg in options.targets if "=" not in arg]
 
+        kconfig_re = re.compile(r"^[\w\-]+config$")
+        for arg in list(options.targets):
+            if kconfig_re.match(arg):
+                if not options.kconfig:
+                    options.kconfig = arg
+                options.targets.remove(arg)
+                break
+
     build_args = {
         k: v
         for k, v in options.__dict__.items()
@@ -159,8 +168,6 @@ def main(*origargv):
             "results_hooks",
         ]
     }
-    if options.make_target and not options.targets:
-        build_args["targets"] = []
     try:
         if options.download_all_korg_gcc_toolchains:
             with tempfile.TemporaryDirectory() as _tmpdir:

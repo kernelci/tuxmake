@@ -337,6 +337,8 @@ class CommandLine:
         for k, v in build.make_variables.items():
             cmd.append(f"{k}={v}")
         for target in build.targets:
+            if target.name.startswith("make:"):
+                continue
             cmd.append(target.name)
 
         return cmd

@@ -140,6 +140,15 @@ class TestMakeTarget:
         assert "make:drivers/mmc/" in names
         assert "make:kernel/livepatch/patch.o" in names
 
+    def test_no_duplicate_when_positional_and_flag(self, linux):
+        b = Build(
+            tree=linux,
+            targets=["drivers/mmc/"],
+            make_target=["drivers/mmc/"],
+        )
+        names = [t.name for t in b.targets]
+        assert names.count("make:drivers/mmc/") == 1
+
 
 class TestKconfig:
     def test_kconfig_default(self, linux, Popen):

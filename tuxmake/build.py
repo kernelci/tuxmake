@@ -247,10 +247,12 @@ class Build:
         self.make_target = make_target or []
         if self.make_target:
             self.add_target("config")
+            existing = {t.name for t in self.targets}
             for mt in self.make_target:
                 target = MakeTarget(mt, self, self.compression)
-                self.__ordering_only_targets__[target.name] = False
-                self.targets.append(target)
+                if target.name not in existing:
+                    self.__ordering_only_targets__[target.name] = False
+                    self.targets.append(target)
         self.cleanup_targets()
         self.extend_kconfig()
 

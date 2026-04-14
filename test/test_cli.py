@@ -74,14 +74,24 @@ class TestTargets:
         tuxmake("--make-target=drivers/mmc/")
         assert args(builder).make_target == ["drivers/mmc/"]
 
-    def test_make_target_forces_empty_targets(self, builder):
-        tuxmake("--make-target=drivers/mmc/")
-        assert args(builder).targets == []
-
     def test_make_target_with_positional(self, builder):
         tuxmake("config", "--make-target=drivers/mmc/")
         assert args(builder).targets == ["config"]
         assert args(builder).make_target == ["drivers/mmc/"]
+
+    def test_positional_kconfig(self, builder):
+        tuxmake("defconfig")
+        assert args(builder).kconfig == "defconfig"
+        assert not getattr(args(builder), "targets", [])
+
+    def test_positional_kconfig_allmodconfig(self, builder):
+        tuxmake("allmodconfig")
+        assert args(builder).kconfig == "allmodconfig"
+
+    def test_explicit_kconfig_wins_over_positional(self, builder):
+        tuxmake("--kconfig=tinyconfig", "defconfig")
+        assert args(builder).kconfig == "tinyconfig"
+        assert "defconfig" not in getattr(args(builder), "targets", [])
 
 
 class TestMakeVariables:
