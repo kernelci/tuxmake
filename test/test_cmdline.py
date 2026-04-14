@@ -65,6 +65,7 @@ class TestCommandLine:
         build = Build(targets=[], make_target=["drivers/mmc/"])
         cmd = cmdline.reproduce(build)
         assert "--make-target=drivers/mmc/" in cmd
+        assert "make:drivers/mmc/" not in cmd
 
     def test_debug(self, cmdline):
         cmd = cmdline.reproduce(Build(debug=True))
