@@ -159,6 +159,8 @@ def main(*origargv):
             "results_hooks",
         ]
     }
+    if options.make_target and not options.targets:
+        build_args["targets"] = []
     try:
         if options.download_all_korg_gcc_toolchains:
             with tempfile.TemporaryDirectory() as _tmpdir:

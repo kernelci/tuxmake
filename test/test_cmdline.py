@@ -61,6 +61,11 @@ class TestCommandLine:
         assert "--kconfig-add=foo.config" in cmd
         assert "--kconfig-add=bar.config" in cmd
 
+    def test_make_target(self, cmdline):
+        build = Build(targets=[], make_target=["drivers/mmc/"])
+        cmd = cmdline.reproduce(build)
+        assert "--make-target=drivers/mmc/" in cmd
+
     def test_debug(self, cmdline):
         cmd = cmdline.reproduce(Build(debug=True))
         assert "--debug" in cmd

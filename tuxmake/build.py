@@ -18,6 +18,7 @@ from tuxmake.wrapper import Wrapper
 from tuxmake.output import get_new_output_dir, get_default_korg_toolchains_dir
 from tuxmake.target import Compression
 from tuxmake.target import default_compression
+from tuxmake.target import MakeTarget
 from tuxmake.target import create_target
 from tuxmake.runtime import Runtime, DockerRuntime
 from tuxmake.runtime import Terminated
@@ -181,6 +182,7 @@ class Build:
         targets=defaults.targets,
         compression_type=None,
         kernel_image=None,
+        make_target=None,
         jobs=None,
         runtime=None,
         fail_fast=False,
@@ -227,7 +229,7 @@ class Build:
         self.dynamic_make_variables = dict(self.target_arch.dynamic_makevars)
 
         if not targets:
-            targets = defaults.targets
+            targets = [] if make_target else defaults.targets
 
         if kernel_image:
             self.target_overrides = {"kernel": kernel_image}
@@ -242,6 +244,13 @@ class Build:
         self.__ordering_only_targets__ = {}
         for t in targets:
             self.add_target(t)
+        self.make_target = make_target or []
+        if self.make_target:
+            self.add_target("config")
+            for mt in self.make_target:
+                target = MakeTarget(mt, self, self.compression)
+                self.__ordering_only_targets__[target.name] = False
+                self.targets.append(target)
         self.cleanup_targets()
         self.extend_kconfig()
 
@@ -301,10 +310,10 @@ class Build:
         target = create_target(target_name, self, self.compression)
 
         if ordering_only:
-            if target_name not in self.__ordering_only_targets__:
-                self.__ordering_only_targets__[target_name] = True
+            if target.name not in self.__ordering_only_targets__:
+                self.__ordering_only_targets__[target.name] = True
         else:
-            self.__ordering_only_targets__[target_name] = False
+            self.__ordering_only_targets__[target.name] = False
 
         for d in target.dependencies:
             self.add_target(d, ordering_only=ordering_only)
