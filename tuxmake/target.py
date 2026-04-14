@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from configparser import ConfigParser
 from pathlib import Path
 import re
 import shlex
@@ -279,6 +280,23 @@ class Kernel(Target):
             self.artifacts["vmlinux"] = "vmlinux"
 
 
+class MakeTarget(Target):
+    """Pass-through target that runs `make <make_target>`."""
+
+    def __init__(self, make_target, build, compression=default_compression):
+        self.build = build
+        self.compression = compression
+        self.target_arch = build.target_arch
+        self.name = f"make:{make_target}"
+        self.config = ConfigParser()
+        self.config["target"] = {
+            "description": f"make {make_target}",
+            "dependencies": "config",
+            "commands": shlex.quote("{make}") + " " + shlex.quote(make_target),
+        }
+        self.__init_config__()
+
+
 class Kselftest(Target):
     def __init_config__(self):
         super().__init_config__()
@@ -303,6 +321,15 @@ __special_targets__ = {
 }
 
 
+_make_target_re = re.compile(r"/|\.(o|ko|s|i|lst|dtb|dtbo)$")
+
+
 def create_target(name, build, compression=default_compression):
     cls = __special_targets__.get(name, Target)
+    # Fall back to a pass-through make target when the name looks like
+    # a Kbuild target (contains / or ends in .o / .ko / .s / .i / ...).
+    # Lets users pass drivers/dma/ or kernel/livepatch/patch.o as
+    # positional arguments without --make-target=.
+    if cls is Target and _make_target_re.search(name):
+        return MakeTarget(name, build, compression)
     return cls(name, build, compression)

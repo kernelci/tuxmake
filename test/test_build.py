@@ -98,6 +98,49 @@ class TestBasicFunctionality:
             build(tree=linux, targets=["unknown-target"])
 
 
+class TestMakeTarget:
+    def test_adds_make_target(self, linux):
+        b = Build(tree=linux, targets=[], make_target=["drivers/mmc/"])
+        names = [t.name for t in b.targets]
+        assert "make:drivers/mmc/" in names
+
+    def test_pulls_in_config(self, linux):
+        b = Build(tree=linux, targets=[], make_target=["drivers/mmc/"])
+        names = [t.name for t in b.targets]
+        assert "config" in names
+
+    def test_does_not_pull_defaults(self, linux):
+        b = Build(tree=linux, targets=[], make_target=["drivers/mmc/"])
+        names = [t.name for t in b.targets]
+        assert "default" not in names
+        assert "kernel" not in names
+
+    def test_positional_make_target(self, linux):
+        b = Build(tree=linux, targets=["config", "drivers/dma/"])
+        names = [t.name for t in b.targets]
+        assert "make:drivers/dma/" in names
+        assert "config" in names
+
+    def test_positional_object_target(self, linux):
+        b = Build(tree=linux, targets=["config", "kernel/livepatch/patch.o"])
+        names = [t.name for t in b.targets]
+        assert "make:kernel/livepatch/patch.o" in names
+
+    def test_unknown_bareword_still_fails(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedTarget):
+            Build(tree=linux, targets=["typo-target"])
+
+    def test_multiple_make_targets(self, linux):
+        b = Build(
+            tree=linux,
+            targets=[],
+            make_target=["drivers/mmc/", "kernel/livepatch/patch.o"],
+        )
+        names = [t.name for t in b.targets]
+        assert "make:drivers/mmc/" in names
+        assert "make:kernel/livepatch/patch.o" in names
+
+
 class TestKconfig:
     def test_kconfig_default(self, linux, Popen):
         b = Build(tree=linux, targets=["config"])

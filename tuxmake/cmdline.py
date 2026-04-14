@@ -104,6 +104,14 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         type=str,
         help="Kernel image to build, overriding the default image name for the target architecture.",
     )
+    target.add_argument(
+        "-M",
+        "--make-target",
+        type=str,
+        action="append",
+        default=[],
+        help="Arbitrary Kbuild target to pass to make, e.g. drivers/mmc/ or kernel/livepatch/patch.o. Can be specified multiple times. Kbuild-like positional targets (with / or .o/.ko extensions) also work without this flag.",
+    )
 
     buildenv = parser.add_argument_group("Build environment options")
     buildenv.add_argument(

@@ -2,7 +2,14 @@ import pytest
 
 import tuxmake.exceptions
 from tuxmake.arch import Native
-from tuxmake.target import Compression, Target, Config, Kselftest, create_target
+from tuxmake.target import (
+    Compression,
+    Target,
+    Config,
+    Kselftest,
+    MakeTarget,
+    create_target,
+)
 
 
 @pytest.fixture
@@ -229,6 +236,21 @@ class TestKselftest:
         build.toolchain.name = "gcc-14"
         kselftest = Kselftest("kselftest", build)
         assert kselftest.makevars.get("KDIR") == "{build_dir}"
+
+
+class TestMakeTarget:
+    @pytest.fixture
+    def make_target(self, build):
+        return MakeTarget("drivers/mmc/", build)
+
+    def test_name(self, make_target):
+        assert make_target.name == "make:drivers/mmc/"
+
+    def test_commands(self, make_target):
+        assert make_target.commands[0] == ["{make}", "drivers/mmc/"]
+
+    def test_depends_on_config(self, make_target):
+        assert make_target.dependencies == ["config"]
 
 
 class TestCompression:

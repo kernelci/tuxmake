@@ -70,6 +70,19 @@ class TestTargets:
         tuxmake("config", "kernel")
         assert args(builder).targets == ["config", "kernel"]
 
+    def test_make_target(self, builder):
+        tuxmake("--make-target=drivers/mmc/")
+        assert args(builder).make_target == ["drivers/mmc/"]
+
+    def test_make_target_forces_empty_targets(self, builder):
+        tuxmake("--make-target=drivers/mmc/")
+        assert args(builder).targets == []
+
+    def test_make_target_with_positional(self, builder):
+        tuxmake("config", "--make-target=drivers/mmc/")
+        assert args(builder).targets == ["config"]
+        assert args(builder).make_target == ["drivers/mmc/"]
+
 
 class TestMakeVariables:
     def test_basic(self, builder):
