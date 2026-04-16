@@ -211,6 +211,39 @@ class TestKconfig:
         config = output_dir / "config"
         assert "CONFIG_FOO=n\n" in config.read_text()
 
+    def test_kconfig_add_inline_set_to_int(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_FOO=1", "CONFIG_BAR=0", "CONFIG_BAZ=128"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        text = config.read_text()
+        assert "CONFIG_FOO=1\n" in text
+        assert "CONFIG_BAR=0\n" in text
+        assert "CONFIG_BAZ=128\n" in text
+
+    def test_kconfig_add_inline_set_to_hex(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=["CONFIG_FOO=0xdeadbeef"],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert "CONFIG_FOO=0xdeadbeef\n" in config.read_text()
+
+    def test_kconfig_add_inline_set_to_string(self, linux, output_dir):
+        build(
+            tree=linux,
+            targets=["config"],
+            kconfig_add=['CONFIG_FOO="hello world"'],
+            output_dir=output_dir,
+        )
+        config = output_dir / "config"
+        assert 'CONFIG_FOO="hello world"\n' in config.read_text()
+
     def test_kconfig_add_in_tree(self, linux, output_dir):
         build(
             tree=linux,
@@ -246,6 +279,18 @@ class TestKconfig:
     def test_kconfig_add_invalid(self, linux):
         with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
             build(tree=linux, targets=["config"], kconfig_add=["foo"])
+
+    def test_kconfig_add_rejects_missing_prefix(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
+            build(tree=linux, targets=["config"], kconfig_add=["FOO=m"])
+
+    def test_kconfig_add_rejects_empty_name(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
+            build(tree=linux, targets=["config"], kconfig_add=["CONFIG_=y"])
+
+    def test_kconfig_add_rejects_empty_value(self, linux):
+        with pytest.raises(tuxmake.exceptions.UnsupportedKconfigFragment):
+            build(tree=linux, targets=["config"], kconfig_add=["CONFIG_FOO="])
 
     def test_kconfig_from_source_tree(self, linux):
         b = build(tree=linux, targets=["config"], kconfig="config/test.config")
