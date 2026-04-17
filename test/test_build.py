@@ -1046,6 +1046,19 @@ class TestKselftest:
         names = [t.name for t in build.targets]
         assert names == ["config", "kselftest-merge", "default", "kernel"]
 
+    def test_nonfatal_continues_on_failure(self, linux, mocker):
+        b = Build(tree=linux, targets=["config"])
+        target = mocker.MagicMock()
+        target.name = "kselftest"
+        target.nonfatal = True
+        target.dependencies = []
+        target.preconditions = []
+        target.commands = [Command(["false"]), Command(["true"])]
+        mocker.patch.object(b, "run_cmd", side_effect=[False, True])
+        mocker.patch.object(b, "check_artifacts", return_value=True)
+        result = b.build(target)
+        assert result.passed
+
 
 class TestHeaders:
     def test_basics(self, linux):

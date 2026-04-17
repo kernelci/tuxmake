@@ -599,8 +599,11 @@ class Build:
                 interactive=cmd.interactive,
                 exclude_build_makevars=exclude_keys,
             ):
-                fail = True
-                break
+                if target.nonfatal:
+                    self.log("W: command failed, continuing (nonfatal target)")
+                else:
+                    fail = True
+                    break
 
         if not fail and not self.check_artifacts(target):
             fail = True
