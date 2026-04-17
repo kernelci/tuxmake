@@ -80,6 +80,7 @@ class Target(ConfigurableObject):
         self.runs_after = self.config["target"].get("runs_after", "").split()
         self.preconditions = self.__split_cmds__("target", "preconditions")
         self.commands = self.__split_cmds__("target", "commands")
+        self.nonfatal = self.config["target"].get("nonfatal", "").lower() == "true"
         self.kconfig_add = self.__split_kconfigs__()
         try:
             artifacts = dict(self.config["artifacts"])

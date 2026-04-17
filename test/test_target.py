@@ -213,6 +213,18 @@ class TestKselftest:
         kselftest = Kselftest("kselftest", build)
         assert not getattr(kselftest, "exclude_build_makevars", set())
 
+    def test_kselftest_is_nonfatal(self, build):
+        kselftest = Kselftest("kselftest", build)
+        assert kselftest.nonfatal
+
+    def test_kselftest_bpf_is_nonfatal(self, build):
+        kselftest_bpf = Kselftest("kselftest-bpf", build)
+        assert kselftest_bpf.nonfatal
+
+    def test_config_is_not_nonfatal(self, build):
+        config = Target("config", build)
+        assert not config.nonfatal
+
     def test_kdir_set_to_build_dir(self, build):
         build.toolchain.name = "gcc-14"
         kselftest = Kselftest("kselftest", build)
