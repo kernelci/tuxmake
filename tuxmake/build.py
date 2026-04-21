@@ -79,7 +79,7 @@ class BuildInfo:
         """
         `True` if this target passed.
         """
-        return self.status == "PASS"
+        return self.status in ("PASS", "WARNING")
 
     @property
     def skipped(self):
@@ -87,6 +87,13 @@ class BuildInfo:
         `True` if this target was skipped.
         """
         return self.status == "SKIP"
+
+    @property
+    def warning(self):
+        """
+        `True` if this target passed with warnings.
+        """
+        return self.status == "WARNING"
 
 
 class Build:
@@ -591,6 +598,7 @@ class Build:
         target.prepare()
 
         fail = False
+        had_nonfatal_failure = False
         exclude_keys = getattr(target, "exclude_build_makevars", set())
         for cmd in target.commands:
             if not self.run_cmd(
@@ -601,6 +609,7 @@ class Build:
             ):
                 if target.nonfatal:
                     self.log("W: command failed, continuing (nonfatal target)")
+                    had_nonfatal_failure = True
                 else:
                     fail = True
                     break
@@ -610,6 +619,9 @@ class Build:
 
         if fail:
             return BuildInfo("FAIL")
+
+        if had_nonfatal_failure:
+            return BuildInfo("WARNING")
 
         return BuildInfo("PASS")
 
@@ -667,7 +679,15 @@ class Build:
         }
         errors, warnings = self.parse_log()
         self.metadata["results"] = {
-            "status": "PASS" if self.passed else "FAIL",
+            "status": (
+                "FAIL"
+                if self.failed
+                else (
+                    "WARNING"
+                    if any(info.warning for info in self.status.values())
+                    else "PASS"
+                )
+            ),
             "targets": {
                 name: {"status": s.status, "duration": s.duration}
                 for name, s in self.status.items()
