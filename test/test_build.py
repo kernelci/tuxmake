@@ -1058,6 +1058,37 @@ class TestKselftest:
         mocker.patch.object(b, "check_artifacts", return_value=True)
         result = b.build(target)
         assert result.passed
+        assert result.warning
+        assert not result.failed
+
+    def test_warning_does_not_block_dependent_targets(self, linux, mocker):
+        b = Build(tree=linux, targets=["config"])
+        b.status["kselftest"] = BuildInfo("WARNING")
+        target = mocker.MagicMock()
+        target.name = "next"
+        target.nonfatal = False
+        target.dependencies = ["kselftest"]
+        target.preconditions = []
+        target.commands = [Command(["true"])]
+        mocker.patch.object(b, "run_cmd", return_value=True)
+        mocker.patch.object(b, "check_artifacts", return_value=True)
+        result = b.build(target)
+        assert result.passed
+        assert not result.skipped
+
+    def test_warning_target_build_not_failed(self, linux):
+        b = Build(tree=linux, targets=["config"])
+        b.status["config"] = BuildInfo("PASS")
+        b.status["kselftest"] = BuildInfo("WARNING")
+        assert not b.failed
+        assert b.passed
+
+    def test_fail_overrides_warning(self, linux):
+        b = Build(tree=linux, targets=["config"])
+        b.status["config"] = BuildInfo("FAIL")
+        b.status["kselftest"] = BuildInfo("WARNING")
+        assert b.failed
+        assert not b.passed
 
 
 class TestHeaders:
