@@ -1071,25 +1071,10 @@ class TestKernel:
 
 
 class TestKselftest:
-    def test_kselftest_merge_before_kselftest(self, linux):
-        build = Build(tree=linux, targets=["kselftest", "kselftest-merge"])
-        names = [t.name for t in build.targets][-2:]
-        assert names == ["kselftest-merge", "kselftest"]
-
-    def test_kselftest_merge_before_kselftest_with_input_already_ordered(self, linux):
-        build = Build(tree=linux, targets=["kselftest-merge", "kselftest"])
-        names = [t.name for t in build.targets][-2:]
-        assert names == ["kselftest-merge", "kselftest"]
-
-    def test_kselftest_without_kselftest_merge(self, linux):
+    def test_kselftest_depends_on_config(self, linux):
         build = Build(tree=linux, targets=["kselftest"])
         names = [t.name for t in build.targets]
         assert names == ["config", "kselftest"]
-
-    def test_kselftest_merge_runs_right_after_config_and_before_default(self, linux):
-        build = Build(tree=linux, targets=["config", "kernel", "kselftest-merge"])
-        names = [t.name for t in build.targets]
-        assert names == ["config", "kselftest-merge", "default", "kernel"]
 
     def test_nonfatal_continues_on_failure(self, linux, mocker):
         b = Build(tree=linux, targets=["config"])
