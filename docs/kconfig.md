@@ -26,7 +26,12 @@ ways:
 - a path to a config file on the local filesystem;
 - a URL to a config file, in which case TuxMake will download it;
 - a config fragment matching one of these:
-    - `CONFIG_*=[y|m|n]`
+    - `CONFIG_*=<value>`
+
+  `<value>` can be `y`, `m`, `n`, a number, a hex value, or a string.
+  TuxMake only checks the format. The value is passed to kconfig
+  (`merge_config.sh` and `make olddefconfig`), which decides what to do
+  with it.
     - `# CONFIG_* is not set`
 
 `kconfig_add` can be specified multiple times. Any in-tree configuration target

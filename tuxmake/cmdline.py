@@ -96,7 +96,7 @@ def build_parser(cls=argparse.ArgumentParser, **kwargs):
         "--kconfig-add",
         type=str,
         action="append",
-        help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. In tree configuration fragment (e.g. `kvm_guest.config`), path to local file, URL, `CONFIG_*=[y|m|n]`, or `# CONFIG_* is not set`. Can be specified multiple times, and will be merged in the order given.",
+        help="Extra kconfig fragments, merged on top of the main kconfig from --kconfig. In tree configuration fragment (e.g. `kvm_guest.config`), path to local file, URL, `CONFIG_*=<value>`, `# CONFIG_* is not set`, or `make:<target>` to run a make target that modifies .config (e.g. `make:kselftest-merge`). Can be specified multiple times, and will be merged in the order given.",
     )
     target.add_argument(
         "-I",

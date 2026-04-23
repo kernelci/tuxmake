@@ -136,17 +136,6 @@ selftests because they require the most recent clang toolchain and a specific
 kernel configuration. The resulting, installed tests are compressed in a
 tarball which is copied into the output directory as `kselftest-bpf.tar.xz`.
 
-## kselftest-merge
-
-*DEPRECATED:* this target is deprecated. You should use
-`--kconfig-add=make:kselftest-merge` instead.
-
-This target merges some configuration required by `kselftest` in the kernel
-configuration. It will run after the `config` target. Note that `kselftest`
-does not require this, so if you want `kselftest-merge` to be built, it needs
-to be specified explicitly. If built, it will always be built before
-`kselftest` itself.
-
 ## clang-analyzer
 
 This target run check with clang static analyzer.
