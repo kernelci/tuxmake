@@ -21,3 +21,6 @@ Homepage = "https://tuxmake.org/"
 
 [project.scripts]
 tuxmake = "tuxmake.cli:main"
+
+[tool.flit.sdist]
+include = ["test/", "Makefile", "tuxmake.rst", "scripts/", "docs/", "LICENSE"]
