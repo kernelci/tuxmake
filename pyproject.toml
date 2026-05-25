@@ -1,17 +1,23 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=3.2,<5"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "tuxmake"
-author = "Antonio Terceiro"
-author-email = "antonio.terceiro@linaro.org"
-maintainer = "Anders Roxell, Ben Copeland"
-maintainer-email = "anders.roxell@linaro.org, ben.copeland@linaro.org"
-home-page = "https://tuxmake.org/"
-description-file = "README.md"
+[project]
+name = "tuxmake"
+authors = [
+    {name = "Antonio Terceiro", email = "antonio.terceiro@linaro.org"},
+]
+maintainers = [
+    {name = "Anders Roxell", email = "anders.roxell@linaro.org"},
+    {name = "Ben Copeland", email = "ben.copeland@linaro.org"},
+]
+readme = "README.md"
 classifiers = ["License :: OSI Approved :: MIT License"]
 requires-python = ">=3.6"
+dynamic = ["version", "description"]
 
-[tool.flit.scripts]
+[project.urls]
+Homepage = "https://tuxmake.org/"
+
+[project.scripts]
 tuxmake = "tuxmake.cli:main"
