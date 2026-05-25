@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "tuxmake"
 authors = [
-    {name = "Antonio Terceiro", email = "antonio.terceiro@linaro.org"},
+    {name = "Antonio Terceiro"},
 ]
 maintainers = [
     {name = "Anders Roxell", email = "anders.roxell@linaro.org"},
