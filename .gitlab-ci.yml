@@ -275,7 +275,7 @@ pkg:
       - dist/*.pkg.tar.zst
 
 packages:
-  image: debian:bullseye
+  image: debian:trixie
   stage: build
   extends: .tuxmake
   only:
@@ -294,7 +294,7 @@ packages:
 
 trigger_tuxsuite:
   stage: .post
-  image: debian:bullseye
+  image: debian:trixie
   before_script:
     - apt update
     - apt install -y curl
