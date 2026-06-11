@@ -109,6 +109,13 @@ class TestEarlyMetadataWrite:
         assert "results" not in data
 
 
+class TestCompilerInBuildLog:
+    def test_compiler_logged(self, build):
+        log = (build.output_dir / "build.log").read_text()
+        version_full = build.metadata["compiler"]["version_full"]
+        assert f"# compiler: {version_full}" in log
+
+
 class TestKernelVersion:
     def test_happy_path(self, build):
         assert type(build.metadata["source"]["kernelversion"]) is str
