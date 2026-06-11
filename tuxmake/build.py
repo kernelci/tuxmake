@@ -849,6 +849,10 @@ class Build:
                 self.collect_metadata_early()
             self.save_metadata()
 
+            version_full = self.metadata.get("compiler", {}).get("version_full")
+            if version_full:
+                self.log(f"# compiler: {version_full}")
+
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):
                     self.build_all_targets()
