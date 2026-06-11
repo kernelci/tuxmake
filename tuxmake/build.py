@@ -674,7 +674,11 @@ class Build:
         s = [info.failed for info in self.status.values()]
         return s and True in set(s)
 
-    def collect_metadata(self):
+    def collect_metadata_early(self):
+        """
+        Collect the metadata we already know after prepare(). We write this
+        before the build starts, so it survives a hard kill during the build.
+        """
         self.metadata["build"] = {
             "targets": [t.name for t in self.targets],
             "target_arch": self.target_arch.name,
@@ -688,6 +692,11 @@ class Build:
             "verbose": self.verbose,
             "reproducer_cmdline": self.cmdline.reproduce(self),
         }
+        self.metadata["tuxmake"] = {"version": __version__}
+        self.metadata["runtime"] = self.runtime.get_metadata()
+        self.metadata.update(self.metadata_collector.collect_early())
+
+    def collect_metadata(self):
         errors, warnings = self.parse_log()
         self.metadata["results"] = {
             "status": (
@@ -708,16 +717,14 @@ class Build:
             "warnings": warnings,
             "duration": self.__durations__,
         }
-        self.metadata["tuxmake"] = {"version": __version__}
-        self.metadata["runtime"] = self.runtime.get_metadata()
-
-        extracted = self.metadata_collector.collect()
-        self.metadata.update(extracted)
+        self.metadata.update(self.metadata_collector.collect_late())
 
     def save_metadata(self):
-        with (self.output_dir / "metadata.json").open("w") as f:
-            f.write(json.dumps(self.metadata, indent=4, sort_keys=True))
-            f.write("\n")
+        # Atomic rename, so a hard kill mid-write can't leave a half-written file.
+        path = self.output_dir / "metadata.json"
+        tmp = self.output_dir / "metadata.json.tmp"
+        tmp.write_text(json.dumps(self.metadata, indent=4, sort_keys=True) + "\n")
+        os.replace(tmp, path)
 
     def parse_log(self):
         parser = LogParser()
@@ -837,6 +844,10 @@ class Build:
 
             prepared = True
             self.log(quote_command_line(self.cmdline.reproduce(self)))
+
+            with self.measure_duration("Early Metadata Extraction"):
+                self.collect_metadata_early()
+            self.save_metadata()
 
             with self.go_offline():
                 with self.measure_duration("Build", metadata="build"):

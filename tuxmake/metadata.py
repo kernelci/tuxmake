@@ -7,6 +7,10 @@ from tuxmake.config import ConfigurableObject
 from tuxmake.exceptions import UnsupportedMetadata
 from tuxmake.exceptions import UnsupportedMetadataType
 
+# These handlers only need the prepared build, not the build result. We collect
+# them early so the data survives a hard kill like SIGKILL or OOM.
+EARLY_METADATA_HANDLERS = ["compiler", "git", "hardware", "os", "tools", "uname"]
+
 
 class MetadataItemExtactor(ABC):
     def __init__(self, build):
@@ -57,7 +61,17 @@ class MetadataCollector:
         for _, _, extractor in self.each_extractor():
             extractor.before_build()
 
-    def collect(self):
+    def collect_early(self):
+        handlers = [h for h in self.handlers if h.name in EARLY_METADATA_HANDLERS]
+        return self.collect(handlers)
+
+    def collect_late(self):
+        handlers = [h for h in self.handlers if h.name not in EARLY_METADATA_HANDLERS]
+        return self.collect(handlers)
+
+    def collect(self, handlers=None):
+        if handlers is None:
+            handlers = self.handlers
         build = self.build
         compiler = build.toolchain.compiler(
             build.target_arch, build.makevars.get("CROSS_COMPILE", None)
@@ -67,7 +81,7 @@ class MetadataCollector:
                 key: build.format_cmd_part(cmd.replace("{compiler}", compiler))
                 for key, cmd in handler.commands.items()
             }
-            for handler in self.handlers
+            for handler in handlers
         }
         metadata_input = build.build_dir / "metadata.in.json"
         metadata_input.write_text(json.dumps(metadata_input_data))
@@ -81,11 +95,13 @@ class MetadataCollector:
             build.run_cmd(
                 ["perl", str(script), str(metadata_input)], echo=False, stdout=f
             )
-        metadata = self.read_json(stdout.read_text())
-        self.collect_extra_metadata(metadata)
+        metadata = self.read_json(stdout.read_text(), handlers)
+        self.collect_extra_metadata(metadata, handlers)
         return metadata
 
-    def read_json(self, metadata_json):
+    def read_json(self, metadata_json, handlers=None):
+        if handlers is None:
+            handlers = self.handlers
         if not metadata_json:
             return {}
         try:
@@ -96,7 +112,7 @@ class MetadataCollector:
             return {}
 
         result = {}
-        for handler in self.handlers:
+        for handler in handlers:
             for key in handler.commands.keys():
                 v = metadata[handler.name][key]
                 if v:
@@ -107,8 +123,11 @@ class MetadataCollector:
 
         return result
 
-    def collect_extra_metadata(self, metadata):
+    def collect_extra_metadata(self, metadata, handlers):
+        names = {handler.name for handler in handlers}
         for handler, item, extractor in self.each_extractor():
+            if handler not in names:
+                continue
             metadata.setdefault(handler, {})
             metadata[handler][item] = extractor.get()
 
