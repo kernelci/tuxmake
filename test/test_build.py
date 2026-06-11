@@ -42,6 +42,7 @@ def check_artifacts(mocker):
 # pretty slow.
 @pytest.fixture(autouse=True)
 def collect_metadata(mocker):
+    mocker.patch("tuxmake.build.Build.collect_metadata_early")
     return mocker.patch("tuxmake.build.Build.collect_metadata")
 
 

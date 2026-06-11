@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -84,6 +85,28 @@ class TestMetadata:
         source = next(c for c in cls if c.name == "source")
         git = next(c for c in cls if c.name == "git")
         assert cls.index(source) < cls.index(git)
+
+
+class TestEarlyMetadataWrite:
+    def test_metadata_written_before_build(self, build, linux, mocker):
+        b = Build(linux, target_arch="arm64")
+        captured = {}
+        original = b.build_all_targets
+
+        def capture(*args, **kwargs):
+            path = b.output_dir / "metadata.json"
+            captured["data"] = json.loads(path.read_text())
+            return original(*args, **kwargs)
+
+        mocker.patch.object(b, "build_all_targets", side_effect=capture)
+        b.run()
+
+        data = captured["data"]
+        assert "compiler" in data
+        assert "tuxmake" in data
+        assert "git" in data
+        # results need the finished build, so they must not be there yet
+        assert "results" not in data
 
 
 class TestKernelVersion:
