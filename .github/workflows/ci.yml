@@ -52,44 +52,66 @@ jobs:
 
   unit-tests:
     runs-on: ubuntu-latest
-    container:
-      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v4
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make shunit2 git ccache gcc perl findutils xz-utils bzip2
       - name: Install dependencies
         run: |
-          pip install -e . --break-system-packages
-          pip install -r requirements-dev.txt --break-system-packages
+          pip install -e .
+          pip install pytest pytest-cov pytest-mock
       - name: Run unit tests
         run: make unit-tests
 
   unit-tests-arm64:
     runs-on: ubuntu-24.04-arm
-    container:
-      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v4
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make shunit2 git ccache gcc perl findutils xz-utils bzip2
       - name: Install dependencies
         run: |
-          pip install -e . --break-system-packages
-          pip install -r requirements-dev.txt --break-system-packages
+          pip install -e .
+          pip install pytest pytest-cov pytest-mock
       - name: Run unit tests
         run: make unit-tests
 
   integration-tests:
     runs-on: ubuntu-latest
-    container:
-      image: registry.gitlab.com/linaro/tuxmake/ci-debian-12
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v4
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make shunit2 git ccache gcc perl findutils xz-utils bzip2 socat \
+            gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu clang lld
       - name: Install tuxmake
-        run: pip install -e . --break-system-packages
+        run: pip install -e .
       - name: Run integration tests
         run: make integration-tests TMV=1
 

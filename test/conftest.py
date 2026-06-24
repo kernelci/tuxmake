@@ -33,6 +33,10 @@ def session_home(tmpdir_factory):
 def home(monkeypatch, tmp_path):
     h = tmp_path / "HOME"
     monkeypatch.setenv("HOME", str(h))
+    # The config and cache dirs live under HOME. Drop the XDG variables
+    # so a value in the environment does not point the tests elsewhere.
+    monkeypatch.delenv("XDG_CONFIG_HOME", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
     return h
 
 

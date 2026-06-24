@@ -93,6 +93,11 @@ docker_in_docker() {
   docker_runtime && under_docker
 }
 
+offline_unavailable() {
+  # the offline test needs socat and a private network namespace
+  ! "${base}/tuxmake/runtime/bin/tuxmake-run-offline" true
+}
+
 program_installed() {
   /usr/bin/which "${@}" > /dev/null
 }
