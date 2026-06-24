@@ -21,7 +21,7 @@ BuildRequires: wget
 
 BuildArch: noarch
 
-Requires: python3 >= 3.6
+Requires: python3 >= 3.11
 Requires: perl-JSON-PP
 Recommends: socat
 
