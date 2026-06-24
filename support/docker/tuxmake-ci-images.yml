@@ -46,19 +46,6 @@
   variables:
     ARCH: arm64
 
-ci-debian-10-amd64:
-  extends: .build-ci-image-amd64
-  variables:
-    BASE: docker.io/library/debian:buster-slim
-
-ci-debian-10-arm64:
-  extends: .build-ci-image-arm64
-  variables:
-    BASE: docker.io/library/debian:buster-slim
-
-ci-debian-10:
-  extends: .publish-ci-image
-
 ci-debian-11-amd64:
   extends: .build-ci-image-amd64
   variables:
@@ -83,45 +70,6 @@ ci-debian-12-arm64:
     BASE: docker.io/library/debian:bookworm-slim
 
 ci-debian-12:
-  extends: .publish-ci-image
-
-ci-ubuntu-18.04-amd64:
-  extends: .build-ci-image-amd64
-  variables:
-    BASE: docker.io/library/ubuntu:18.04
-
-ci-ubuntu-18.04-arm64:
-  extends: .build-ci-image-arm64
-  variables:
-    BASE: docker.io/library/ubuntu:18.04
-
-ci-ubuntu-18.04:
-  extends: .publish-ci-image
-
-ci-ubuntu-20.04-amd64:
-  extends: .build-ci-image-amd64
-  variables:
-    BASE: docker.io/library/ubuntu:20.04
-
-ci-ubuntu-20.04-arm64:
-  extends: .build-ci-image-arm64
-  variables:
-    BASE: docker.io/library/ubuntu:20.04
-
-ci-ubuntu-20.04:
-  extends: .publish-ci-image
-
-ci-ubuntu-22.04-amd64:
-  extends: .build-ci-image-amd64
-  variables:
-    BASE: docker.io/library/ubuntu:22.04
-
-ci-ubuntu-22.04-arm64:
-  extends: .build-ci-image-arm64
-  variables:
-    BASE: docker.io/library/ubuntu:22.04
-
-ci-ubuntu-22.04:
   extends: .publish-ci-image
 
 ci-ubuntu-24.04-amd64:
