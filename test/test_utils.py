@@ -130,8 +130,9 @@ class TestDownloadFileWithProgress:
         mock_response.__enter__ = lambda x: mock_response
         mock_response.__exit__ = lambda x, y, z, w: None
 
-        with patch("urllib.request.Request") as mock_request, patch(
-            "urllib.request.urlopen", return_value=mock_response
+        with (
+            patch("urllib.request.Request") as mock_request,
+            patch("urllib.request.urlopen", return_value=mock_response),
         ):
             download_file_with_progress(
                 "http://example.com/file.txt", output_path, mock_logger
@@ -163,8 +164,9 @@ class TestDownloadFileWithProgress:
         mock_response.__enter__ = lambda x: mock_response
         mock_response.__exit__ = lambda x, y, z, w: None
 
-        with patch("urllib.request.Request"), patch(
-            "urllib.request.urlopen", return_value=mock_response
+        with (
+            patch("urllib.request.Request"),
+            patch("urllib.request.urlopen", return_value=mock_response),
         ):
             download_file_with_progress(
                 "http://example.com/file.txt", output_path, mock_logger
@@ -183,9 +185,11 @@ class TestDownloadFileWithProgress:
         mock_response.__enter__ = lambda x: mock_response
         mock_response.__exit__ = lambda x, y, z, w: None
 
-        with patch("urllib.request.Request"), patch(
-            "urllib.request.urlopen", return_value=mock_response
-        ), patch("builtins.print") as mock_print:
+        with (
+            patch("urllib.request.Request"),
+            patch("urllib.request.urlopen", return_value=mock_response),
+            patch("builtins.print") as mock_print,
+        ):
             download_file_with_progress("http://example.com/file.txt", output_path)
 
         assert output_path.read_bytes() == test_content
