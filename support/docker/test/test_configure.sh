@@ -42,9 +42,9 @@ test_gcc() {
     assertArg 'BASE=$(DOCKER_REGISTRY)$(PROJECT)/base' 'PACKAGES="gcc g++"'
 }
 
-test_gcc_11() {
-    get_build_args gcc-11
-    assertArg 'BASE=$(DOCKER_REGISTRY)$(PROJECT)/base-debian' 'PACKAGES="gcc-11 g++-11"'
+test_gcc_14() {
+    get_build_args gcc-14
+    assertArg 'BASE=$(DOCKER_REGISTRY)$(PROJECT)/base-debian' 'PACKAGES="gcc-14 g++-14"'
 }
 
 test_arm64_gcc() {
