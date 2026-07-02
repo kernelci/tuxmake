@@ -760,6 +760,7 @@ class Build:
     # Map the ones that differ.
     korg_arch_map = {
         "arm64": "aarch64",
+        "armel": "arm",
         "loongarch": "loongarch64",
         "openrisc": "or1k",
         "parisc": "hppa",
@@ -774,7 +775,7 @@ class Build:
         target_arch = self.korg_arch_map.get(
             self.target_arch.name, self.target_arch.name
         )
-        if self.target_arch.name == "arm":
+        if self.target_arch.name == "armel":
             suffix = f"{suffix}-gnueabi"
 
         # Calculate the cross compile tool prefix
