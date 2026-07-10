@@ -15,7 +15,7 @@ Architecture | Aliases     | Description              | Kernel   | Userspace
 alpha        |             | 64-bit RISC              | yes³     | no
 arc          |             | ARC                      | yes¹ ³   | no
 arm64        | *aarch64*   | 64-bit ARMv8             | yes      | yes
-armel        | *arm*, *armv5* | 32-bit ARM (soft-float)  | yes¹ ²   | yes
+armel        | *armv5*     | 32-bit ARM (soft-float)  | yes¹ ²   | yes
 armhf        | *arm*, *armv8l* | 32-bit ARM (hard-float)  | yes      | yes
 csky         |             | 32-bit                   | yes³     | no
 hexagon      |             | Qualcomm Hexagon (DSP6)  | yes²     | no
