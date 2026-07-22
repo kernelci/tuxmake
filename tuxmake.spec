@@ -1,5 +1,5 @@
 Name:      tuxmake
-Version:   1.42.0
+Version:   1.43.0
 Release:   0%{?dist}
 Summary:   Thin wrapper to build Linux kernels
 License:   Expat
@@ -63,6 +63,9 @@ install -m 644 bash_completion/tuxmake %{buildroot}/usr/share/bash-completion/co
 %license LICENSE
 
 %changelog
+* Wed Jul 22 2026 Anders Roxell <anders.roxell@linaro.org> - 1.43.0-1
+- Release 1.43.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.43.0
+
 * Wed Jul 08 2026 Anders Roxell <anders.roxell@linaro.org> - 1.42.0-1
 - Release 1.42.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.42.0
 

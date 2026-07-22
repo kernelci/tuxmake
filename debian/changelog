@@ -1,3 +1,9 @@
+tuxmake (1.43.0-1) UNRELEASED; urgency=medium
+
+  * Release 1.43.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.43.0
+
+ -- Anders Roxell <anders.roxell@linaro.org>  Wed, 22 Jul 2026 09:37:40 +0200
+
 tuxmake (1.42.0-1) UNRELEASED; urgency=medium
 
   * Release 1.42.0. See: https://github.com/kernelci/tuxmake/releases/tag/v1.42.0
