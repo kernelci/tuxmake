@@ -59,7 +59,8 @@ available.
         * **status**: target status: "PASS", "FAIL", or "SKIP" (string).
         * **duration**: duration of this target build, in seconds (number).
     - **artifacts**: key/value with target names (string) as keys, and list of
-      artifacts built for that target (list of strings).
+      artifacts built for that target (list of strings). Two keys are not
+      targets: `log` for the build logs, and `reproducer` for `reproducer.sh`.
     - **errors**: number of errors in the build (integer).
     - **warnings**: number of warnings in the build (integer).
 - **sccache**: sccache statistics.
