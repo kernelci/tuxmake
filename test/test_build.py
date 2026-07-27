@@ -1243,6 +1243,17 @@ class TestReproducible:
         ts = "KBUILD_BUILD_TIMESTAMP"
         assert build1.environment[ts] == build2.environment[ts]
 
+    def test_maps_the_build_dir(self, linux):
+        build = Build(tree=linux)
+        assert (
+            build.environment["KCFLAGS"]
+            == f"-ffile-prefix-map={build.build_dir}=/tuxmake"
+        )
+
+    def test_maps_the_build_dir_for_assembly_too(self, linux):
+        env = Build(tree=linux).environment
+        assert env["KAFLAGS"] == env["KCFLAGS"]
+
 
 class TestTerminated:
     def test_signal_handler_raises_exception(self):
