@@ -97,6 +97,11 @@ class TestModules:
     def test_depends_on_config(self, modules):
         assert modules.dependencies == ["config"]
 
+    def test_leaves_out_the_build_dir_symlinks(self, modules):
+        tar = modules.commands[2]
+        assert "--exclude=lib/modules/*/build" in tar
+        assert "--exclude=lib/modules/*/source" in tar
+
 
 class TestDtbs:
     def test_commands(self, build):
