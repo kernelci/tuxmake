@@ -112,6 +112,10 @@ When this target is built, the `kernel` target is not.
 This target builds the Kernel modules. The modules are compressed in a tarball,
 which is copied into the output directory as `modules.tar.xz`.
 
+The `build` and `source` symlinks that `modules_install` creates are left out
+of the tarball. They point at the local build and source directories, so they
+are broken anywhere else, and they made the tarball different on every build.
+
 
 ## headers
 
