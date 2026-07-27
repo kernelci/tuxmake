@@ -55,10 +55,11 @@ class TestCommandLine:
         cmd = cmdline.reproduce(build)
         assert "--environment=FOO=BAR" in cmd
 
-    def test_environment_without_local_kcflags(self, cmdline):
+    @pytest.mark.parametrize("var", ["KCFLAGS", "KAFLAGS"])
+    def test_environment_without_local_prefix_map(self, cmdline, var):
         build = Build()
         cmd = cmdline.reproduce(build)
-        assert [o for o in cmd if o.startswith("--environment=KCFLAGS=")] == []
+        assert [o for o in cmd if o.startswith(f"--environment={var}=")] == []
 
     def test_environment_with_kcflags_from_the_user(self, cmdline):
         build = Build(environment={"KCFLAGS": "-Werror"})

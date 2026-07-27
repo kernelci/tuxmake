@@ -166,6 +166,10 @@ class Build:
         "O",
     ]
 
+    # Set from the local build dir, so they are left out of the reproducer
+    # command line. The next build sets its own.
+    LOCAL_ENVIRONMENT = ["KCFLAGS", "KAFLAGS"]
+
     def __init__(
         self,
         tree=".",
@@ -444,18 +448,21 @@ class Build:
         env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
         env["KBUILD_BUILD_USER"] = "tuxmake"
         env["KBUILD_BUILD_HOST"] = "tuxmake"
-        env["KCFLAGS"] = f"-ffile-prefix-map={self.build_dir}/="
+        # No trailing slash: the compilation directory is the build dir
+        # itself, and a map with a slash does not match it.
+        prefix_map = f"-ffile-prefix-map={self.build_dir}=/tuxmake"
+        for var in self.LOCAL_ENVIRONMENT:
+            env[var] = prefix_map
         env.update(self.__environment_input__)
         self.__environment__ = env
         return self.__environment__
 
     @property
     def reproducible_environment(self):
-        # Our KCFLAGS points at the local build dir, so the next build has
-        # to set its own.
         env = dict(self.environment)
-        if "KCFLAGS" not in self.__environment_input__:
-            del env["KCFLAGS"]
+        for var in self.LOCAL_ENVIRONMENT:
+            if var not in self.__environment_input__:
+                del env[var]
         return env
 
     def get_silent(self):
