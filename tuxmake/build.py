@@ -290,7 +290,10 @@ class Build:
 
         self.offline = False
 
-        self.artifacts = {"log": ["build.log", "build-debug.log"]}
+        self.artifacts = {
+            "log": ["build.log", "build-debug.log"],
+            "reproducer": ["reproducer.sh"],
+        }
         self.__status__ = {}
         self.__durations__ = {}
         self.metadata_collector = MetadataCollector(self)
@@ -735,6 +738,15 @@ class Build:
         tmp.write_text(json.dumps(self.metadata, indent=4, sort_keys=True) + "\n")
         os.replace(tmp, path)
 
+    def save_reproducer(self):
+        # Atomic rename, so a hard kill mid-write can't leave a half-written file.
+        path = self.output_dir / "reproducer.sh"
+        tmp = self.output_dir / "reproducer.sh.tmp"
+        command = quote_command_line(self.cmdline.reproduce(self), " \\\n  ")
+        tmp.write_text(f"#!/bin/sh\nset -eu\nexec {command}\n")
+        tmp.chmod(0o755)
+        os.replace(tmp, path)
+
     def parse_log(self):
         parser = LogParser()
         parser.parse(self.output_dir / "build.log")
@@ -858,6 +870,7 @@ class Build:
             with self.measure_duration("Early Metadata Extraction"):
                 self.collect_metadata_early()
             self.save_metadata()
+            self.save_reproducer()
 
             version_full = self.metadata.get("compiler", {}).get("version_full")
             if version_full:

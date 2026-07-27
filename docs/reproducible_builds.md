@@ -61,6 +61,22 @@ the one Alice did on their side. The only artifact that will be different is
 `metadata.json` and `build.log`, because both include data about their local
 systems.
 
+## The reproducer script
+
+The same command line is also saved as `reproducer.sh` in the output directory.
+It is executable, so person A can just send the file to person B. B runs it
+from the root of the same kernel tree:
+
+```
+linux (master) $ /path/to/artifacts/reproducer.sh
+```
+
+The script does not set up the kernel tree. You have to be in the tree you want
+to build.
+
+The reproducer.sh is written before the build starts, so you also get it when
+the build fails.
+
 ## On container images
 
 As described above, the easiest way of ensuring a consistent build environment

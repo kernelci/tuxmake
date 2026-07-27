@@ -15,8 +15,8 @@ DOWNLOAD_CHUNK_SIZE = 2 * MB  # 2MB chunks for download performance
 PROGRESS_REPORT_CHUNK_SIZE = 1 * MB  # Report progress every 1MB for responsiveness
 
 
-def quote_command_line(cmd: List[str]) -> str:
-    return " ".join([shlex.quote(c) for c in cmd])
+def quote_command_line(cmd: List[str], separator: str = " ") -> str:
+    return separator.join([shlex.quote(c) for c in cmd])
 
 
 def get_directory_timestamp(directory):

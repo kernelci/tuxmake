@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import pytest
 import re
+import shlex
 import subprocess
 import shutil
 import urllib
@@ -967,6 +968,24 @@ class TestMetadata:
 
     def test_command_line(self, metadata):
         assert type(metadata["build"]["reproducer_cmdline"]) is list
+
+    @pytest.fixture(scope="class")
+    def reproducer(self, build):
+        return build.output_dir / "reproducer.sh"
+
+    def test_reproducer_script_written_for_failed_build(self, reproducer):
+        assert reproducer.read_text().startswith("#!/bin/sh\n")
+
+    def test_reproducer_script_is_executable(self, reproducer):
+        assert os.access(reproducer, os.X_OK)
+
+    def test_reproducer_script_runs_the_reproducer_cmdline(self, reproducer, metadata):
+        command = reproducer.read_text().split("\nexec ", 1)[1]
+        command = command.replace("\\\n", "")
+        assert shlex.split(command) == metadata["build"]["reproducer_cmdline"]
+
+    def test_reproducer_script_is_an_artifact(self, metadata):
+        assert metadata["results"]["artifacts"]["reproducer"] == ["reproducer.sh"]
 
 
 class TestParseLog:
