@@ -446,6 +446,15 @@ class Build:
         self.__environment__ = env
         return self.__environment__
 
+    @property
+    def reproducible_environment(self):
+        # Our KCFLAGS points at the local build dir, so the next build has
+        # to set its own.
+        env = dict(self.environment)
+        if "KCFLAGS" not in self.__environment_input__:
+            del env["KCFLAGS"]
+        return env
+
     def get_silent(self):
         if self.verbose:
             return []
