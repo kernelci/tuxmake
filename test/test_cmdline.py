@@ -55,6 +55,16 @@ class TestCommandLine:
         cmd = cmdline.reproduce(build)
         assert "--environment=FOO=BAR" in cmd
 
+    def test_environment_without_local_kcflags(self, cmdline):
+        build = Build()
+        cmd = cmdline.reproduce(build)
+        assert [o for o in cmd if o.startswith("--environment=KCFLAGS=")] == []
+
+    def test_environment_with_kcflags_from_the_user(self, cmdline):
+        build = Build(environment={"KCFLAGS": "-Werror"})
+        cmd = cmdline.reproduce(build)
+        assert "--environment=KCFLAGS=-Werror" in cmd
+
     def test_kconfig_add(self, cmdline):
         build = Build(kconfig_add=["foo.config", "bar.config"])
         cmd = cmdline.reproduce(build)

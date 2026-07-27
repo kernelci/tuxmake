@@ -326,7 +326,10 @@ class CommandLine:
             if option.key in self.ignore:
                 continue
             if hasattr(build, option.key):
-                value = getattr(build, option.key)
+                if option.key == "environment":
+                    value = build.reproducible_environment
+                else:
+                    value = getattr(build, option.key)
                 if not value:
                     continue
                 for c in option.expand(value):
