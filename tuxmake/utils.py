@@ -19,6 +19,28 @@ def quote_command_line(cmd: List[str], separator: str = " ") -> str:
     return separator.join([shlex.quote(c) for c in cmd])
 
 
+def get_git_dir(directory):
+    # In a git worktree, .git is a file that points at a directory outside
+    # the tree. Return that directory, so it can be made available to the
+    # build. Return None for a normal tree, where .git is inside it.
+    dotgit = directory / ".git"
+    if not dotgit.is_file():
+        return None
+    _, sep, after = dotgit.read_text().partition("gitdir:")
+    if not sep:
+        return None
+    gitdir = directory / Path(after.strip())
+    commondir = gitdir / "commondir"
+    if commondir.exists():
+        gitdir = gitdir / commondir.read_text().strip()
+    gitdir = gitdir.resolve()
+    if not gitdir.is_dir():
+        # The pointer can be stale. Mounting a path that is not there gives
+        # the build an empty dir, and then git finds no repo at all.
+        return None
+    return gitdir
+
+
 def get_directory_timestamp(directory):
     if (directory / ".git").exists():
         try:

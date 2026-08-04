@@ -3,6 +3,7 @@ import subprocess
 import pytest
 from unittest.mock import patch, MagicMock
 from tuxmake.utils import get_directory_timestamp
+from tuxmake.utils import get_git_dir
 from tuxmake.utils import retry
 from tuxmake.utils import download_file_with_progress
 from tuxmake.utils import prepare_file_from_source
@@ -308,3 +309,35 @@ class TestPrepareFileFromSource:
         mock_print.assert_called_once()
         print_call = mock_print.call_args[0][0]
         assert "Decompressing" in print_call
+
+
+class TestGetGitDir:
+    def test_worktree(self, tmp_path):
+        git_dir = tmp_path / "main" / ".git"
+        (git_dir / "worktrees" / "wt").mkdir(parents=True)
+        (git_dir / "worktrees" / "wt" / "commondir").write_text("../..\n")
+        tree = tmp_path / "wt"
+        tree.mkdir()
+        (tree / ".git").write_text(f"gitdir: {git_dir}/worktrees/wt\n")
+        assert get_git_dir(tree) == git_dir
+
+    def test_relative_gitdir(self, tmp_path):
+        # submodules write a relative gitdir, and no commondir
+        git_dir = tmp_path / "main" / ".git" / "modules" / "sub"
+        git_dir.mkdir(parents=True)
+        tree = tmp_path / "main" / "sub"
+        tree.mkdir(parents=True)
+        (tree / ".git").write_text("gitdir: ../.git/modules/sub\n")
+        assert get_git_dir(tree) == git_dir
+
+    def test_normal_tree(self, tmp_path):
+        (tmp_path / ".git").mkdir()
+        assert get_git_dir(tmp_path) is None
+
+    def test_dotgit_file_without_gitdir(self, tmp_path):
+        (tmp_path / ".git").write_text("something else\n")
+        assert get_git_dir(tmp_path) is None
+
+    def test_gitdir_that_does_not_exist(self, tmp_path):
+        (tmp_path / ".git").write_text(f"gitdir: {tmp_path}/gone\n")
+        assert get_git_dir(tmp_path) is None

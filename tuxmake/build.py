@@ -36,6 +36,7 @@ from tuxmake.cmdline import CommandLine
 from tuxmake.build_utils import defaults
 from tuxmake.utils import quote_command_line
 from tuxmake.utils import get_directory_timestamp
+from tuxmake.utils import get_git_dir
 from tuxmake.utils import prepare_file_from_source
 
 
@@ -377,6 +378,9 @@ class Build:
         self.runtime.source_dir = self.source_tree
         self.runtime.output_dir = self.output_dir
         self.runtime.add_volume(self.build_dir)
+        git_dir = get_git_dir(self.source_tree)
+        if git_dir:
+            self.runtime.add_volume(git_dir, ro=True)
         if self.prepare_korg_gcc:
             self.runtime.add_volume(self.korg_toolchains_dir)
         if self.wrapper.path:
