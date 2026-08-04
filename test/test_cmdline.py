@@ -55,7 +55,7 @@ class TestCommandLine:
         cmd = cmdline.reproduce(build)
         assert "--environment=FOO=BAR" in cmd
 
-    @pytest.mark.parametrize("var", ["KCFLAGS", "KAFLAGS"])
+    @pytest.mark.parametrize("var", ["KCFLAGS", "KAFLAGS", "KRUSTFLAGS"])
     def test_environment_without_local_prefix_map(self, cmdline, var):
         build = Build()
         cmd = cmdline.reproduce(build)

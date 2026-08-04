@@ -1243,14 +1243,22 @@ class TestReproducible:
         ts = "KBUILD_BUILD_TIMESTAMP"
         assert build1.environment[ts] == build2.environment[ts]
 
-    def test_maps_the_build_dir(self, linux):
+    def test_maps_the_build_dir_and_the_source_tree(self, linux):
         build = Build(tree=linux)
-        assert (
-            build.environment["KCFLAGS"]
-            == f"-ffile-prefix-map={build.build_dir}=/tuxmake"
+        # the build dir map comes last, the last map that matches wins
+        assert build.environment["KCFLAGS"] == (
+            f"-ffile-prefix-map={build.source_tree}/= "
+            f"-ffile-prefix-map={build.build_dir}=/tuxmake"
         )
 
-    def test_maps_the_build_dir_for_assembly_too(self, linux):
+    def test_maps_the_same_for_rust(self, linux):
+        build = Build(tree=linux)
+        assert build.environment["KRUSTFLAGS"] == (
+            f"--remap-path-prefix={build.source_tree}/= "
+            f"--remap-path-prefix={build.build_dir}=/tuxmake"
+        )
+
+    def test_maps_the_same_for_assembly(self, linux):
         env = Build(tree=linux).environment
         assert env["KAFLAGS"] == env["KCFLAGS"]
 

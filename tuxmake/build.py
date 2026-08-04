@@ -168,7 +168,7 @@ class Build:
 
     # Set from the local build dir, so they are left out of the reproducer
     # command line. The next build sets its own.
-    LOCAL_ENVIRONMENT = ["KCFLAGS", "KAFLAGS"]
+    LOCAL_ENVIRONMENT = ["KCFLAGS", "KAFLAGS", "KRUSTFLAGS"]
 
     def __init__(
         self,
@@ -448,11 +448,22 @@ class Build:
         env["KBUILD_BUILD_TIMESTAMP"] = "@" + self.timestamp
         env["KBUILD_BUILD_USER"] = "tuxmake"
         env["KBUILD_BUILD_HOST"] = "tuxmake"
-        # No trailing slash: the compilation directory is the build dir
-        # itself, and a map with a slash does not match it.
-        prefix_map = f"-ffile-prefix-map={self.build_dir}=/tuxmake"
-        for var in self.LOCAL_ENVIRONMENT:
-            env[var] = prefix_map
+        # The build dir has no trailing slash: the compilation directory is
+        # the build dir itself, and a map with a slash does not match it. The
+        # source tree has one, so the file names come out relative to it.
+        # The build dir comes last, the last map that matches wins, and the
+        # build dir can be inside the source tree.
+        prefix_map = (
+            f"-ffile-prefix-map={self.source_tree}/= "
+            f"-ffile-prefix-map={self.build_dir}=/tuxmake"
+        )
+        env["KCFLAGS"] = prefix_map
+        env["KAFLAGS"] = prefix_map
+        # rustc does not take the gcc spelling.
+        env["KRUSTFLAGS"] = (
+            f"--remap-path-prefix={self.source_tree}/= "
+            f"--remap-path-prefix={self.build_dir}=/tuxmake"
+        )
         env.update(self.__environment_input__)
         self.__environment__ = env
         return self.__environment__

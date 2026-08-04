@@ -37,6 +37,21 @@ configuration, tarballs containing headers/dtbs/modules/kselftest, etc. If
 you find any artifact that cannot be reproduced (minus the exceptions
 documented above), please send a bug report.
 
+## Paths in the debug info
+
+The build directory and the source tree would otherwise end up in the debug
+info, and they are different on every machine. TuxMake maps them away with
+`-ffile-prefix-map` in `KCFLAGS` and `KAFLAGS`, and `--remap-path-prefix` in
+`KRUSTFLAGS`. The build directory becomes `/tuxmake`, and the source files
+get names relative to the tree, the same as an in tree build.
+
+So a debugger does not find the sources on its own. Run it from the root of
+the kernel tree, or point it there:
+
+```
+(gdb) dir /path/to/linux
+```
+
 ## Example
 
 Alice does a local arm64 build, using a given kernel configuration.  At the top
