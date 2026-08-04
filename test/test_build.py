@@ -1263,6 +1263,23 @@ class TestReproducible:
         assert env["KAFLAGS"] == env["KCFLAGS"]
 
 
+class TestGitWorktree:
+    @pytest.fixture
+    def worktree(self, linux_rw, tmp_path, mocker):
+        mocker.patch("tuxmake.build.get_directory_timestamp", return_value="1")
+        git_dir = tmp_path / "main" / ".git"
+        (git_dir / "worktrees" / "wt").mkdir(parents=True)
+        (git_dir / "worktrees" / "wt" / "commondir").write_text("../..\n")
+        (linux_rw / ".git").write_text(f"gitdir: {git_dir}/worktrees/wt\n")
+        return linux_rw, git_dir
+
+    def test_mounts_the_git_dir(self, worktree, mocker, Popen):
+        tree, git_dir = worktree
+        add_volume = mocker.patch("tuxmake.runtime.Runtime.add_volume")
+        Build(tree=tree).prepare()
+        assert mocker.call(git_dir, ro=True) in add_volume.call_args_list
+
+
 class TestTerminated:
     def test_signal_handler_raises_exception(self):
         with pytest.raises(Terminated):
