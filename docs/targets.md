@@ -123,6 +123,10 @@ which is copied into the output directory as `headers.tar.xz`.
 Build the kernsel selftests. The resulting, installed tests are compressed in a
 tarball which is copied into the output directory as `kselftest.tar.xz`.
 
+This target depends on the `headers` target. The selftests build against the
+UAPI headers in the build directory, so they must be installed first. This is
+the same order the kernel uses for its own `make kselftest` target.
+
 TuxMake doesn't do anything special with regards to which tests are built, so
 by default it will build everything that kselftest builds by default. If you
 want to build a subset of the tests, you can use the same mechanism that you

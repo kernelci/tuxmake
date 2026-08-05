@@ -1124,10 +1124,10 @@ class TestKernel:
 
 
 class TestKselftest:
-    def test_kselftest_depends_on_config(self, linux):
+    def test_kselftest_depends_on_config_and_headers(self, linux):
         build = Build(tree=linux, targets=["kselftest"])
         names = [t.name for t in build.targets]
-        assert names == ["config", "kselftest"]
+        assert names == ["config", "headers", "kselftest"]
 
     def test_nonfatal_continues_on_failure(self, linux, mocker):
         b = Build(tree=linux, targets=["config"])
