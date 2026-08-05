@@ -120,7 +120,7 @@ which is copied into the output directory as `headers.tar.xz`.
 
 ## kselftest
 
-Build the kernsel selftests. The resulting, installed tests are compressed in a
+Build the kernel selftests. The resulting, installed tests are compressed in a
 tarball which is copied into the output directory as `kselftest.tar.xz`.
 
 This target depends on the `headers` target. The selftests build against the
