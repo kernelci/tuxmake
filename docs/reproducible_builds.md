@@ -45,6 +45,12 @@ info, and they are different on every machine. TuxMake maps them away with
 `KRUSTFLAGS`. The build directory becomes `/tuxmake`, and the source files
 get names relative to the tree, the same as an in tree build.
 
+You can pass your own `KCFLAGS`, `KAFLAGS` or `KRUSTFLAGS` with
+`--environment`. TuxMake then puts the maps in front of your flags, so the
+paths stay out of the debug info anyway. The maps only make sense on this
+machine, so the reproducer carries your flags and not the maps. You cannot
+turn the maps off. An empty value only means that nothing comes after them.
+
 So a debugger does not find the sources on its own. Run it from the root of
 the kernel tree, or point it there:
 

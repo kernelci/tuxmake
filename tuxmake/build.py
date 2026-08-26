@@ -461,22 +461,30 @@ class Build:
             f"-ffile-prefix-map={self.source_tree}/= "
             f"-ffile-prefix-map={self.build_dir}=/tuxmake"
         )
-        env["KCFLAGS"] = prefix_map
-        env["KAFLAGS"] = prefix_map
+        maps = dict.fromkeys(self.LOCAL_ENVIRONMENT, prefix_map)
         # rustc does not take the gcc spelling.
-        env["KRUSTFLAGS"] = (
+        maps["KRUSTFLAGS"] = (
             f"--remap-path-prefix={self.source_tree}/= "
             f"--remap-path-prefix={self.build_dir}=/tuxmake"
         )
         env.update(self.__environment_input__)
+        # The user can set these too. Keep our map in front, so the paths
+        # stay out of the debug info either way.
+        for var, prefix in maps.items():
+            given = self.__environment_input__.get(var)
+            env[var] = f"{prefix} {given}" if given else prefix
         self.__environment__ = env
         return self.__environment__
 
     @property
     def reproducible_environment(self):
         env = dict(self.environment)
+        # The maps hold paths from this machine, so drop them here. What the
+        # user passed can stay.
         for var in self.LOCAL_ENVIRONMENT:
-            if var not in self.__environment_input__:
+            if var in self.__environment_input__:
+                env[var] = self.__environment_input__[var]
+            else:
                 del env[var]
         return env
 
