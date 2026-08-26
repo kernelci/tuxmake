@@ -1262,6 +1262,31 @@ class TestReproducible:
         env = Build(tree=linux).environment
         assert env["KAFLAGS"] == env["KCFLAGS"]
 
+    def test_keeps_the_maps_when_the_user_passes_flags(self, linux):
+        build = Build(tree=linux, environment={"KCFLAGS": "-Werror"})
+        assert build.environment["KCFLAGS"] == (
+            f"-ffile-prefix-map={build.source_tree}/= "
+            f"-ffile-prefix-map={build.build_dir}=/tuxmake "
+            "-Werror"
+        )
+
+    def test_reproducer_keeps_only_the_flags_the_user_passed(self, linux):
+        build = Build(tree=linux, environment={"KCFLAGS": "-Werror"})
+        env = build.reproducible_environment
+        assert env["KCFLAGS"] == "-Werror"
+        assert "KAFLAGS" not in env
+        assert "KRUSTFLAGS" not in env
+
+    def test_keeps_an_empty_value_the_user_passed(self, linux):
+        build = Build(tree=linux, environment={"KCFLAGS": ""})
+        # nothing to put after the map, but the reproducer still says what
+        # the user asked for
+        assert build.environment["KCFLAGS"] == (
+            f"-ffile-prefix-map={build.source_tree}/= "
+            f"-ffile-prefix-map={build.build_dir}=/tuxmake"
+        )
+        assert build.reproducible_environment["KCFLAGS"] == ""
+
 
 class TestGitWorktree:
     @pytest.fixture
