@@ -105,11 +105,10 @@ class TestMakeVariables:
         assert args(builder).make_variables == {"FOO": "BAR"}
         assert args(builder).targets == ["config"]
 
-    def test_rejects_multiple_equal_signs(self, builder):
-        with pytest.raises(SystemExit) as exit:
-            tuxmake("FOO=BAR=QUX", "config")
-        builder.assert_not_called()
-        assert exit.value.code == 1
+    def test_value_with_equal_sign(self, builder):
+        tuxmake("KCFLAGS=-mcpu=cortex-a55", "config")
+        assert args(builder).make_variables == {"KCFLAGS": "-mcpu=cortex-a55"}
+        assert args(builder).targets == ["config"]
 
 
 class TestKConfig:
