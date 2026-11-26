@@ -12,7 +12,7 @@ from tuxmake.arch import Architecture
 from tuxmake.toolchain import Toolchain
 from tuxmake.build import Build
 from tuxmake.build_utils import supported
-from tuxmake.cmdline import build_parser
+from tuxmake.cmdline import build_parser, key_value
 from tuxmake.exceptions import TuxMakeException
 from tuxmake.runtime import Runtime
 
@@ -135,11 +135,7 @@ def main(*origargv):
 
     if options.targets:
         key_values = [arg for arg in options.targets if "=" in arg]
-        for kv in key_values:
-            if kv.count("=") > 1:
-                error(f"E: invalid KEY=VALUE: {kv}")
-                sys.exit(1)
-        options.make_variables = dict((arg.split("=") for arg in key_values))
+        options.make_variables = dict(key_value(arg) for arg in key_values)
         options.targets = [arg for arg in options.targets if "=" not in arg]
 
         kconfig_re = re.compile(r"^[\w\-]+config$")
